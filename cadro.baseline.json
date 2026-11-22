@@ -1,0 +1,85 @@
+{
+  "schema_version": 1,
+  "baseline": {
+    "name": "cadro-evaluation-baseline",
+    "observed_at": "2026-11-20",
+    "source_commit": "920f1d5b3d18142cf3c4cc6edf59e53950a7832b",
+    "source_branch": "tr-translation-complete",
+    "release_status": "evaluation-only",
+    "production_approved": false
+  },
+  "components": [
+    {
+      "name": "erpnext",
+      "repository": "https://github.com/frappe/erpnext",
+      "ref": "develop",
+      "commit": "920f1d5b3d18142cf3c4cc6edf59e53950a7832b",
+      "purpose": "ERP and CADRO technical application base",
+      "channel": "development",
+      "production_approved": false
+    },
+    {
+      "name": "frappe",
+      "repository": "https://github.com/frappe/frappe",
+      "ref": "develop",
+      "commit": "96c27e16ed5cfcfaf27d1db2f40c5c7acf871bbd",
+      "purpose": "Framework, authentication, API and local UI source",
+      "channel": "development",
+      "production_approved": false
+    },
+    {
+      "name": "payments",
+      "repository": "https://github.com/frappe/payments",
+      "ref": "develop",
+      "commit": "d6df15a6ce91e508d58fe34ba53e27f3b63d344e",
+      "purpose": "Existing optional payment application integration",
+      "channel": "development",
+      "production_approved": false
+    }
+  ],
+  "references": [
+    {
+      "name": "stable-line-evaluation-erpnext",
+      "repository": "https://github.com/frappe/erpnext",
+      "ref": "v16.23.0",
+      "commit": "b1ca423e119e14c8edb54138c3be4b493b71834e",
+      "purpose": "Backport analysis candidate only; no framework pairing established"
+    }
+  ],
+  "integration_tests": [
+    {
+      "manifest": "yarn.lock",
+      "declared_in": "package.json",
+      "locked_dependencies": true
+    },
+    {
+      "manifest": "banking/yarn.lock",
+      "declared_in": "banking/package.json",
+      "locked_dependencies": true
+    },
+    {
+      "manifest": "islands/yarn.lock",
+      "declared_in": "islands/package.json",
+      "locked_dependencies": true
+    },
+    {
+      "manifest": "pyproject.toml",
+      "declared_in": "erpnext/__init__.py",
+      "locked_dependencies": false
+    }
+  ],
+  "pending": [
+    {
+      "area": "stable_release_line",
+      "reason": "Compare v17 evaluation features and migration cost against an ERPNext/Frappe v16 pair before production."
+    },
+    {
+      "area": "runtime_images_and_tools",
+      "reason": "Container digests, system packages and exact Python/Node/Yarn runtime patch versions are not fixed by this repository."
+    },
+    {
+      "area": "sbom_and_licenses",
+      "reason": "Pinned app commits do not constitute a full dependency, license, container or vulnerability inventory."
+    }
+  ]
+}

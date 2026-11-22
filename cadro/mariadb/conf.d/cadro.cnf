@@ -1,0 +1,24 @@
+[mysqld]
+# CADRO staging deployment — MariaDB configuration
+#
+# These settings are appropriate for a pilot/evaluation environment.
+# Production: review buffer pool, log file sizes and durability settings.
+
+character-set-server = utf8mb4
+collation-server     = utf8mb4_unicode_ci
+
+# InnoDB defaults for ERP workloads — adjust based on dataset size
+innodb_buffer_pool_size = 512M
+innodb_log_file_size    = 256M
+innodb_flush_method     = O_DIRECT
+innodb_file_per_table   = 1
+
+# Connection limits
+max_connections         = 200
+thread_cache_size       = 16
+
+# Durability settings (safe for staging/pilot)
+innodb_flush_log_at_trx_commit = 2
+sync_binlog                     = 1
+
+bind-address = 0.0.0.0

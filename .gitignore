@@ -23,3 +23,13 @@ node_modules/
 # Banking SPA
 erpnext/public/banking
 erpnext/www/banking.html
+
+# CADRO SaaS control-plane SQLite database (runtime artifact)
+cadro/control_plane.db
+
+# CADRO Docker Compose env file (contains passwords)
+cadro/.env
+
+# Yarn cache / install artifacts (kept in yarn.lock)
+.yarn/
+.pnp.*

@@ -1,0 +1,118 @@
+# CADRO staging / pilot deployment
+
+# This compose file is intended for evaluation and controlled pilot runs.
+# It does NOT claim production readiness or HA. Use CADRO baseline pins,
+# not the upstream develop branches, for reproducible builds.
+
+# Prerequisites:
+#   FRAPPE_BENCH_PATH    - host path that will hold the persistent bench
+#   DB_PASSWORD          - MariaDB root password (generate once)
+#   SITE_NAME            - Frappe site name (e.g. cadro-pilot.localhost)
+#   ADMIN_PASSWORD       - Administrator password for the site
+
+version: "3.8"
+
+services:
+  db:
+    image: mariadb:11.8
+    container_name: cadro-db
+    restart: unless-stopped
+    environment:
+      MARIADB_ROOT_PASSWORD: ${DB_PASSWORD:?required}
+    volumes:
+      - db-data:/var/lib/mysql
+      - ./cadro/mariadb/conf.d:/etc/mysql/conf.d:ro
+    healthcheck:
+      test: ["CMD", "mariadb-admin", "ping", "--silent"]
+      interval: 10s
+      retries: 5
+      start_period: 30s
+    networks:
+      - cadro-net
+
+  redis-cache:
+    image: redis:7-alpine
+    container_name: cadro-redis-cache
+    restart: unless-stopped
+    command: redis-server --appendonly no --save ""
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      retries: 3
+    networks:
+      - cadro-net
+
+  redis-queue:
+    image: redis:7-alpine
+    container_name: cadro-redis-queue
+    restart: unless-stopped
+    command: redis-server --appendonly no --save ""
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      retries: 3
+    networks:
+      - cadro-net
+
+  redis-socketio:
+    image: redis:7-alpine
+    container_name: cadro-redis-socketio
+    restart: unless-stopped
+    command: redis-server --appendonly no --save ""
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      retries: 3
+    networks:
+      - cadro-net
+
+  bench:
+    build:
+      context: .
+      dockerfile: cadro/Dockerfile
+      args:
+        - PYTHON_VERSION=3.14
+        - NODE_MAJOR=24
+    image: cadro-bench:eval
+    container_name: cadro-bench
+    restart: unless-stopped
+    depends_on:
+      db:
+        condition: service_healthy
+      redis-cache:
+        condition: service_healthy
+      redis-queue:
+        condition: service_healthy
+      redis-socketio:
+        condition: service_healthy
+    environment:
+      - DB_HOST=db
+      - DB_PORT=3306
+      - DB_PASSWORD=${DB_PASSWORD:?required}
+      - SITE_NAME=${SITE_NAME:?required}
+      - ADMIN_PASSWORD=${ADMIN_PASSWORD:?required}
+      - CADRO_LANGUAGE=${CADRO_LANGUAGE:-tr}
+      - CADRO_COUNTRY=${CADRO_COUNTRY:-Türkiye}
+      - CADRO_TIME_ZONE=${CADRO_TIME_ZONE:-Europe/Istanbul}
+    ports:
+      - "8001:8000"
+    volumes:
+      - bench-data:/home/frappe/cadro-data
+    mem_limit: 4g
+    mem_reservation: 1g
+    healthcheck:
+      test: ["CMD", "python", "scripts/healthcheck.py", "--site", "${SITE_NAME:?required}"]
+      interval: 30s
+      retries: 10
+      start_period: 600s
+      timeout: 20s
+    networks:
+      - cadro-net
+
+volumes:
+  db-data:
+  bench-data:
+
+networks:
+  cadro-net:
+    driver: bridge

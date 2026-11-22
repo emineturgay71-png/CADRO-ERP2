@@ -1,0 +1,19 @@
+# Parallel CADRO test stack (does not touch the existing "cadro" stack).
+# Usage (from repo root):
+#   $env:SITE_NAME = "cadro-tr.localhost"
+#   docker compose -p cadro-trtest --project-directory . --env-file cadro/.env `
+#     -f cadro/docker-compose.yml -f cadro/docker-compose.trtest.yml up -d --build
+services:
+  db:
+    container_name: cadro-trtest-db
+  redis-cache:
+    container_name: cadro-trtest-redis-cache
+  redis-queue:
+    container_name: cadro-trtest-redis-queue
+  redis-socketio:
+    container_name: cadro-trtest-redis-socketio
+  bench:
+    container_name: cadro-trtest-bench
+    image: cadro-bench:tr-test
+    ports: !override
+      - "8002:8000"
