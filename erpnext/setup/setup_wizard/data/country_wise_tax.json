@@ -5040,10 +5040,123 @@
 		}
 	},
 
-	"Turkey": {
-		"Turkey Tax": {
-			"account_name": "VAT 18%",
-			"tax_rate": 18.00
+	"T\u00fcrkiye": {
+		"chart_of_accounts": {
+			"Turkey - Chart of Accounts": {
+				"sales_tax_templates": [
+					{
+						"title": "KDV %20",
+						"is_default": 1,
+						"taxes": [
+							{
+								"account_head": {
+									"account_name": "% 20 HESAPLANAN KDV",
+									"account_number": "391.01.04",
+									"tax_rate": 20.00
+								}
+							}
+						]
+					},
+					{
+						"title": "KDV %10",
+						"taxes": [
+							{
+								"account_head": {
+									"account_name": "% 10 HESAPLANAN KDV",
+									"account_number": "391.01.05",
+									"tax_rate": 10.00
+								}
+							}
+						]
+					},
+					{
+						"title": "KDV %1",
+						"taxes": [
+							{
+								"account_head": {
+									"account_name": "% 1 HESAPLANAN KDV",
+									"account_number": "391.01.03",
+									"tax_rate": 1.00
+								}
+							}
+						]
+					}
+				],
+				"purchase_tax_templates": [
+					{
+						"title": "KDV %20",
+						"is_default": 1,
+						"taxes": [
+							{
+								"account_head": {
+									"account_name": "% 20'L\u0130K \u0130ND\u0130R\u0130LECEK KDV",
+									"account_number": "191.01.04",
+									"root_type": "Asset",
+									"tax_rate": 20.00
+								}
+							}
+						]
+					},
+					{
+						"title": "KDV %10",
+						"taxes": [
+							{
+								"account_head": {
+									"account_name": "% 10'L\u0130K \u0130ND\u0130R\u0130LECEK KDV",
+									"account_number": "191.01.05",
+									"root_type": "Asset",
+									"tax_rate": 10.00
+								}
+							}
+						]
+					},
+					{
+						"title": "KDV %1",
+						"taxes": [
+							{
+								"account_head": {
+									"account_name": "% 1'L\u0130K \u0130ND\u0130R\u0130LECEK KDV",
+									"account_number": "191.01.03",
+									"root_type": "Asset",
+									"tax_rate": 1.00
+								}
+							}
+						]
+					}
+				]
+			},
+			"*": {
+				"sales_tax_templates": [
+					{
+						"title": "KDV %20",
+						"is_default": 1,
+						"taxes": [{"account_head": {"account_name": "Hesaplanan KDV %20", "tax_rate": 20.00}}]
+					},
+					{
+						"title": "KDV %10",
+						"taxes": [{"account_head": {"account_name": "Hesaplanan KDV %10", "tax_rate": 10.00}}]
+					},
+					{
+						"title": "KDV %1",
+						"taxes": [{"account_head": {"account_name": "Hesaplanan KDV %1", "tax_rate": 1.00}}]
+					}
+				],
+				"purchase_tax_templates": [
+					{
+						"title": "KDV %20",
+						"is_default": 1,
+						"taxes": [{"account_head": {"account_name": "\u0130ndirilecek KDV %20", "tax_rate": 20.00}}]
+					},
+					{
+						"title": "KDV %10",
+						"taxes": [{"account_head": {"account_name": "\u0130ndirilecek KDV %10", "tax_rate": 10.00}}]
+					},
+					{
+						"title": "KDV %1",
+						"taxes": [{"account_head": {"account_name": "\u0130ndirilecek KDV %1", "tax_rate": 1.00}}]
+					}
+				]
+			}
 		}
 	},
 

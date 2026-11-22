@@ -294,6 +294,10 @@ def get_balance_on(
 			order_by="lft",
 		)
 
+		# `gle.account in ()` is invalid SQL; no accounts of this type means no balance.
+		if not accounts:
+			return 0.0
+
 		cond.append(
 			"""
 			gle.account in (%s)

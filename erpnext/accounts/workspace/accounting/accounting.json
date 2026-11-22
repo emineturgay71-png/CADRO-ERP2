@@ -881,6 +881,7 @@
    "link_to": "Lower Deduction Certificate",
    "link_type": "DocType",
    "onboard": 0,
+   "only_for": "India",
    "type": "Link"
   },
   {

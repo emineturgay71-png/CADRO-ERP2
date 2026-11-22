@@ -8,6 +8,8 @@ import os
 import frappe
 from frappe import _
 
+from erpnext.regional import get_country_package
+
 
 def setup_taxes_and_charges(company_name: str, country: str):
 	if not frappe.db.exists("Company", company_name):
@@ -119,11 +121,12 @@ def from_detailed_data(company_name, data):
 
 
 def update_regional_tax_settings(country, company):
-	path = frappe.get_app_path("erpnext", "regional", frappe.scrub(country))
+	package = get_country_package(country)
+	path = frappe.get_app_path("erpnext", "regional", package)
 	if os.path.exists(path.encode("utf-8")):
 		frappe.db.savepoint("regional_tax_settings")
 		try:
-			module_name = f"erpnext.regional.{frappe.scrub(country)}.setup.update_regional_tax_settings"
+			module_name = f"erpnext.regional.{package}.setup.update_regional_tax_settings"
 			frappe.get_attr(module_name)(country, company)
 		except (ImportError, AttributeError):
 			pass

@@ -8,6 +8,15 @@ from frappe.model.rename_doc import rename_doc
 
 from erpnext import get_region
 
+# Country names whose regional package does not follow frappe.scrub(country).
+# Frappe names the country "Türkiye", the package is erpnext.regional.turkey.
+COUNTRY_PACKAGE_ALIASES = {"Türkiye": "turkey"}
+
+
+def get_country_package(country: str) -> str:
+	"""Return the erpnext.regional sub-package name for a country."""
+	return COUNTRY_PACKAGE_ALIASES.get(country) or frappe.scrub(country)
+
 
 def check_deletion_permission(doc, method):
 	region = get_region(doc.company)

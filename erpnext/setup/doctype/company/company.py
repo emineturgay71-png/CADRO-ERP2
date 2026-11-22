@@ -29,6 +29,7 @@ from erpnext.accounts.doctype.account.account import get_account_currency
 from erpnext.accounts.doctype.financial_report_template.financial_report_template import (
 	sync_financial_report_templates,
 )
+from erpnext.regional import get_country_package
 from erpnext.setup.doctype.terms_and_conditions.terms_and_conditions import validate_terms_and_conditions
 from erpnext.setup.setup_wizard.operations.taxes_setup import setup_taxes_and_charges
 from erpnext.stock.utils import check_pending_reposting
@@ -1073,7 +1074,7 @@ def get_name_with_abbr(name, company):
 
 def install_country_fixtures(company, country):
 	try:
-		module_name = f"erpnext.regional.{frappe.scrub(country)}.setup.setup"
+		module_name = f"erpnext.regional.{get_country_package(country)}.setup.setup"
 		frappe.get_attr(module_name)(company, False)
 	except ImportError:
 		pass
