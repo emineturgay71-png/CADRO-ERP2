@@ -204,6 +204,8 @@ set_single time_zone "${CADRO_TIME_ZONE}"
 set_single date_format "${CADRO_DATE_FORMAT}"
 set_single number_format "${CADRO_NUMBER_FORMAT}"
 set_single first_day_of_the_week Monday
+bench --site "${SITE_NAME}" execute erpnext.regional.sync_system_defaults || \
+    echo "WARNING: could not sync System Settings into global defaults"
 bench --site "${SITE_NAME}" execute frappe.db.set_value \
     --args "[\"User\", \"Administrator\", \"language\", \"${CADRO_LANGUAGE}\"]" || \
     echo "WARNING: could not set Administrator language"

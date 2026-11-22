@@ -825,3 +825,34 @@ msgstr "Bu çalışma alanının ait olduğu modül. Hangi modülün dock giriş
 #. phase 7
 msgid "Empty State Message"
 msgstr "Boş Durum Mesajı"
+#. banking
+msgid "This Week"
+msgstr "Bu Hafta"
+
+#. banking
+msgid "This Month"
+msgstr "Bu Ay"
+
+#. banking
+msgid "This Quarter"
+msgstr "Bu Çeyrek"
+
+#. banking
+msgid "This Year"
+msgstr "Bu Yıl"
+
+#. banking
+msgid "Last Week"
+msgstr "Geçen Hafta"
+
+#. banking
+msgid "Last Quarter"
+msgstr "Geçen Çeyrek"
+
+#. banking
+msgid "Last Year"
+msgstr "Geçen Yıl"
+
+#. banking
+msgid "Date Range"
+msgstr "Tarih Aralığı"

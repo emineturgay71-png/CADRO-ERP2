@@ -18,6 +18,17 @@ def get_country_package(country: str) -> str:
 	return COUNTRY_PACKAGE_ALIASES.get(country) or frappe.scrub(country)
 
 
+def sync_system_defaults():
+	"""Copy System Settings (language, date/number format, ...) into the global defaults.
+
+	System Settings.on_update does this on save. Values written straight to the database,
+	as the CADRO provisioning does, skip it and the desk keeps showing the old defaults.
+	"""
+	frappe.get_doc("System Settings").set_defaults()
+	frappe.db.commit()
+	frappe.clear_cache()
+
+
 def check_deletion_permission(doc, method):
 	region = get_region(doc.company)
 	if region in ["Nepal"] and doc.docstatus != 0:

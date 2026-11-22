@@ -96,6 +96,7 @@ services:
       - CADRO_TIME_ZONE=${CADRO_TIME_ZONE:-Europe/Istanbul}
     ports:
       - "8001:8000"
+      - "9000:9000"
     volumes:
       - bench-data:/home/frappe/cadro-data
     mem_limit: 4g
