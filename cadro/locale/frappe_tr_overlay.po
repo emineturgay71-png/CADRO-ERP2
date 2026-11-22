@@ -1,0 +1,827 @@
+# CADRO Turkish overlay translations.
+#
+# Fixes for strings that are untranslated or missing in the upstream frappe/erpnext
+# catalogs. Applied on top of erpnext's tr.po at container start (see cadro/entrypoint.sh
+# and cadro/locale/merge_po.py). Phase tag in the comment shows where it was found.
+msgid ""
+msgstr ""
+"Project-Id-Version: cadro\n"
+"Language: tr\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+
+#. phase 0
+msgid "All apps"
+msgstr "Tüm uygulamalar"
+
+#. phase 0
+msgid "Breadcrumb"
+msgstr "Gezinti yolu"
+
+#. phase 0
+msgid "Collapse sidebar"
+msgstr "Kenar çubuğunu daralt"
+
+#. phase 0
+msgid "Sidebar Menu"
+msgstr "Kenar Çubuğu Menüsü"
+
+#. phase 0
+msgid "More Options"
+msgstr "Diğer Seçenekler"
+
+#. phase 0
+msgid "Geo"
+msgstr "Coğrafi"
+
+#. phase 0
+msgid "Website"
+msgstr "Web Sitesi"
+
+#. phase 0
+msgid "Access"
+msgstr "Erişim"
+
+#. phase 0
+msgid "Add attachment"
+msgstr "Ek ekle"
+
+#. phase 0
+msgid "Last Edited By You"
+msgstr "Son Düzenleyen: Siz"
+
+#. phase 0
+msgid "Add User"
+msgstr "Kullanıcı Ekle"
+
+#. phase 0
+msgid "Failed Scheduled Jobs"
+msgstr "Başarısız Zamanlanmış İşler"
+
+#. phase 0
+msgid "Good morning"
+msgstr "Günaydın"
+
+#. phase 0
+msgid "1 filter applied"
+msgstr "1 filtre uygulandı"
+
+#. phase 0
+msgid "Clear all filters"
+msgstr "Tüm filtreleri temizle"
+
+#. phase 0
+msgid "Clear the filters to see all records."
+msgstr "Tüm kayıtları görmek için filtreleri temizleyin."
+
+#. phase 0
+msgid "Profiles"
+msgstr "Profiller"
+
+#. phase 0
+msgid "AI Agents"
+msgstr "Yapay Zeka Ajanları"
+
+#. phase 0
+msgid "Your customers, ranked by what you deliver to them."
+msgstr "Müşterileriniz, onlara teslim ettiklerinize göre sıralı."
+
+#. phase 0
+msgid "Your income and expenses over the year, and what's left as profit."
+msgstr "Yıl boyunca gelir ve giderleriniz ve kâr olarak geriye kalan."
+
+#. phase 0
+msgid "Good afternoon"
+msgstr "İyi günler"
+
+#. phase 0
+msgid "Good evening"
+msgstr "İyi akşamlar"
+
+
+#. phase 1
+msgid "Background color"
+msgstr "Arka plan rengi"
+
+#. phase 1
+msgid "Font size"
+msgstr "Yazı tipi boyutu"
+
+#. phase 1
+msgid "Text color"
+msgstr "Metin rengi"
+
+#. phase 1
+msgid "Text style"
+msgstr "Metin stili"
+
+#. phase 1
+msgid "Optional"
+msgstr "İsteğe bağlı"
+
+#. phase 1
+msgid "Play video"
+msgstr "Videoyu oynat"
+
+#. phase 1
+msgid "No {0} created"
+msgstr "{0} oluşturulmadı"
+
+#. phase 1
+msgid "{0} of {1} steps done"
+msgstr "{0} / {1} adım tamamlandı"
+
+#. phase 1
+msgid "{0} of {1} done · {2} skipped"
+msgstr "{0} / {1} tamamlandı · {2} atlandı"
+
+#. phase 1
+msgid "Your budgets against what you actually spent."
+msgstr "Bütçeleriniz ve fiilen harcadıklarınız."
+#. phase 1
+msgid "What you bill your customers each month."
+msgstr "Müşterilerinize her ay faturalandırdığınız tutar."
+
+#. phase 2-3
+msgid "Naming Series"
+msgstr "Adlandırma Serisi"
+
+#. phase 2
+msgid "Where your purchase orders stand: to receive, to bill, or done."
+msgstr "Satın alma siparişlerinizin durumu: teslim alınacak, faturalanacak veya tamamlandı."
+
+#. phase 3
+msgid "New leads coming in each week."
+msgstr "Her hafta gelen yeni potansiyel müşteriler."
+
+#. phase 3
+msgid "Sales orders still waiting to be delivered or billed."
+msgstr "Teslim edilmeyi veya faturalanmayı bekleyen satış siparişleri."
+#. phase 4
+msgid "Set the filters and generate a new one."
+msgstr "Filtreleri ayarlayıp yenisini oluşturun."
+
+#. phase 4
+msgid "This is a background report"
+msgstr "Bu bir arka plan raporudur"
+
+#. phase 4
+msgid "Last"
+msgstr "Son"
+
+#. phase 4
+msgid "Next page"
+msgstr "Sonraki sayfa"
+
+#. phase 4
+msgid "Previous page"
+msgstr "Önceki sayfa"
+
+#. phase 5
+msgid "Default Order"
+msgstr "Varsayılan Sıralama"
+
+#. phase 5
+msgid "Reload Tree"
+msgstr "Ağacı Yenile"
+
+#. phase 5
+msgid "Show all (including disabled)"
+msgstr "Tümünü göster (devre dışı olanlar dahil)"
+
+#. phase 4
+msgid "What your stock is worth, by item group."
+msgstr "Stokunuzun ürün grubuna göre değeri."
+
+#. phase 4
+msgid "Stop reposting an item and warehouse at a later Stock Reconciliation, or when its balance is the same as the saved ledger. Reposts made by stock transactions set this."
+msgstr "Bir ürün ve depo için yeniden kayıt işlemini, daha sonraki bir Stok Mutabakatında veya bakiyesi kayıtlı defterle aynı olduğunda durdurur. Stok hareketlerinin yaptığı yeniden kayıtlar bunu ayarlar."
+
+#. phase 5
+msgid "Your work orders by status, from planned to completed."
+msgstr "İş emirleriniz duruma göre, planlanandan tamamlanana kadar."
+
+#. phase 5
+msgid "How far along your open projects are."
+msgstr "Açık projelerinizin ne kadar ilerlediği."
+
+#. phase 5
+msgid "How many inspections you run each month."
+msgstr "Her ay yaptığınız kontrol sayısı."
+#. phase 6-7
+msgid "Conversations"
+msgstr "Konuşmalar"
+
+#. phase 6-7
+msgid "Flow Agent"
+msgstr "Flow Ajanı"
+
+#. phase 6-7
+msgid "Flow Knowledge Base"
+msgstr "Flow Bilgi Tabanı"
+
+#. phase 6-7
+msgid "Flow Knowledge Settings"
+msgstr "Flow Bilgi Ayarları"
+
+#. phase 6-7
+msgid "Flow Knowledge Source"
+msgstr "Flow Bilgi Kaynağı"
+
+#. phase 6-7
+msgid "Flow Model"
+msgstr "Flow Modeli"
+
+#. phase 6-7
+msgid "Flow Provider"
+msgstr "Flow Sağlayıcısı"
+
+#. phase 6-7
+msgid "Flow Run"
+msgstr "Flow Çalıştırması"
+
+#. phase 6-7
+msgid "Flow Session"
+msgstr "Flow Oturumu"
+
+#. phase 6-7
+msgid "Flow Tool"
+msgstr "Flow Aracı"
+
+#. phase 6-7
+msgid "Flow Trigger"
+msgstr "Flow Tetikleyicisi"
+
+#. phase 6-7
+msgid "Flow Skill"
+msgstr "Flow Becerisi"
+
+#. phase 6-7
+msgid "Flow Agent Skill"
+msgstr "Flow Ajan Becerisi"
+
+#. phase 6-7
+msgid "Flow Agent Sub Agent"
+msgstr "Flow Alt Ajanı"
+
+#. phase 6-7
+msgid "Flow Settings"
+msgstr "Flow Ayarları"
+
+#. phase 6-7
+msgid "Knowledge"
+msgstr "Bilgi"
+
+#. phase 6-7
+msgid "Knowledge Bases"
+msgstr "Bilgi Tabanları"
+
+#. phase 6-7
+msgid "Background Task"
+msgstr "Arka Plan Görevi"
+
+#. phase 6-7
+msgid "RQ Worker"
+msgstr "RQ İşçisi"
+
+#. phase 6-7
+msgid "Script"
+msgstr "Betik"
+
+#. phase 6-7
+msgid "Print Format Editor"
+msgstr "Yazdırma Biçimi Düzenleyicisi"
+
+#. phase 6-7
+msgid "Nothing has been added yet."
+msgstr "Henüz hiçbir şey eklenmedi."
+
+#. phase 6-7
+msgid "Chunking"
+msgstr "Parçalama"
+
+#. phase 6-7
+msgid "Notification Webhook URL"
+msgstr "Bildirim Webhook URL'si"
+
+#. phase 6-7
+msgid "Ref DocType"
+msgstr "Referans Belge Türü"
+
+#. phase 6-7
+msgid "Background Job Activity"
+msgstr "Arka Plan İş Etkinliği"
+
+#. phase 6-7
+msgid "Notifications By Type"
+msgstr "Türe Göre Bildirimler"
+
+#. phase 6-7
+msgid "Function Name"
+msgstr "Fonksiyon Adı"
+
+#. phase 6-7
+msgid "Available to All Agents"
+msgstr "Tüm Ajanlara Açık"
+
+#. phase 6-7
+msgid "Available to All Agents:"
+msgstr "Tüm Ajanlara Açık:"
+
+#. phase 6-7
+msgid "User Invocable"
+msgstr "Kullanıcı Çağırabilir"
+
+#. phase 6-7
+msgid "Target DocType"
+msgstr "Hedef Belge Türü"
+
+#. phase 6-7
+msgid "Characters shared between consecutive chunks to preserve context across boundaries."
+msgstr "Sınırlar boyunca bağlamı korumak için ardışık parçalar arasında paylaşılan karakterler."
+
+#. phase 6-7
+msgid "Chunk Overlap"
+msgstr "Parça Örtüşmesi"
+
+#. phase 6-7
+msgid "Chunk Size"
+msgstr "Parça Boyutu"
+
+#. phase 6-7
+msgid "Embedding Model"
+msgstr "Gömme Modeli"
+
+#. phase 6-7
+msgid "Embedding model"
+msgstr "Gömme modeli"
+
+#. phase 6-7
+msgid "Hybrid fuses vector similarity with keyword matching. Vector uses similarity alone."
+msgstr "Karma, vektör benzerliğini anahtar sözcük eşleştirmesiyle birleştirir. Vektör yalnızca benzerliği kullanır."
+
+#. phase 6-7
+msgid "Maximum characters per chunk."
+msgstr "Parça başına en fazla karakter sayısı."
+
+#. phase 6-7
+msgid "Search Type"
+msgstr "Arama Türü"
+
+#. phase 6-7
+msgid "Only users with one of these roles can send SMS. Leave empty to allow only System Manager."
+msgstr "Yalnızca bu rollerden birine sahip kullanıcılar SMS gönderebilir. Yalnızca Sistem Yöneticisine izin vermek için boş bırakın."
+
+#. phase 6-7
+msgid "No data yet"
+msgstr "Henüz veri yok"
+
+#. phase 6-7
+msgid "DuckDB Sync"
+msgstr "DuckDB Eşitleme"
+
+#. phase 6-7
+msgid "Automation Flow"
+msgstr "Otomasyon Akışı"
+
+#. phase 6-7
+msgid "Automation Trigger Queue"
+msgstr "Otomasyon Tetikleyici Kuyruğu"
+
+#. phase 6-7
+msgid "Automation Run"
+msgstr "Otomasyon Çalıştırması"
+
+#. phase 6-7
+msgid "Automation Run Step"
+msgstr "Otomasyon Çalıştırma Adımı"
+
+#. phase 6-7
+msgid "Automation Settings"
+msgstr "Otomasyon Ayarları"
+
+#. phase 6-7
+msgid "Attachment Queue"
+msgstr "Ek Kuyruğu"
+
+#. phase 6-7
+msgid "Custom Sidebar"
+msgstr "Özel Kenar Çubuğu"
+
+#. phase 6-7
+msgid "Dock"
+msgstr "Dock"
+
+#. phase 6-7
+msgid "Dock Item"
+msgstr "Dock Öğesi"
+
+#. phase 6-7
+msgid "File Blob"
+msgstr "Dosya Blob'u"
+
+#. phase 6-7
+msgid "Server Script Variable"
+msgstr "Sunucu Betiği Değişkeni"
+
+#. phase 6-7
+msgid "Studio App"
+msgstr "Studio Uygulaması"
+
+#. phase 6-7
+msgid "Workflow Condition"
+msgstr "İş Akışı Koşulu"
+
+#. phase 6-7
+msgid "Child Layouts"
+msgstr "Alt Düzenler"
+
+#. phase 6-7
+msgid "Display name shown in the layout switcher"
+msgstr "Düzen değiştiricide gösterilen ad"
+
+#. phase 6-7
+msgid "Inherit field order and properties from another layout of the same DocType"
+msgstr "Alan sırasını ve özelliklerini aynı Belge Türünün başka bir düzeninden devral"
+
+#. phase 6-7
+msgid "Parent Layout"
+msgstr "Üst Düzen"
+
+#. phase 6-7
+msgid "Set for layouts shipped with apps or fixtures"
+msgstr "Uygulamalarla veya sabit verilerle gelen düzenler için ayarlanır"
+
+#. phase 6-7
+msgid "Sync Fields"
+msgstr "Alanları Eşitle"
+
+#. phase 6-7
+msgid "Enable this option to include the field in the data import template"
+msgstr "Alanı veri içe aktarma şablonuna dahil etmek için bu seçeneği etkinleştirin"
+
+#. phase 6-7
+msgid "Ignore Versioning"
+msgstr "Sürüm Oluşturmayı Yoksay"
+
+#. phase 6-7
+msgid "Include in Import Template"
+msgstr "İçe Aktarma Şablonuna Dahil Et"
+
+#. phase 6-7
+msgid "Is App Disabled"
+msgstr "Uygulama Devre Dışı"
+
+#. phase 6-7
+msgid "Set while owner app is disabled."
+msgstr "Sahip uygulama devre dışıyken ayarlanır."
+
+#. phase 6-7
+msgid "Portal"
+msgstr "Portal"
+
+#. phase 6-7
+msgid "The app whose dock lists this module. A custom module may leave it empty and stand on its own."
+msgstr "Bu modülü dock'unda listeleyen uygulama. Özel bir modül boş bırakılıp tek başına da durabilir."
+
+#. phase 6-7
+msgid "Is Optional"
+msgstr "İsteğe Bağlı"
+
+#. phase 6-7
+msgid "Environment Variables"
+msgstr "Ortam Değişkenleri"
+
+#. phase 6-7
+msgid "Snapshot Report"
+msgstr "Anlık Görüntü Raporu"
+
+#. phase 6-7
+msgid "Label Color"
+msgstr "Etiket Rengi"
+
+#. phase 6-7
+msgid "Show Colon After Field Labels"
+msgstr "Alan Etiketlerinden Sonra İki Nokta Göster"
+
+#. phase 6-7
+msgid "Show a colon after field labels (e.g. \"Name:\"), matching the older print style."
+msgstr "Alan etiketlerinden sonra iki nokta göster (ör. \"Ad:\"), eski yazdırma stiliyle uyumlu."
+
+#. phase 6-7
+msgid "Value Color"
+msgstr "Değer Rengi"
+
+#. phase 6-7
+msgid "Write the format by hand in HTML and Jinja."
+msgstr "Biçimi HTML ve Jinja ile elle yazın."
+
+#. phase 6-7
+msgid "Opens in whichever sidebar is on screen instead of switching to its module's. For pages that act on a document from anywhere, such as Print."
+msgstr "Modülünün kenar çubuğuna geçmek yerine ekrandaki kenar çubuğunda açılır. Yazdır gibi her yerden bir belge üzerinde işlem yapan sayfalar içindir."
+
+#. phase 6-7
+msgid "Shared Page"
+msgstr "Paylaşılan Sayfa"
+
+#. phase 6-7
+msgid "Create your first Flow Agent to get started."
+msgstr "Başlamak için ilk Flow Ajanınızı oluşturun."
+
+#. phase 6-7
+msgid "Agents this one can hand a task to. Binding one attaches the subagent tool."
+msgstr "Bu ajanın görev devredebileceği ajanlar. Birini bağlamak alt ajan aracını ekler."
+
+#. phase 6-7
+msgid "Flow Model used to drive this agent."
+msgstr "Bu ajanı çalıştırmak için kullanılan Flow Modeli."
+
+#. phase 6-7
+msgid "Flow Skills this agent can load. Their names and descriptions are listed in its prompt; the agent loads one when a task matches."
+msgstr "Bu ajanın yükleyebileceği Flow Becerileri. Adları ve açıklamaları isteminde listelenir; ajan bir görev eşleştiğinde birini yükler."
+
+#. phase 6-7
+msgid "Flow Tools this agent can call."
+msgstr "Bu ajanın çağırabileceği Flow Araçları."
+
+#. phase 6-7
+msgid "Knowledge bases this agent can search. Anyone who can use the agent can read them, whatever their own access."
+msgstr "Bu ajanın arayabileceği bilgi tabanları. Ajanı kullanabilen herkes, kendi erişimine bakılmaksızın bunları okuyabilir."
+
+#. phase 6-7
+msgid "Max Iterations"
+msgstr "Maksimum Yineleme"
+
+#. phase 6-7
+msgid "Maximum number of think → tool → think loops before the run gives up."
+msgstr "Çalıştırma vazgeçmeden önce en fazla düşün → araç → düşün döngüsü sayısı."
+
+#. phase 6-7
+msgid "Sub-agents"
+msgstr "Alt ajanlar"
+
+#. phase 6-7
+msgid "Token Budget"
+msgstr "Token Bütçesi"
+
+#. phase 6-7
+msgid "Tokens a single run may spend, shared with its sub-agents. Cached reads are not counted. 0 means no limit."
+msgstr "Tek bir çalıştırmanın harcayabileceği, alt ajanlarıyla paylaşılan token miktarı. Önbellekten okumalar sayılmaz. 0 sınır yok demektir."
+
+#. phase 6-7
+msgid "What this agent is for, shown to an agent that has it as a sub-agent."
+msgstr "Bu ajanın ne için olduğu; onu alt ajan olarak kullanan ajana gösterilir."
+
+#. phase 6-7
+msgid "Who can use this agent directly; empty means every Flow User. As a sub-agent it works for anyone using an agent that has it. Disabling a role also drops it here, which can leave the agent open to every Flow User."
+msgstr "Bu ajanı doğrudan kimlerin kullanabileceği; boş olması her Flow Kullanıcısı demektir. Alt ajan olarak, onu içeren bir ajanı kullanan herkes için çalışır. Bir rolü devre dışı bırakmak onu burada da kaldırır; bu da ajanı her Flow Kullanıcısına açık bırakabilir."
+
+#. phase 6-7
+msgid "Web Search"
+msgstr "Web Araması"
+
+#. phase 6-7
+msgid "Definition"
+msgstr "Tanım"
+
+#. phase 6-7
+msgid "Description (LLM-facing)"
+msgstr "Açıklama (LLM'e gösterilen)"
+
+#. phase 6-7
+msgid "Import Path"
+msgstr "İçe Aktarma Yolu"
+
+#. phase 6-7
+msgid "Pause the run and ask the user to approve each call before this tool executes."
+msgstr "Çalıştırmayı duraklat ve bu araç çalışmadan önce her çağrı için kullanıcıdan onay iste."
+
+#. phase 6-7
+msgid "Requires Confirmation"
+msgstr "Onay Gerektirir"
+
+#. phase 6-7
+msgid "Run each call in a background job, so a slow tool doesn't hold a web worker."
+msgstr "Yavaş bir aracın web işçisini meşgul etmemesi için her çağrıyı arka plan işinde çalıştır."
+
+#. phase 6-7
+msgid "Run in Background"
+msgstr "Arka Planda Çalıştır"
+
+#. phase 6-7
+msgid "Shown to the LLM. Should state what the tool does and how to interpret the return value."
+msgstr "LLM'e gösterilir. Aracın ne yaptığını ve dönüş değerinin nasıl yorumlanacağını belirtmelidir."
+
+#. phase 6-7
+msgid "Snake-cased name the LLM sees. Used as the unique identifier."
+msgstr "LLM'in gördüğü snake_case ad. Benzersiz tanımlayıcı olarak kullanılır."
+
+#. phase 6-7
+msgid "Every agent gets this skill without binding it. Use it for site-wide conventions, and to give the built-in assistant skills."
+msgstr "Her ajan bu beceriyi bağlamadan alır. Site genelindeki kurallar ve yerleşik asistana beceri vermek için kullanın."
+
+#. phase 6-7
+msgid "Markdown instructions the agent receives when it loads this skill."
+msgstr "Ajanın bu beceriyi yüklediğinde aldığı Markdown talimatları."
+
+#. phase 6-7
+msgid "Shown to the agent in its skill index: what this skill covers and when to load it. Keep it to one line."
+msgstr "Ajanın beceri dizininde gösterilir: bu becerinin neyi kapsadığı ve ne zaman yükleneceği. Tek satırda tutun."
+
+#. phase 6-7
+msgid "Create your first Flow Trigger to get started."
+msgstr "Başlamak için ilk Flow Tetikleyicinizi oluşturun."
+
+#. phase 6-7
+msgid "DocType whose events fire this trigger."
+msgstr "Olayları bu tetikleyiciyi çalıştıran Belge Türü."
+
+#. phase 6-7
+msgid "Flow Agent to run when this trigger fires."
+msgstr "Bu tetikleyici çalıştığında çalıştırılacak Flow Ajanı."
+
+#. phase 6-7
+msgid "Prompt"
+msgstr "İstem"
+
+#. phase 6-7
+msgid "Prompt Template"
+msgstr "İstem Şablonu"
+
+#. phase 6-7
+msgid "Run As"
+msgstr "Şu Olarak Çalıştır"
+
+#. phase 6-7
+msgid "Shipped by an app: the Desk can switch it on or off, nothing else."
+msgstr "Bir uygulama tarafından sağlanır: Masaüstü yalnızca açıp kapatabilir, başka bir şey yapamaz."
+
+#. phase 6-7
+msgid "What kind of event fires this trigger."
+msgstr "Bu tetikleyiciyi ne tür bir olayın çalıştırdığı."
+
+#. phase 6-7
+msgid "When"
+msgstr "Ne Zaman"
+
+#. phase 6-7
+msgid "Which lifecycle event of the target DocType fires this trigger."
+msgstr "Hedef Belge Türünün hangi yaşam döngüsü olayının bu tetikleyiciyi çalıştırdığı."
+
+#. phase 6-7
+msgid "Create your first Flow Knowledge Base to get started."
+msgstr "Başlamak için ilk Flow Bilgi Tabanınızı oluşturun."
+
+#. phase 6-7
+msgid "Shown to the agent: what this knowledge base contains and when to search it. Helps the agent decide whether to use it."
+msgstr "Ajana gösterilir: bu bilgi tabanının neleri içerdiği ve ne zaman aranacağı. Ajanın kullanıp kullanmayacağına karar vermesine yardımcı olur."
+
+#. phase 6-7
+msgid "Create your first Flow Knowledge Source to get started."
+msgstr "Başlamak için ilk Flow Bilgi Kaynağınızı oluşturun."
+
+#. phase 6-7
+msgid "Indexing"
+msgstr "Dizinleme"
+
+#. phase 6-7
+msgid "Create your first Flow Session to get started."
+msgstr "Başlamak için ilk Flow Oturumunuzu oluşturun."
+
+#. phase 6-7
+msgid "Approval Mode"
+msgstr "Onay Modu"
+
+#. phase 6-7
+msgid "General Access"
+msgstr "Genel Erişim"
+
+#. phase 6-7
+msgid "How this conversation was started. Trigger sessions are hidden from the chat panel's recent list."
+msgstr "Bu konuşmanın nasıl başlatıldığı. Tetikleyici oturumları sohbet panelindeki son listesinde gizlenir."
+
+#. phase 6-7
+msgid "Override the agent's default model for this conversation. Empty falls back to the agent's model."
+msgstr "Bu konuşma için ajanın varsayılan modelini geçersiz kıl. Boşsa ajanın modeli kullanılır."
+
+#. phase 6-7
+msgid "Saved Flow Agent driving this conversation."
+msgstr "Bu konuşmayı yürüten kayıtlı Flow Ajanı."
+
+#. phase 6-7
+msgid "Short label for this conversation. The flow server titles it from the first message if left blank."
+msgstr "Bu konuşma için kısa etiket. Boş bırakılırsa Flow sunucusu ilk mesajdan başlık oluşturur."
+
+#. phase 6-7
+msgid "Transcript"
+msgstr "Döküm"
+
+#. phase 6-7
+msgid "Who else may view this conversation: only the people it is shared with, or every Flow user. Set from its Share dialog."
+msgstr "Bu konuşmayı başka kimlerin görüntüleyebileceği: yalnızca paylaşılan kişiler veya her Flow kullanıcısı. Paylaş penceresinden ayarlanır."
+
+#. phase 6-7
+msgid "Feedback Rating"
+msgstr "Geri Bildirim Puanı"
+
+#. phase 6-7
+msgid "Session"
+msgstr "Oturum"
+
+#. phase 6-7
+msgid "Trigger"
+msgstr "Tetikleyici"
+
+#. phase 6-7
+msgid "Detail"
+msgstr "Ayrıntı"
+
+#. phase 6-7
+msgid "How this run was started."
+msgstr "Bu çalıştırmanın nasıl başlatıldığı."
+
+#. phase 6-7
+msgid "Iterations"
+msgstr "Yinelemeler"
+
+#. phase 6-7
+msgid "Create your first Flow Model to get started."
+msgstr "Başlamak için ilk Flow Modelinizi oluşturun."
+
+#. phase 6-7
+msgid "API key to authenticate with this model's endpoint. Needed when no Provider is linked."
+msgstr "Bu modelin uç noktasında kimlik doğrulaması için API anahtarı. Bağlı bir Sağlayıcı yoksa gereklidir."
+
+#. phase 6-7
+msgid "Extra Params"
+msgstr "Ek Parametreler"
+
+#. phase 6-7
+msgid "Model ID"
+msgstr "Model Kimliği"
+
+#. phase 6-7
+msgid "Turns text into vectors for Knowledge's search. Not offered in chats."
+msgstr "Bilgi aramasında metni vektörlere dönüştürür. Sohbetlerde sunulmaz."
+
+#. phase 6-7
+msgid "Create your first Flow Provider to get started."
+msgstr "Başlamak için ilk Flow Sağlayıcınızı oluşturun."
+
+#. phase 6-7
+msgid "API key for this provider. Leave empty for local servers (Ollama, LM Studio) that don't require authentication."
+msgstr "Bu sağlayıcı için API anahtarı. Kimlik doğrulaması gerektirmeyen yerel sunucular (Ollama, LM Studio) için boş bırakın."
+
+#. phase 6-7
+msgid "OpenAI-compatible endpoint"
+msgstr "OpenAI uyumlu uç nokta"
+
+#. phase 6-7
+msgid "Optional. Override the provider's default endpoint, e.g. a proxy or self-hosted gateway."
+msgstr "İsteğe bağlı. Sağlayıcının varsayılan uç noktasını geçersiz kıl, ör. bir proxy veya kendi barındırdığınız ağ geçidi."
+
+#. phase 6-7
+msgid "Embedding Dimension"
+msgstr "Gömme Boyutu"
+
+#. phase 6-7
+msgid "Vector width of the embedding model. Detected automatically when the embedding model is saved."
+msgstr "Gömme modelinin vektör genişliği. Gömme modeli kaydedildiğinde otomatik algılanır."
+
+#. phase 6-7
+msgid "Max Retries"
+msgstr "Maksimum Yeniden Deneme"
+
+#. phase 6-7
+msgid "Number of retry attempts for failed requests. Set to 0 for no retries."
+msgstr "Başarısız istekler için yeniden deneme sayısı. Yeniden deneme istemiyorsanız 0 yapın."
+
+#. phase 6-7
+msgid "Create your first Notification Webhook URL to get started."
+msgstr "Başlamak için ilk Bildirim Webhook URL'nizi oluşturun."
+
+#. phase 6-7
+msgid "Scheduled Jobs"
+msgstr "Zamanlanmış İşler"
+
+#. phase 6-7
+msgid "Not Helpful: 0"
+msgstr "Yararlı Değil: 0"
+
+#. phase 6-7
+msgid "What your assets are worth, year by year."
+msgstr "Varlıklarınızın yıllara göre değeri."
+
+#. phase 7
+msgid "Create your first {0} to get started."
+msgstr "Başlamak için ilk {0} kaydınızı oluşturun."
+
+#. phase 7
+msgid "The module this workspace belongs to. Decides which module's dock entry and sidebar it appears under."
+msgstr "Bu çalışma alanının ait olduğu modül. Hangi modülün dock girişi ve kenar çubuğu altında görüneceğini belirler."
+
+#. phase 7
+msgid "Empty State Message"
+msgstr "Boş Durum Mesajı"
