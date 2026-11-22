@@ -7,12 +7,23 @@ import quarterOfYear from 'dayjs/plugin/quarterOfYear'
 import customParseFormat from 'dayjs/plugin/customParseFormat';
 import _ from '@/lib/translate';
 
+// Locale imports for supported languages — add new locale imports here when
+// a translation catalog ships.
+import 'dayjs/locale/tr';
+import 'dayjs/locale/en';
+
 dayjs.extend(utc);
 dayjs.extend(timezone);
 dayjs.extend(advancedFormat);
 dayjs.extend(relativeTime);
 dayjs.extend(quarterOfYear);
 dayjs.extend(customParseFormat);
+
+/** Apply the Frappe session language to Day.js so month names, relative time
+ *  and locale-aware format tokens follow the user's choice.  Falls back to
+ *  English when Frappe's boot data is not yet available (first paint). */
+const bootLang: string = (typeof window !== 'undefined' && window.frappe?.boot?.lang) || 'en';
+dayjs.locale(bootLang === 'tr' ? 'tr' : 'en');
 
 const FRAPPE_DATE_FORMAT = "YYYY-MM-DD"
 

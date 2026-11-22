@@ -185,7 +185,7 @@ const StatementInstructions = () => {
                         <TableCell className="text-ink-gray-5">{_("The date of the transaction")}</TableCell>
                     </TableRow>
                     <TableRow>
-                        <TableCell>Amount</TableCell>
+                        <TableCell>{_("Amount")}</TableCell>
                         <TableCell>{_("Amount")}</TableCell>
                         <TableCell className="text-ink-gray-5">{_('This can contain "CR"/"DR" values or positive/negative values. You could also have a separate column for CR/DR.')}</TableCell>
                     </TableRow>

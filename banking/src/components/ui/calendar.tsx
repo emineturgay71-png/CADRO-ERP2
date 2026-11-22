@@ -39,7 +39,10 @@ function Calendar({
       captionLayout={captionLayout}
       formatters={{
         formatMonthDropdown: (date) =>
-          date.toLocaleString("default", { month: "short" }),
+          date.toLocaleString(
+            window.frappe?.boot?.lang ?? undefined,
+            { month: "short" }
+          ),
         ...formatters,
       }}
       classNames={{

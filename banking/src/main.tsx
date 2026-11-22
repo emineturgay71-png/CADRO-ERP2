@@ -6,6 +6,8 @@ import './lib/namespace'
 import { DirectionProvider } from './components/ui/direction.tsx'
 
 
+const rootElement = document.getElementById('root') as HTMLElement;
+
 if (import.meta.env.DEV) {
   fetch('/api/method/erpnext.www.banking.get_context_for_dev', {
     method: 'POST',
@@ -20,7 +22,7 @@ if (import.meta.env.DEV) {
     document.dir = values.message.layout_direction;
     //@ts-expect-error - frappe will be available
     frappe.model.sync(frappe.boot.docs);
-    createRoot(document.getElementById('root') as HTMLElement).render(
+    createRoot(rootElement).render(
       <StrictMode>
         <DirectionProvider dir={values.message.layout_direction}>
           <App />
@@ -30,13 +32,26 @@ if (import.meta.env.DEV) {
 
   })
 } else {
+  // Wait for translations to load before first render, so Turkish (and all
+  // non-English) strings are available from the initial paint.
   //@ts-expect-error - frappe will be available
   frappe.model.sync(frappe.boot.docs);
-  createRoot(document.getElementById('root') as HTMLElement).render(
-    <StrictMode>
-      <DirectionProvider dir={window.frappe?.boot?.layout_direction ?? 'ltr'}>
-        <App />
-      </DirectionProvider>
-    </StrictMode>,
-  )
+  Promise.resolve(window.frappe?._translations_loaded).then(() => {
+    createRoot(rootElement).render(
+      <StrictMode>
+        <DirectionProvider dir={window.frappe?.boot?.layout_direction ?? 'ltr'}>
+          <App />
+        </DirectionProvider>
+      </StrictMode>,
+    )
+  }).catch(() => {
+    // Render anyway with fallback translations so the page is never blank.
+    createRoot(rootElement).render(
+      <StrictMode>
+        <DirectionProvider dir={window.frappe?.boot?.layout_direction ?? 'ltr'}>
+          <App />
+        </DirectionProvider>
+      </StrictMode>,
+    )
+  });
 }
