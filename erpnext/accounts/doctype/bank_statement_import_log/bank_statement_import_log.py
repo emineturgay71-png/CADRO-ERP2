@@ -488,7 +488,9 @@ class BankStatementImportLog(Document):
 	@frappe.whitelist(methods=["POST"])
 	def insert_transactions(self):
 		if self.status == "Completed":
-			return
+			frappe.throw(
+				_("This statement has already been imported."), title=_("Already Imported")
+			)
 
 		company, account, is_company_account, disabled = frappe.get_value(
 			"Bank Account", self.bank_account, ["company", "account", "is_company_account", "disabled"]
@@ -516,8 +518,26 @@ class BankStatementImportLog(Document):
 			final_transactions = self.get_final_transactions(transaction_rows=transaction_rows)
 
 		total_transactions = len(final_transactions)
+		skipped_count = 0
 
 		for transaction in final_transactions:
+			# Guard against duplicate imports: skip a row already present for the same bank
+			# account on the same day with the same amount and reference number.
+			existing = frappe.db.exists(
+				"Bank Transaction",
+				{
+					"bank_account": self.bank_account,
+					"date": transaction.get("date"),
+					"deposit": transaction.get("deposit") or 0.0,
+					"withdrawal": transaction.get("withdrawal") or 0.0,
+					"reference_number": transaction.get("reference") or "",
+					"docstatus": 1,
+				},
+			)
+			if existing:
+				skipped_count += 1
+				continue
+
 			bank_tx = frappe.get_doc(
 				{
 					"doctype": "Bank Transaction",
@@ -564,11 +584,19 @@ class BankStatementImportLog(Document):
 				self.bank_account, frappe.utils.getdate(self.end_date), self.closing_balance
 			)
 
-		from erpnext.accounts.doctype.bank_transaction_rule.bank_transaction_rule import run_rule_evaluation
+		# Only run rules when new transactions were actually created.
+		if progress > 0:
+			from erpnext.accounts.doctype.bank_transaction_rule.bank_transaction_rule import run_rule_evaluation
 
-		run_rule_evaluation()
+			run_rule_evaluation()
 
 		self.status = "Completed"
+		self.add_comment(
+			"Info",
+			_("Imported {0} transactions (skipped {1} duplicate rows).").format(
+				frappe.utils.cint(progress), frappe.utils.cint(skipped_count)
+			),
+		)
 		self.save()
 
 

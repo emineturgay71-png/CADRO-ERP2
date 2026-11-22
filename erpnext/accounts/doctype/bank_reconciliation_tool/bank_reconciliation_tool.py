@@ -104,7 +104,12 @@ def get_bank_transactions(
 @frappe.whitelist()
 def get_account_balance(bank_account: str, till_date: str | date, company: str):
 	# returns account balance till the specified date
-	frappe.has_permission("Bank Account", "read", bank_account, throw=True)
+	bank_account = cstr(bank_account)
+	if not bank_account or not frappe.has_permission("Bank Account", "read", doc=bank_account):
+		_refuse()
+	bank_company = frappe.db.get_value("Bank Account", bank_account, "company")
+	if bank_company and cstr(bank_company) != cstr(company):
+		frappe.throw(_("Bank account {0} does not belong to company {1}").format(bank_account, company))
 	account = frappe.db.get_value("Bank Account", bank_account, "account")
 	filters = frappe._dict(
 		{
@@ -419,6 +424,9 @@ def get_older_unreconciled_transactions(bank_account: str, from_date: str):
 	"""
 	Get number of unreconciled transactions before a given date for a bank account
 	"""
+	bank_account = cstr(bank_account)
+	if not bank_account or not frappe.has_permission("Bank Account", "read", doc=bank_account):
+		_refuse()
 	count = frappe.db.count(
 		"Bank Transaction",
 		filters={
@@ -494,6 +502,10 @@ def clear_clearing_date(voucher_type: str, voucher_name: str):
 		frappe.throw(
 			_("{0} is not a voucher this tool can clear").format(voucher_type), title=_("Invalid Voucher")
 		)
+
+	voucher_name = cstr(voucher_name)
+	if not voucher_name or not frappe.has_permission(voucher_type, "write", doc=voucher_name):
+		_refuse()
 
 	payment_entry = frappe.get_doc(voucher_type, voucher_name)
 	validate_clearance_date(payment_entry, None, None)
@@ -1047,6 +1059,9 @@ def search_for_transfer_transaction(transaction_id: str | int):
 
 	If the mirror transaction is found, we return the bank account and account details.
 	"""
+	transaction_id = cstr(transaction_id)
+	if not transaction_id or not frappe.has_permission("Bank Transaction", "read", doc=transaction_id):
+		_refuse()
 	company, withdrawal, deposit, date, bank_account = frappe.db.get_value(
 		"Bank Transaction", transaction_id, ["company", "withdrawal", "deposit", "date", "bank_account"]
 	)

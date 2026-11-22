@@ -22,7 +22,9 @@ from erpnext.accounts.doctype.bank_reconciliation_tool.bank_reconciliation_tool 
 	get_auto_reconcile_message,
 	get_bank_transactions,
 	get_linked_payments,
+	get_older_unreconciled_transactions,
 	reconcile_vouchers,
+	search_for_transfer_transaction,
 	update_clearance_date,
 )
 from erpnext.accounts.doctype.journal_entry.test_journal_entry import make_journal_entry
@@ -36,9 +38,11 @@ from erpnext.tests.permission_test_utils import (
 	make_company_fenced_user,
 	make_fenced_user,
 )
+from erpnext.accounts.doctype.bank_account.bank_account import (
+	get_closing_balance_as_per_statement,
+	set_closing_balance_as_per_statement,
+)
 from erpnext.tests.utils import ERPNextTestSuite
-
-RATE_METHOD = "erpnext.accounts.doctype.bank_reconciliation_tool.bank_reconciliation_tool.get_exchange_rate"
 
 
 class TestBankReconciliationTool(ERPNextTestSuite, AccountsTestMixin):
@@ -897,3 +901,45 @@ class TestBankReconciliationTool(ERPNextTestSuite, AccountsTestMixin):
 			today(),
 		)
 		self.assertRaises(frappe.ValidationError, clear_clearing_date, "Sales Order", "SO-MISSING-0001")
+
+	def test_get_closing_balance_fences_the_bank_account(self):
+		"""A user without Bank Account read permission must not read closing balance."""
+		set_closing_balance_as_per_statement(self.bank_account, today(), 500)
+		user = make_fenced_user("brt-read@example.com", ["Accounts User"])
+		with as_user(user):
+			# No Bank Account permission → refused
+			assert_refused(
+				self, get_closing_balance_as_per_statement, self.bank_account, str(today())
+			)
+
+	def test_get_older_unreconciled_transactions_fences_the_bank_account(self):
+		"""An unauthorised user must not probe unreconciled counts."""
+		transaction = self.make_bank_transaction(add_days(today(), -30))
+		user = make_fenced_user("brt-older@example.com", ["Accounts User"])
+		with as_user(user):
+			assert_refused(
+				self, get_older_unreconciled_transactions, self.bank_account, str(today())
+			)
+		with as_user("Administrator"):
+			result = get_older_unreconciled_transactions(self.bank_account, str(today()))
+		self.assertEqual(result["count"], 1)
+
+	def test_search_for_transfer_refuses_an_unauthorised_transaction(self):
+		"""The source transaction must be readable."""
+		transaction = self.make_bank_transaction(today())
+		user = make_fenced_user("brt-search@example.com", ["Accounts User"])
+		with as_user(user):
+			assert_refused(self, search_for_transfer_transaction, transaction.name)
+
+	def test_clear_clearing_date_refuses_a_voucher_without_write_permission(self):
+		"""clear_clearing_date now checks record-level write permission on the voucher."""
+		payment = self.make_other_company_payment()
+		user = make_company_fenced_user("brt-clear@example.com", ["Accounts User"], "_Test Company")
+		with as_user(user):
+			with self.assertRaises(frappe.PermissionError):
+				clear_clearing_date(payment.doctype, payment.name)
+
+	def test_get_account_balance_refuses_mismatched_company(self):
+		"""get_account_balance must reject a company that doesn't own the bank account."""
+		with self.assertRaises(frappe.ValidationError):
+			get_account_balance(self.bank_account, today(), "_Test Company 1")
