@@ -9001,3 +9001,3623 @@ msgstr "Varsayılan giden hesap güncellendi"
 #. frappe 06
 msgid "Mail has stopped"
 msgstr "Posta durdu"
+
+#. frappe 07
+msgid "Mailboxes"
+msgstr "Posta Kutuları"
+
+#. frappe 07
+msgid "Needs reconnect"
+msgstr "Yeniden bağlanmalı"
+
+#. frappe 07
+msgid "No email accounts yet"
+msgstr "Henüz e-posta hesabı yok"
+
+#. frappe 07
+msgid "Are you sure you want to go back? Unsaved changes will be lost."
+msgstr "Geri dönmek istediğinizden emin misiniz? Kaydedilmemiş değişiklikler kaybolacak."
+
+#. frappe 07
+msgid "Unsaved"
+msgstr "Kaydedilmedi"
+
+#. frappe 07
+msgid "Couldn't copy. Select the text and copy it yourself."
+msgstr "Kopyalanamadı. Metni seçip kendiniz kopyalayın."
+
+#. frappe 07
+msgid "Enter a valid email address"
+msgstr "Geçerli bir e-posta adresi girin"
+
+#. frappe 07
+msgid "Opens the setup form with this address filled in."
+msgstr "Bu adresin doldurulduğu kurulum formunu açar."
+
+#. frappe 07
+msgid "Personal Gmail connects with an app password"
+msgstr "Kişisel Gmail bir uygulama parolasıyla bağlanır"
+
+#. frappe 07
+msgid "Turn on 2-Step Verification, then create a 16-character app password in your Google Account."
+msgstr "2 Adımlı Doğrulamayı açın, ardından Google Hesabınızda 16 karakterlik bir uygulama parolası oluşturun."
+
+#. frappe 07
+msgid "You can still connect with an app password."
+msgstr "Yine de bir uygulama parolasıyla bağlanabilirsiniz."
+
+#. frappe 07
+msgid "You signed in with another Google account"
+msgstr "Başka bir Google hesabıyla oturum açtınız"
+
+#. frappe 07
+msgid "Pick a color"
+msgstr "Bir renk seçin"
+
+#. frappe 07
+msgid "Custom color"
+msgstr "Özel renk"
+
+#. frappe 07
+msgid "Row Actions"
+msgstr "Satır İşlemleri"
+
+#. frappe 07
+msgid "Clear grouping"
+msgstr "Gruplamayı temizle"
+
+#. frappe 07
+msgid "Grouped by {0}"
+msgstr "{0} alanına göre gruplandı"
+
+#. frappe 07
+msgid "Show totals"
+msgstr "Toplamları göster"
+
+#. frappe 07
+msgid "No records"
+msgstr "Kayıt yok"
+
+#. frappe 07
+msgid "Activating a workflow without conditions deactivates the other workflows of this document type that have no conditions."
+msgstr "Koşulsuz bir iş akışını etkinleştirmek, bu belge türünün koşulsuz diğer iş akışlarını devre dışı bırakır."
+
+#. frappe 07
+msgid "Restrict this workflow to documents matching all of these conditions. Leave empty to apply it to every document of this type."
+msgstr "Bu iş akışını bu koşulların tümüyle eşleşen belgelerle sınırlayın. Bu türdeki her belgeye uygulamak için boş bırakın."
+
+#. frappe 07
+msgid "Workflows with a higher priority are matched first."
+msgstr "Önceliği daha yüksek iş akışları önce eşleştirilir."
+
+#. frappe 07
+msgid "Workflow {0} has the same priority and can govern the same {1}. Narrow the conditions of either workflow, or give them different priorities."
+msgstr "{0} iş akışı aynı önceliğe sahip ve aynı {1} belgesini yönetebilir. İki iş akışından birinin koşullarını daraltın veya farklı öncelikler verin."
+
+#. frappe 07
+msgid "Workflow {0} on {1} uses the state field {2}. Every active workflow of a doctype must use the same field."
+msgstr "{1} üzerindeki {0} iş akışı {2} durum alanını kullanıyor. Bir belge türünün her etkin iş akışı aynı alanı kullanmalıdır."
+
+#. frappe 07
+msgid "Workflow State"
+msgstr "İş Akışı Durumu"
+
+#. frappe 07
+msgid "Aggregate fields from a child table need a Group By field from the same child table."
+msgstr "Alt tablodan toplama alanları için aynı alt tablodan bir Gruplama alanı gerekir."
+
+#. frappe 07
+msgid "An unexpected error occurred. Please contact your System Manager."
+msgstr "Beklenmeyen bir hata oluştu. Lütfen Sistem Yöneticinizle iletişime geçin."
+
+#. frappe 07
+msgid "Bulk Deletion"
+msgstr "Toplu Silme"
+
+#. frappe 07
+msgid "Deleted {0} records from {1} doctype"
+msgstr "{1} belge türünden {0} kayıt silindi"
+
+#. frappe 07
+msgid "Deleting {0} of {1} ({2} failed)"
+msgstr "{1} kaydın {0} tanesi siliniyor ({2} başarısız)"
+
+#. frappe 07
+msgid "Group By and aggregate fields can only use one child table, found: {0}"
+msgstr "Gruplama ve toplama alanları yalnızca bir alt tablo kullanabilir, bulunan: {0}"
+
+#. frappe 07
+msgid "Invalid aggregate function: {0}"
+msgstr "Geçersiz toplama işlevi: {0}"
+
+#. frappe 07
+msgid "These documents are linked with other documents and cannot be deleted:"
+msgstr "Bu belgeler başka belgelerle bağlantılı ve silinemez:"
+
+#. frappe 07
+msgid "You don't have permission to create Report records."
+msgstr "Rapor kaydı oluşturma yetkiniz yok."
+
+#. frappe 07
+msgid "You don't have permission to create report for {0}"
+msgstr "{0} için rapor oluşturma yetkiniz yok"
+
+#. frappe 07
+msgid "{0} of {1} documents could not be deleted"
+msgstr "{1} belgenin {0} tanesi silinemedi"
+
+#. frappe 07
+msgid "Backup requested for unknown DocType(s): {0}. Check for typos or use the exact DocType name (case-sensitive). Aborting to avoid taking a full backup instead of the requested subset."
+msgstr "Bilinmeyen Belge Türleri için yedek istendi: {0}. Yazım hatalarını kontrol edin veya Belge Türü adını (büyük/küçük harf duyarlı) tam olarak kullanın. İstenen alt küme yerine tam yedek alınmaması için iptal ediliyor."
+
+#. frappe 07
+msgid "Backup requested only for DocType(s) held in the log database: {0}. Log DocTypes are not included in site backups, so there is nothing to back up."
+msgstr "Yedek yalnızca günlük veritabanında tutulan Belge Türleri için istendi: {0}. Günlük Belge Türleri site yedeklerine dahil edilmez, bu yüzden yedeklenecek bir şey yok."
+
+#. frappe 07
+msgid "You don't have permission to read/attach the file {0}."
+msgstr "{0} dosyasını okuma/ekleme yetkiniz yok."
+
+#. frappe 07
+msgid "You need write permissions to add attachments to this record."
+msgstr "Bu kayda ek eklemek için yazma izniniz olmalıdır."
+
+#. frappe 07
+msgid "Invalid action"
+msgstr "Geçersiz işlem"
+
+#. frappe 07
+msgid "Login with {0} is not enabled"
+msgstr "{0} ile giriş etkin değil"
+
+#. frappe 07
+msgid "This Microsoft account does not belong to the expected organization."
+msgstr "Bu Microsoft hesabı beklenen kuruluşa ait değil."
+
+#. frappe 07
+msgid "This Office 365 Social Login Key is not restricted to a specific tenant. Set a Tenant ID, or enable 'Trust Any Tenant' if you intend to allow sign-in from any organization."
+msgstr "Bu Office 365 Sosyal Giriş Anahtarı belirli bir kiracıyla sınırlı değil. Bir Kiracı ID'si ayarlayın veya herhangi bir kuruluştan girişe izin vermek istiyorsanız 'Herhangi Bir Kiracıya Güven'i etkinleştirin."
+
+#. frappe 07
+msgid "{0} size exceeded the maximum allowed size."
+msgstr "{0} boyutu izin verilen en büyük boyutu aştı."
+
+#. frappe 07
+msgid "Failed to optimize PDF: {0}"
+msgstr "PDF iyileştirilemedi: {0}"
+
+#. frappe 07
+msgid "Unexpected error while optimizing PDF"
+msgstr "PDF iyileştirilirken beklenmeyen hata"
+
+#. frappe 07
+msgid "Unexpected error while optimizing one image in PDF"
+msgstr "PDF'teki bir resim iyileştirilirken beklenmeyen hata"
+
+#. frappe 07
+msgid "Header, footer and margins leave no room for content on a {0}px tall page. Reduce their height or use a larger page size."
+msgstr "Üstbilgi, altbilgi ve kenar boşlukları {0}px yüksekliğindeki bir sayfada içeriğe yer bırakmıyor. Yüksekliklerini azaltın veya daha büyük bir sayfa boyutu kullanın."
+
+#. frappe 07
+msgid "Margins leave no room for content on a {0}px wide page. Reduce them or use a larger page size."
+msgstr "Kenar boşlukları {0}px genişliğindeki bir sayfada içeriğe yer bırakmıyor. Bunları azaltın veya daha büyük bir sayfa boyutu kullanın."
+
+#. frappe 07
+msgid "PlutoPrint is not installed on this server"
+msgstr "PlutoPrint bu sunucuda kurulu değil"
+
+#. frappe 07
+msgid "Invalid format. Supported formats are {0}"
+msgstr "Geçersiz biçim. Desteklenen biçimler: {0}"
+
+#. frappe 07
+msgid "Cannot generate PDF for more than {0} documents at a time"
+msgstr "Bir seferde {0} belgeden fazlası için PDF oluşturulamaz"
+
+#. frappe 07
+msgid "Failed to print {0} documents"
+msgstr "{0} belge yazdırılamadı"
+
+#. frappe 07
+msgid "Print Format {0} does not belong to report {1}"
+msgstr "{0} Yazdırma Biçimi {1} raporuna ait değil"
+
+#. frappe 07
+msgid "Print Format {0} has no HTML body"
+msgstr "{0} Yazdırma Biçiminin HTML gövdesi yok"
+
+#. frappe 07
+msgid "Print Format {0} is not a Jinja format"
+msgstr "{0} Yazdırma Biçimi bir Jinja biçimi değil"
+
+#. frappe 07
+msgid "You already have the maximum number of bulk PDF exports in progress. Please wait for one to finish."
+msgstr "Devam eden toplu PDF dışa aktarma sayınız zaten en üst sınırda. Lütfen birinin bitmesini bekleyin."
+
+#. frappe 07
+msgid "You are not permitted to print one of the selected documents"
+msgstr "Seçilen belgelerden birini yazdırma yetkiniz yok"
+
+#. frappe 07
+msgid "Barcode value must be text under 2000 characters"
+msgstr "Barkod değeri 2000 karakterden kısa bir metin olmalıdır"
+
+#. frappe 07
+msgid "Chromium renderer unavailable"
+msgstr "Chromium oluşturucusu kullanılamıyor"
+
+#. frappe 07
+msgid "Expected an unsaved Print Format document"
+msgstr "Kaydedilmemiş bir Yazdırma Biçimi belgesi bekleniyordu"
+
+#. frappe 07
+msgid "Failed to render template: {0}"
+msgstr "Şablon oluşturulamadı: {0}"
+
+#. frappe 07
+msgid "Invalid arguments"
+msgstr "Geçersiz bağımsız değişkenler"
+
+#. frappe 07
+msgid "No document available to preview"
+msgstr "Önizlenecek belge yok"
+
+#. frappe 07
+msgid "The global variables of this print format could not be set: {0}"
+msgstr "Bu yazdırma biçiminin genel değişkenleri ayarlanamadı: {0}"
+
+#. frappe 07
+msgid "This condition could not be evaluated"
+msgstr "Bu koşul değerlendirilemedi"
+
+#. frappe 07
+msgid "This format can no longer render through Typst: {0}"
+msgstr "Bu biçim artık Typst ile oluşturulamıyor: {0}"
+
+#. frappe 07
+msgid "This format uses a Typst block, which only the Typst renderer can print. Set the PDF Renderer to Typst or remove the block."
+msgstr "Bu biçim yalnızca Typst oluşturucusunun yazdırabildiği bir Typst bloğu kullanıyor. PDF Oluşturucusunu Typst yapın veya bloğu kaldırın."
+
+#. frappe 07
+msgid "Invalid backup path"
+msgstr "Geçersiz yedek yolu"
+
+#. frappe 07
+msgid "Environment Variables Unavailable"
+msgstr "Ortam Değişkenleri Kullanılamıyor"
+
+#. frappe 07
+msgid "Environment variables are only available in Server Scripts"
+msgstr "Ortam değişkenleri yalnızca Sunucu Betiklerinde kullanılabilir"
+
+#. frappe 07
+msgid "Wait for it to finish. Deleting the lock file {} will not release the lock."
+msgstr "Bitmesini bekleyin. {} kilit dosyasını silmek kilidi serbest bırakmaz."
+
+#. frappe 07
+msgid "Invalid Typst block"
+msgstr "Geçersiz Typst bloğu"
+
+#. frappe 07
+msgid "Letterhead image loaded from a web address"
+msgstr "Web adresinden yüklenen antetli kağıt resmi"
+
+#. frappe 07
+msgid "The Typst block could not render its template: {0}"
+msgstr "Typst bloğu şablonunu oluşturamadı: {0}"
+
+#. frappe 07
+msgid "The Typst renderer cannot embed this background image: {0}"
+msgstr "Typst oluşturucusu bu arka plan resmini gömemiyor: {0}"
+
+#. frappe 07
+msgid "The Typst renderer cannot embed this image: {0}"
+msgstr "Typst oluşturucusu bu resmi gömemiyor: {0}"
+
+#. frappe 07
+msgid "Cannot register an empty XLSX style"
+msgstr "Boş bir XLSX stili kaydedilemez"
+
+#. frappe 07
+msgid "File content does not match its extension"
+msgstr "Dosya içeriği uzantısıyla eşleşmiyor"
+
+#. frappe 07
+msgid "Unknown storage driver: {0}"
+msgstr "Bilinmeyen depolama sürücüsü: {0}"
+
+#. frappe 07
+msgid "batch_size must be greater than zero"
+msgstr "batch_size sıfırdan büyük olmalıdır"
+
+#. frappe 07
+msgid "The S3 storage driver requires a {0} in {1}"
+msgstr "S3 depolama sürücüsü {1} içinde bir {0} gerektirir"
+
+#. frappe 07
+msgid "The S3 storage driver requires the {0} package. Install it with: {1}"
+msgstr "S3 depolama sürücüsü {0} paketini gerektirir. Şununla kurun: {1}"
+
+#. frappe 07
+msgid "The S3 storage prefix may only contain letters, digits, '-', '_' and '.'"
+msgstr "S3 depolama öneki yalnızca harf, rakam, '-', '_' ve '.' içerebilir"
+
+#. frappe 07
+msgid "Checksum mismatch"
+msgstr "Sağlama toplamı uyuşmazlığı"
+
+#. frappe 07
+msgid "File Storage v2 is not enabled for this site"
+msgstr "Dosya Depolama v2 bu site için etkin değil"
+
+#. frappe 07
+msgid "Invalid chunk offset"
+msgstr "Geçersiz parça ofseti"
+
+#. frappe 07
+msgid "Invalid upload id"
+msgstr "Geçersiz yükleme ID'si"
+
+#. frappe 07
+msgid "This upload session expects a direct upload, not chunks"
+msgstr "Bu yükleme oturumu parça değil, doğrudan yükleme bekliyor"
+
+#. frappe 07
+msgid "Upload exceeds the declared file size"
+msgstr "Yükleme bildirilen dosya boyutunu aşıyor"
+
+#. frappe 07
+msgid "Upload session has no data"
+msgstr "Yükleme oturumunda veri yok"
+
+#. frappe 07
+msgid "Upload session not found or expired"
+msgstr "Yükleme oturumu bulunamadı veya süresi doldu"
+
+#. frappe 07
+msgid "App frappe cannot be disabled"
+msgstr "frappe uygulaması devre dışı bırakılamaz"
+
+#. frappe 07
+msgid "App {0} depends on {1}. Enable {1} first."
+msgstr "{0} uygulaması {1} uygulamasına bağlı. Önce {1} uygulamasını etkinleştirin."
+
+#. frappe 07
+msgid "App {0} is a dependency of {1}. Disable {1} first."
+msgstr "{0} uygulaması {1} uygulamasının bağımlılığıdır. Önce {1} uygulamasını devre dışı bırakın."
+
+#. frappe 07
+msgid "Custom Module Renamed"
+msgstr "Özel Modül Yeniden Adlandırıldı"
+
+#. frappe 07
+msgid "Dry run complete, nothing was removed from Site {0}"
+msgstr "Deneme çalıştırması tamamlandı, {0} sitesinden hiçbir şey kaldırılmadı"
+
+#. frappe 07
+msgid "Module {0} is now shipped by {1}; this site's module of that name is now {2}."
+msgstr "{0} modülü artık {1} tarafından sağlanıyor; bu sitedeki aynı adlı modül artık {2}."
+
+#. frappe 07
+msgid "Automation Action"
+msgstr "Otomasyon Eylemi"
+
+#. frappe 07
+msgid "Else"
+msgstr "Değilse"
+
+#. frappe 07
+msgid "If"
+msgstr "Eğer"
+
+#. frappe 07
+msgid "Named record alias this action operates on."
+msgstr "Bu eylemin işlem yaptığı adlandırılmış kayıt takma adı."
+
+#. frappe 07
+msgid "Optional alias for the destination reference returned by this action."
+msgstr "Bu eylemin döndürdüğü hedef referansı için isteğe bağlı takma ad."
+
+#. frappe 07
+msgid "Optional. Checked against a related record."
+msgstr "İsteğe bağlı. İlgili bir kayıtla karşılaştırılır."
+
+#. frappe 07
+msgid "Optional. The step runs only if this expression is true."
+msgstr "İsteğe bağlı. Adım yalnızca bu ifade doğruysa çalışır."
+
+#. frappe 07
+msgid "Output Alias"
+msgstr "Çıktı Takma Adı"
+
+#. frappe 07
+msgid "Parent Step"
+msgstr "Üst Adım"
+
+#. frappe 07
+msgid "Parent Step Branch"
+msgstr "Üst Adım Dalı"
+
+#. frappe 07
+msgid "Related Record Condition"
+msgstr "İlgili Kayıt Koşulu"
+
+#. frappe 07
+msgid "Step Condition"
+msgstr "Adım Koşulu"
+
+#. frappe 07
+msgid "Step Key"
+msgstr "Adım Anahtarı"
+
+#. frappe 07
+msgid "Step Type"
+msgstr "Adım Türü"
+
+#. frappe 07
+msgid "Automation Event Subscription"
+msgstr "Otomasyon Olay Aboneliği"
+
+#. frappe 07
+msgid "Correlation Key"
+msgstr "Korelasyon Anahtarı"
+
+#. frappe 07
+msgid "Event Payload"
+msgstr "Olay Yükü"
+
+#. frappe 07
+msgid "Expires At"
+msgstr "Sona Erme Zamanı"
+
+#. frappe 07
+msgid "Matched"
+msgstr "Eşleşti"
+
+#. frappe 07
+msgid "Resume Queue"
+msgstr "Sürdürme Kuyruğu"
+
+#. frappe 07
+msgid "Waiting"
+msgstr "Bekliyor"
+
+#. frappe 07
+msgid "Add field rules below, every rule must match before the flow can run"
+msgstr "Aşağıya alan kuralları ekleyin; akışın çalışabilmesi için her kuralın eşleşmesi gerekir"
+
+#. frappe 07
+msgid "Could not load the saved field rules"
+msgstr "Kayıtlı alan kuralları yüklenemedi"
+
+#. frappe 07
+msgid "Match Fields"
+msgstr "Alanları Eşleştir"
+
+#. frappe 07
+msgid "Run against"
+msgstr "Şuna karşı çalıştır"
+
+#. frappe 07
+msgid "Running…"
+msgstr "Çalışıyor…"
+
+#. frappe 07
+msgid "Select a Document Type to add field rules."
+msgstr "Alan kuralları eklemek için bir Belge Türü seçin."
+
+#. frappe 07
+msgid "Test Run"
+msgstr "Test Çalıştırması"
+
+#. frappe 07
+msgid "Test Run: {0}"
+msgstr "Test Çalıştırması: {0}"
+
+#. frappe 07
+msgid "The flow runs for real against this document, then everything it did is rolled back."
+msgstr "Akış bu belge üzerinde gerçekten çalışır, ardından yaptığı her şey geri alınır."
+
+#. frappe 07
+msgid "This flow has no steps to run."
+msgstr "Bu akışın çalıştırılacak adımı yok."
+
+#. frappe 07
+msgid "Advanced Condition"
+msgstr "Gelişmiş Koşul"
+
+#. frappe 07
+msgid "Advanced Expression using Python"
+msgstr "Python ile Gelişmiş İfade"
+
+#. frappe 07
+msgid "Automation User"
+msgstr "Otomasyon Kullanıcısı"
+
+#. frappe 07
+msgid "Blocked for child tables (istable). Required for document and date-based triggers."
+msgstr "Alt tablolar (istable) için engellenir. Belge ve tarih tabanlı tetikleyiciler için gereklidir."
+
+#. frappe 07
+msgid "Cron Expression"
+msgstr "Cron İfadesi"
+
+#. frappe 07
+msgid "Custom Event"
+msgstr "Özel Olay"
+
+#. frappe 07
+msgid "Date Based"
+msgstr "Tarih Tabanlı"
+
+#. frappe 07
+msgid "Date Direction"
+msgstr "Tarih Yönü"
+
+#. frappe 07
+msgid "Date Field"
+msgstr "Tarih Alanı"
+
+#. frappe 07
+msgid "Date Offset (Days)"
+msgstr "Tarih Ofseti (Gün)"
+
+#. frappe 07
+msgid "Disabled Reason"
+msgstr "Devre Dışı Bırakma Nedeni"
+
+#. frappe 07
+msgid "Doc Cancelled"
+msgstr "Belge İptal Edildi"
+
+#. frappe 07
+msgid "Doc Created"
+msgstr "Belge Oluşturuldu"
+
+#. frappe 07
+msgid "Doc Deleted"
+msgstr "Belge Silindi"
+
+#. frappe 07
+msgid "Doc Submitted"
+msgstr "Belge Onaylandı"
+
+#. frappe 07
+msgid "Doc Updated"
+msgstr "Belge Güncellendi"
+
+#. frappe 07
+msgid "Document Owner"
+msgstr "Belge Sahibi"
+
+#. frappe 07
+msgid "Empty = any value."
+msgstr "Boş = herhangi bir değer."
+
+#. frappe 07
+msgid "Enabling requires at least one action and a valid trigger."
+msgstr "Etkinleştirmek için en az bir eylem ve geçerli bir tetikleyici gerekir."
+
+#. frappe 07
+msgid "Field Value Changed"
+msgstr "Alan Değeri Değişti"
+
+#. frappe 07
+msgid "Matches the event name passed to emit()."
+msgstr "emit() işlevine geçirilen olay adıyla eşleşir."
+
+#. frappe 07
+msgid "Next Run"
+msgstr "Sonraki Çalıştırma"
+
+#. frappe 07
+msgid "Optional. For logic the match fields cannot express, such as OR groups. The document is available as <code>doc</code>; the match fields and this expression must all be true."
+msgstr "İsteğe bağlı. Eşleştirme alanlarının ifade edemediği, VEYA grupları gibi mantık için. Belge <code>doc</code> olarak kullanılabilir; eşleştirme alanları ve bu ifadenin tümü doğru olmalıdır."
+
+#. frappe 07
+msgid "Re-check filters and condition in the worker before executing."
+msgstr "Çalıştırmadan önce filtreleri ve koşulu çalışanda yeniden denetle."
+
+#. frappe 07
+msgid "Relationships"
+msgstr "İlişkiler"
+
+#. frappe 07
+msgid "Revalidate on Run"
+msgstr "Çalıştırmada Yeniden Doğrula"
+
+#. frappe 07
+msgid "Standard 5-field cron, for example <code>0 9 * * 1</code>."
+msgstr "Standart 5 alanlı cron, örneğin <code>0 9 * * 1</code>."
+
+#. frappe 07
+msgid "Stop on Error"
+msgstr "Hatada Dur"
+
+#. frappe 07
+msgid "Trigger Field"
+msgstr "Tetikleyici Alan"
+
+#. frappe 07
+msgid "Trigger Type"
+msgstr "Tetikleyici Türü"
+
+#. frappe 07
+msgid "Triggering User"
+msgstr "Tetikleyen Kullanıcı"
+
+#. frappe 07
+msgid "Action Type is required for action steps"
+msgstr "Eylem adımları için Eylem Türü gereklidir"
+
+#. frappe 07
+msgid "Automation Flow cannot target a child table: {0}"
+msgstr "Otomasyon Akışı bir alt tabloyu hedefleyemez: {0}"
+
+#. frappe 07
+msgid "Automation User {0} is disabled or missing"
+msgstr "Otomasyon Kullanıcısı {0} devre dışı veya eksik"
+
+#. frappe 07
+msgid "Custom Event trigger requires an event name"
+msgstr "Özel Olay tetikleyicisi bir olay adı gerektirir"
+
+#. frappe 07
+msgid "Date Based trigger requires a Date Field and a Date Direction"
+msgstr "Tarih Tabanlı tetikleyici bir Tarih Alanı ve bir Tarih Yönü gerektirir"
+
+#. frappe 07
+msgid "Enable an Automation Flow only after adding at least one action"
+msgstr "Bir Otomasyon Akışını yalnızca en az bir eylem ekledikten sonra etkinleştirin"
+
+#. frappe 07
+msgid "Field Value Changed trigger requires a Trigger Field"
+msgstr "Alan Değeri Değişti tetikleyicisi bir Tetikleyici Alan gerektirir"
+
+#. frappe 07
+msgid "Invalid cron expression: {0}"
+msgstr "Geçersiz cron ifadesi: {0}"
+
+#. frappe 07
+msgid "Row {0}: Branch is only meaningful inside an If step"
+msgstr "Satır {0}: Dal yalnızca bir Eğer adımı içinde anlamlıdır"
+
+#. frappe 07
+msgid "Row {0}: Parent Step must be an earlier row"
+msgstr "Satır {0}: Üst Adım daha önceki bir satır olmalıdır"
+
+#. frappe 07
+msgid "Row {0}: Parent Step {1} is not an If step"
+msgstr "Satır {0}: {1} Üst Adımı bir Eğer adımı değil"
+
+#. frappe 07
+msgid "Row {0}: Step Key must be unique"
+msgstr "Satır {0}: Adım Anahtarı benzersiz olmalıdır"
+
+#. frappe 07
+msgid "Row {0}: Wait unit must be one of {1}"
+msgstr "Satır {0}: Bekleme birimi {1} değerlerinden biri olmalıdır"
+
+#. frappe 07
+msgid "Row {0}: an If step needs a Step Condition"
+msgstr "Satır {0}: Eğer adımı bir Adım Koşulu gerektirir"
+
+#. frappe 07
+msgid "Row {0}: choose the If or Else branch"
+msgstr "Satır {0}: Eğer veya Değilse dalını seçin"
+
+#. frappe 07
+msgid "Row {0}: duplicate output alias {1}"
+msgstr "Satır {0}: yinelenen çıktı takma adı {1}"
+
+#. frappe 07
+msgid "Row {0}: unknown target alias {1}"
+msgstr "Satır {0}: bilinmeyen hedef takma ad {1}"
+
+#. frappe 07
+msgid "Row {0}: unsupported Step Type {1}"
+msgstr "Satır {0}: desteklenmeyen Adım Türü {1}"
+
+#. frappe 07
+msgid "Scheduled trigger requires a Cron Expression"
+msgstr "Zamanlanmış tetikleyici bir Cron İfadesi gerektirir"
+
+#. frappe 07
+msgid "Wait steps require a duration value and unit"
+msgstr "Bekleme adımları bir süre değeri ve birimi gerektirir"
+
+#. frappe 07
+msgid "{0} does not support {1} triggers"
+msgstr "{0}, {1} tetikleyicilerini desteklemiyor"
+
+#. frappe 07
+msgid "{0} requires a Document Type"
+msgstr "{0} bir Belge Türü gerektirir"
+
+#. frappe 07
+msgid "{0} trigger requires a Document Type"
+msgstr "{0} tetikleyicisi bir Belge Türü gerektirir"
+
+#. frappe 07
+msgid "Actions Snapshot"
+msgstr "Eylem Anlık Görüntüsü"
+
+#. frappe 07
+msgid "Automation Flow Title"
+msgstr "Otomasyon Akışı Başlığı"
+
+#. frappe 07
+msgid "Denormalized so the run survives deletion of its Automation Flow."
+msgstr "Otomasyon Akışı silinse de çalıştırmanın korunması için normalleştirilmemiş tutulur."
+
+#. frappe 07
+msgid "Error Summary"
+msgstr "Hata Özeti"
+
+#. frappe 07
+msgid "Partially Failed"
+msgstr "Kısmen Başarısız"
+
+#. frappe 07
+msgid "Recursion Depth"
+msgstr "Özyineleme Derinliği"
+
+#. frappe 07
+msgid "Relationships Snapshot"
+msgstr "İlişkiler Anlık Görüntüsü"
+
+#. frappe 07
+msgid "Run State"
+msgstr "Çalıştırma Durumu"
+
+#. frappe 07
+msgid "Snapshot"
+msgstr "Anlık Görüntü"
+
+#. frappe 07
+msgid "Step outputs, record aliases and branch choices a resumed run picks up."
+msgstr "Sürdürülen bir çalıştırmanın devraldığı adım çıktıları, kayıt takma adları ve dal seçimleri."
+
+#. frappe 07
+msgid "The flow's steps as they were when the run started. A resumed run executes these, not the current flow."
+msgstr "Akışın adımları, çalıştırma başladığındaki haliyle. Sürdürülen bir çalıştırma bunları yürütür, güncel akışı değil."
+
+#. frappe 07
+msgid "Trigger Queue Row"
+msgstr "Tetikleyici Kuyruk Satırı"
+
+#. frappe 07
+msgid "Condition Values"
+msgstr "Koşul Değerleri"
+
+#. frappe 07
+msgid "Small structured result returned by the action."
+msgstr "Eylemin döndürdüğü küçük yapılandırılmış sonuç."
+
+#. frappe 07
+msgid "The step condition that skipped this step."
+msgstr "Bu adımı atlayan adım koşulu."
+
+#. frappe 07
+msgid "Truncated to 5k characters."
+msgstr "5 bin karaktere kısaltıldı."
+
+#. frappe 07
+msgid "What the action threw as a message, if it failed."
+msgstr "Eylem başarısız olduysa mesaj olarak fırlattığı şey."
+
+#. frappe 07
+msgid "Accept emit() calls for events no app registered through the automation_events hook."
+msgstr "automation_events kancası üzerinden hiçbir uygulamanın kaydetmediği olaylar için emit() çağrılarını kabul et."
+
+#. frappe 07
+msgid "Allow Unregistered Events"
+msgstr "Kayıtsız Olaylara İzin Ver"
+
+#. frappe 07
+msgid "Bytes an emitted event payload may carry."
+msgstr "Yayınlanan bir olay yükünün taşıyabileceği bayt sayısı."
+
+#. frappe 07
+msgid "Bytes of output a step may publish to later steps. Larger output is dropped, not failed."
+msgstr "Bir adımın sonraki adımlara yayınlayabileceği çıktı bayt sayısı. Daha büyük çıktı başarısız sayılmaz, atılır."
+
+#. frappe 07
+msgid "Commit Every"
+msgstr "Şu Kadarda Bir Kaydet"
+
+#. frappe 07
+msgid "Consecutive failures after which a flow is auto-disabled and its owner notified."
+msgstr "Bir akışın otomatik devre dışı bırakılıp sahibine bildirileceği art arda hata sayısı."
+
+#. frappe 07
+msgid "Days a Failed or Skipped queue row is kept before the nightly sweep removes it."
+msgstr "Başarısız veya Atlanan bir kuyruk satırının gece temizliği onu kaldırmadan önce tutulduğu gün sayısı."
+
+#. frappe 07
+msgid "Disable Automations"
+msgstr "Otomasyonları Devre Dışı Bırak"
+
+#. frappe 07
+msgid "Drain Seconds"
+msgstr "Boşaltma Saniyesi"
+
+#. frappe 07
+msgid "Event Payload Limit"
+msgstr "Olay Yükü Sınırı"
+
+#. frappe 07
+msgid "Failure Threshold"
+msgstr "Hata Eşiği"
+
+#. frappe 07
+msgid "How long a claimed row may stay Running before it is assumed crashed and requeued."
+msgstr "Sahiplenilen bir satırın, çöktüğü varsayılıp yeniden kuyruğa alınmadan önce Çalışıyor durumunda ne kadar kalabileceği."
+
+#. frappe 07
+msgid "How many times a claimed row is retried when its run fails outside the flow's own steps, before the row is marked Failed."
+msgstr "Sahiplenilen bir satırın çalıştırması akışın kendi adımları dışında başarısız olduğunda, satır Başarısız işaretlenmeden önce kaç kez yeniden denendiği."
+
+#. frappe 07
+msgid "How many times an automation may trigger another before the chain is refused."
+msgstr "Bir otomasyonun, zincir reddedilmeden önce başka birini kaç kez tetikleyebileceği."
+
+#. frappe 07
+msgid "Limits"
+msgstr "Sınırlar"
+
+#. frappe 07
+msgid "Maximum Attempts"
+msgstr "En Fazla Deneme"
+
+#. frappe 07
+msgid "Maximum Recursion Depth"
+msgstr "En Fazla Özyineleme Derinliği"
+
+#. frappe 07
+msgid "Queue Retention Days"
+msgstr "Kuyruk Saklama Günü"
+
+#. frappe 07
+msgid "Reliability"
+msgstr "Güvenilirlik"
+
+#. frappe 07
+msgid "Retention"
+msgstr "Saklama"
+
+#. frappe 07
+msgid "Rows a drain runs between commits."
+msgstr "Bir boşaltmanın kaydetmeler arasında çalıştırdığı satır sayısı."
+
+#. frappe 07
+msgid "Seconds a drain may keep claiming batches. 0 derives it from the queue's own timeout."
+msgstr "Bir boşaltmanın toplu iş almaya devam edebileceği saniye. 0, bunu kuyruğun kendi zaman aşımından türetir."
+
+#. frappe 07
+msgid "Stale Running Minutes"
+msgstr "Takılı Çalışıyor Dakikası"
+
+#. frappe 07
+msgid "Step Output Limit"
+msgstr "Adım Çıktı Sınırı"
+
+#. frappe 07
+msgid "Stop dispatching automations site-wide. Queued rows are left untouched."
+msgstr "Otomasyonların site genelindeki gönderimini durdur. Kuyruktaki satırlara dokunulmaz."
+
+#. frappe 07
+msgid "Tuning for the automation engine: dispatch limits, drain behaviour, retention and payload limits."
+msgstr "Otomasyon motoru ayarları: gönderim sınırları, boşaltma davranışı, saklama ve yük sınırları."
+
+#. frappe 07
+msgid "Attempt"
+msgstr "Deneme"
+
+#. frappe 07
+msgid "Null = run as soon as possible. Used by waits and date/cron triggers."
+msgstr "Null = mümkün olan en kısa sürede çalıştır. Beklemeler ve tarih/cron tetikleyicileri tarafından kullanılır."
+
+#. frappe 07
+msgid "Payload for custom emit() events."
+msgstr "Özel emit() olayları için yük."
+
+#. frappe 07
+msgid "Resume From Step"
+msgstr "Şu Adımdan Sürdür"
+
+#. frappe 07
+msgid "Resume Run"
+msgstr "Çalıştırmayı Sürdür"
+
+#. frappe 07
+msgid "Run After"
+msgstr "Şundan Sonra Çalıştır"
+
+#. frappe 07
+msgid "Triggered At"
+msgstr "Tetiklenme Zamanı"
+
+#. frappe 07
+msgid "Triggered By"
+msgstr "Tetikleyen"
+
+#. frappe 07
+msgid "Wait Resume"
+msgstr "Bekleme Sürdürme"
+
+#. frappe 07
+msgid "Scheduled for {0}"
+msgstr "{0} için zamanlandı"
+
+#. frappe 07
+msgid "Duplicate automation action_type: {0}"
+msgstr "Yinelenen otomasyon action_type: {0}"
+
+#. frappe 07
+msgid "Unknown automation action: {0}"
+msgstr "Bilinmeyen otomasyon eylemi: {0}"
+
+#. frappe 07
+msgid "Assigned to {0}"
+msgstr "{0} kişisine atandı"
+
+#. frappe 07
+msgid "Assignees"
+msgstr "Atananlar"
+
+#. frappe 07
+msgid "At least one assignee is required"
+msgstr "En az bir atanan gereklidir"
+
+#. frappe 07
+msgid "At least one recipient is required"
+msgstr "En az bir alıcı gereklidir"
+
+#. frappe 07
+msgid "Changed {0} by {1}"
+msgstr "{0}, {1} tarafından değiştirildi"
+
+#. frappe 07
+msgid "Choose a numeric field"
+msgstr "Sayısal bir alan seçin"
+
+#. frappe 07
+msgid "Could not resolve host: {0}"
+msgstr "Ana makine çözümlenemedi: {0}"
+
+#. frappe 07
+msgid "Created {0} {1}"
+msgstr "{0} {1} oluşturuldu"
+
+#. frappe 07
+msgid "Document owner"
+msgstr "Belge sahibi"
+
+#. frappe 07
+msgid "Emailed {0}"
+msgstr "{0} e-postalandı"
+
+#. frappe 07
+msgid "Field is required"
+msgstr "Alan gereklidir"
+
+#. frappe 07
+msgid "No recipients to notify"
+msgstr "Bildirilecek alıcı yok"
+
+#. frappe 07
+msgid "Notified {0}"
+msgstr "{0} bilgilendirildi"
+
+#. frappe 07
+msgid "Only a System Manager can write a script step"
+msgstr "Yalnızca Sistem Yöneticisi bir betik adımı yazabilir"
+
+#. frappe 07
+msgid "Only an {0} Server Script can be run from a flow"
+msgstr "Bir akıştan yalnızca bir {0} Sunucu Betiği çalıştırılabilir"
+
+#. frappe 07
+msgid "Pick a Server Script or write one here, not both"
+msgstr "Bir Sunucu Betiği seçin veya burada bir tane yazın, ikisini birden değil"
+
+#. frappe 07
+msgid "Pick a Server Script, or write one here"
+msgstr "Bir Sunucu Betiği seçin veya burada bir tane yazın"
+
+#. frappe 07
+msgid "Ran script"
+msgstr "Betik çalıştırıldı"
+
+#. frappe 07
+msgid "Requests to internal network addresses are not permitted"
+msgstr "İç ağ adreslerine istek yapılmasına izin verilmiyor"
+
+#. frappe 07
+msgid "Server Scripts are disabled. Enable them from the bench configuration."
+msgstr "Sunucu Betikleri devre dışı. Bench yapılandırmasından etkinleştirin."
+
+#. frappe 07
+msgid "Set at least one field"
+msgstr "En az bir alan ayarlayın"
+
+#. frappe 07
+msgid "Set {0}"
+msgstr "{0} ayarla"
+
+#. frappe 07
+msgid "Target Document Type is required"
+msgstr "Hedef Belge Türü gereklidir"
+
+#. frappe 07
+msgid "That Server Script is disabled"
+msgstr "Bu Sunucu Betiği devre dışı"
+
+#. frappe 07
+msgid "Timeout must be between 1 and {0} seconds"
+msgstr "Zaman aşımı 1 ile {0} saniye arasında olmalıdır"
+
+#. frappe 07
+msgid "Too many redirects"
+msgstr "Çok fazla yönlendirme"
+
+#. frappe 07
+msgid "URL has no host"
+msgstr "URL'de ana makine yok"
+
+#. frappe 07
+msgid "URL is required"
+msgstr "URL gereklidir"
+
+#. frappe 07
+msgid "URL must be http or https"
+msgstr "URL http veya https olmalıdır"
+
+#. frappe 07
+msgid "Unknown DocType"
+msgstr "Bilinmeyen Belge Türü"
+
+#. frappe 07
+msgid "Unknown Email Template"
+msgstr "Bilinmeyen E-posta Şablonu"
+
+#. frappe 07
+msgid "Unknown Server Script"
+msgstr "Bilinmeyen Sunucu Betiği"
+
+#. frappe 07
+msgid "Unsupported HTTP method"
+msgstr "Desteklenmeyen HTTP yöntemi"
+
+#. frappe 07
+msgid "Would {0} {1} (not sent)"
+msgstr "{0} {1} yapılırdı (gönderilmedi)"
+
+#. frappe 07
+msgid "{0} has no field {1}"
+msgstr "{0} için {1} alanı yok"
+
+#. frappe 07
+msgid "{0} must be a JSON object"
+msgstr "{0} bir JSON nesnesi olmalıdır"
+
+#. frappe 07
+msgid "{0} requires a target document"
+msgstr "{0} bir hedef belge gerektirir"
+
+#. frappe 07
+msgid "{0} {1} returned {2}"
+msgstr "{0} {1}, {2} döndürdü"
+
+#. frappe 07
+msgid "{0} {1} returned {2}: {3}"
+msgstr "{0} {1}, {2} döndürdü: {3}"
+
+#. frappe 07
+msgid "Branch for step {0} must be If or Else"
+msgstr "{0} adımının dalı Eğer veya Değilse olmalıdır"
+
+#. frappe 07
+msgid "Client-supplied resolver methods are not allowed"
+msgstr "İstemci tarafından sağlanan çözümleyici yöntemlere izin verilmiyor"
+
+#. frappe 07
+msgid "Document-less automations do not accept a document name"
+msgstr "Belgesiz otomasyonlar belge adı kabul etmez"
+
+#. frappe 07
+msgid "Step {0} is not an If step"
+msgstr "{0} adımı bir Eğer adımı değil"
+
+#. frappe 07
+msgid "This action does not support the selected trigger"
+msgstr "Bu eylem seçilen tetikleyiciyi desteklemiyor"
+
+#. frappe 07
+msgid "This action requires a Document Type"
+msgstr "Bu eylem bir Belge Türü gerektirir"
+
+#. frappe 07
+msgid "Unknown parameter: {0}"
+msgstr "Bilinmeyen parametre: {0}"
+
+#. frappe 07
+msgid "Related record condition must be a JSON object"
+msgstr "İlgili kayıt koşulu bir JSON nesnesi olmalıdır"
+
+#. frappe 07
+msgid "Related record condition needs a relationship"
+msgstr "İlgili kayıt koşulu bir ilişki gerektirir"
+
+#. frappe 07
+msgid "Unknown related-condition source alias: {0}"
+msgstr "Bilinmeyen ilgili koşul kaynak takma adı: {0}"
+
+#. frappe 07
+msgid "Unsupported count comparison: {0}"
+msgstr "Desteklenmeyen sayı karşılaştırması: {0}"
+
+#. frappe 07
+msgid "Unsupported related condition: {0}"
+msgstr "Desteklenmeyen ilgili koşul: {0}"
+
+#. frappe 07
+msgid "Automation event payload is too large"
+msgstr "Otomasyon olay yükü çok büyük"
+
+#. frappe 07
+msgid "Unregistered automation event: {0}"
+msgstr "Kayıtsız otomasyon olayı: {0}"
+
+#. frappe 07
+msgid "Wait for Event correlation key rendered empty"
+msgstr "Olay için Bekle korelasyon anahtarı boş oluşturuldu"
+
+#. frappe 07
+msgid "Wait for Event requires a correlation key"
+msgstr "Olay için Bekle bir korelasyon anahtarı gerektirir"
+
+#. frappe 07
+msgid "Wait for Event requires a timeout"
+msgstr "Olay için Bekle bir zaman aşımı gerektirir"
+
+#. frappe 07
+msgid "Wait for Event timeout unit must be one of {0}"
+msgstr "Olay için Bekle zaman aşımı birimi {0} değerlerinden biri olmalıdır"
+
+#. frappe 07
+msgid "Duplicate automation relationship name on {0}"
+msgstr "{0} üzerinde yinelenen otomasyon ilişkisi adı"
+
+#. frappe 07
+msgid "Duplicate record alias: {0}"
+msgstr "Yinelenen kayıt takma adı: {0}"
+
+#. frappe 07
+msgid "Each relationship needs an alias and relationship name"
+msgstr "Her ilişki için bir takma ad ve ilişki adı gerekir"
+
+#. frappe 07
+msgid "Filtered relationship queries require one target DocType"
+msgstr "Filtrelenmiş ilişki sorguları tek bir hedef Belge Türü gerektirir"
+
+#. frappe 07
+msgid "Invalid automation relationship definition"
+msgstr "Geçersiz otomasyon ilişkisi tanımı"
+
+#. frappe 07
+msgid "Record alias could not be resolved"
+msgstr "Kayıt takma adı çözümlenemedi"
+
+#. frappe 07
+msgid "Related record does not exist: {0} {1}"
+msgstr "İlgili kayıt mevcut değil: {0} {1}"
+
+#. frappe 07
+msgid "Relationship provider returned an invalid record reference"
+msgstr "İlişki sağlayıcısı geçersiz bir kayıt başvurusu döndürdü"
+
+#. frappe 07
+msgid "Relationship source DocType does not match"
+msgstr "İlişki kaynağı Belge Türü eşleşmiyor"
+
+#. frappe 07
+msgid "Relationship target DocType is not allowed"
+msgstr "İlişki hedefi Belge Türüne izin verilmiyor"
+
+#. frappe 07
+msgid "Relationship {0} cannot be used as a single record alias"
+msgstr "{0} ilişkisi tek kayıt takma adı olarak kullanılamaz"
+
+#. frappe 07
+msgid "Relationship {0} did not resolve to one record"
+msgstr "{0} ilişkisi tek bir kayda çözümlenmedi"
+
+#. frappe 07
+msgid "Relationship {0} returns multiple records"
+msgstr "{0} ilişkisi birden çok kayıt döndürüyor"
+
+#. frappe 07
+msgid "Relationships must be a JSON list"
+msgstr "İlişkiler bir JSON listesi olmalıdır"
+
+#. frappe 07
+msgid "Unknown automation relationship: {0}"
+msgstr "Bilinmeyen otomasyon ilişkisi: {0}"
+
+#. frappe 07
+msgid "Unknown derived relationship: {0} on {1}"
+msgstr "Bilinmeyen türetilmiş ilişki: {1} üzerinde {0}"
+
+#. frappe 07
+msgid "Unknown relationship source alias: {0}"
+msgstr "Bilinmeyen ilişki kaynak takma adı: {0}"
+
+#. frappe 07
+msgid "Action completed"
+msgstr "Eylem tamamlandı"
+
+#. frappe 07
+msgid "Auto-disabled after {0} consecutive failures"
+msgstr "Art arda {0} hatadan sonra otomatik devre dışı bırakıldı"
+
+#. frappe 07
+msgid "Automation Flow {0} was auto-disabled"
+msgstr "{0} Otomasyon Akışı otomatik devre dışı bırakıldı"
+
+#. frappe 07
+msgid "Automation paused"
+msgstr "Otomasyon duraklatıldı"
+
+#. frappe 07
+msgid "Condition took the {0} branch"
+msgstr "Koşul {0} dalını izledi"
+
+#. frappe 07
+msgid "Forced the {0} branch"
+msgstr "{0} dalı zorlandı"
+
+#. frappe 07
+msgid "Step condition did not match"
+msgstr "Adım koşulu eşleşmedi"
+
+#. frappe 07
+msgid "Waited for {0} (simulated)"
+msgstr "{0} için beklendi (simüle edildi)"
+
+#. frappe 07
+msgid "Waited {0} {1} (simulated)"
+msgstr "{0} {1} beklendi (simüle edildi)"
+
+#. frappe 07
+msgid "Waiting for {0}"
+msgstr "{0} bekleniyor"
+
+#. frappe 07
+msgid "Waiting {0} seconds"
+msgstr "{0} saniye bekleniyor"
+
+#. frappe 07
+msgid "Unknown derived relationship: {0}"
+msgstr "Bilinmeyen türetilmiş ilişki: {0}"
+
+#. frappe 07
+msgid "{0} (by {1} on {2})"
+msgstr "{0} ({2} tarihinde {1} tarafından)"
+
+#. frappe 07
+msgid "{0} (by {1})"
+msgstr "{0} ({1} tarafından)"
+
+#. frappe 07
+msgid "Another AI request is still processing. Please wait."
+msgstr "Başka bir yapay zeka isteği hâlâ işleniyor. Lütfen bekleyin."
+
+#. frappe 07
+msgid "Invalid page context JSON"
+msgstr "Geçersiz sayfa bağlamı JSON'u"
+
+#. frappe 08
+msgid "OpenRouter API key is not configured. Please set it in Studio Settings."
+msgstr "OpenRouter API anahtarı yapılandırılmamış. Lütfen Studio Ayarlarında ayarlayın."
+
+#. frappe 08
+msgid "Image is too large. Please use an image smaller than 5 MB."
+msgstr "Resim çok büyük. Lütfen 5 MB'tan küçük bir resim kullanın."
+
+#. frappe 08
+msgid "Invalid image data: must be a base64-encoded data URL"
+msgstr "Geçersiz resim verisi: base64 kodlu bir veri URL'si olmalıdır"
+
+#. frappe 08
+msgid "Invalid image data: must be a base64-encoded image data URL"
+msgstr "Geçersiz resim verisi: base64 kodlu bir resim veri URL'si olmalıdır"
+
+#. frappe 08
+msgid "AI session does not belong to this page"
+msgstr "Yapay zeka oturumu bu sayfaya ait değil"
+
+#. frappe 08
+msgid "AI session not found"
+msgstr "Yapay zeka oturumu bulunamadı"
+
+#. frappe 08
+msgid "You do not have access to this AI session"
+msgstr "Bu yapay zeka oturumuna erişiminiz yok"
+
+#. frappe 08
+msgid "Editing Studio code files is only allowed in developer mode."
+msgstr "Studio kod dosyalarını düzenlemeye yalnızca geliştirici modunda izin verilir."
+
+#. frappe 08
+msgid "Editing {0} files is not allowed."
+msgstr "{0} dosyalarını düzenlemeye izin verilmiyor."
+
+#. frappe 08
+msgid "File not found: {0}"
+msgstr "Dosya bulunamadı: {0}"
+
+#. frappe 08
+msgid "Not found: {0}"
+msgstr "Bulunamadı: {0}"
+
+#. frappe 08
+msgid "Studio App {0} is not exported to {1}."
+msgstr "Studio Uygulaması {0}, {1} konumuna aktarılmadı."
+
+#. frappe 08
+msgid "{0} already exists."
+msgstr "{0} zaten var."
+
+#. frappe 08
+msgid "{0} changed on disk since you opened it."
+msgstr "{0}, siz açtıktan sonra diskte değişti."
+
+#. frappe 08
+msgid "{0} is generated by Studio and is read-only."
+msgstr "{0} Studio tarafından oluşturulur ve salt okunurdur."
+
+#. frappe 08
+msgid "{0} is managed by Studio and can't be removed or renamed."
+msgstr "{0} Studio tarafından yönetilir ve kaldırılamaz veya yeniden adlandırılamaz."
+
+#. frappe 08
+msgid "{0} runs at build time; edit it in the repository."
+msgstr "{0} derleme zamanında çalışır; depoda düzenleyin."
+
+#. frappe 08
+msgid "Component ID"
+msgstr "Bileşen ID"
+
+#. frappe 08
+msgid "Metadata JSON"
+msgstr "Üst Veri JSON"
+
+#. frappe 08
+msgid "Studio AI Message"
+msgstr "Studio Yapay Zeka Mesajı"
+
+#. frappe 08
+msgid "Studio User"
+msgstr "Studio Kullanıcısı"
+
+#. frappe 08
+msgid "Is Running"
+msgstr "Çalışıyor mu"
+
+#. frappe 08
+msgid "Last Interaction On"
+msgstr "Son Etkileşim Tarihi"
+
+#. frappe 08
+msgid "Last Task Type"
+msgstr "Son Görev Türü"
+
+#. frappe 08
+msgid "Selected Model"
+msgstr "Seçilen Model"
+
+#. frappe 08
+msgid "Studio AI Session"
+msgstr "Studio Yapay Zeka Oturumu"
+
+#. frappe 08
+msgid "Replace Tasks and Onboarding with your page titles. Provide boot.onboarding_complete through the studio_app_boot hook."
+msgstr "Görevler ve Karşılamayı sayfa başlıklarınızla değiştirin. boot.onboarding_complete değerini studio_app_boot kancası üzerinden sağlayın."
+
+#. frappe 08
+msgid "Router script example"
+msgstr "Yönlendirici betiği örneği"
+
+#. frappe 08
+msgid "View example"
+msgstr "Örneği görüntüle"
+
+#. frappe 08
+msgid "Write a JavaScript object without import or export statements. All fields are optional."
+msgstr "import veya export ifadeleri olmadan bir JavaScript nesnesi yazın. Tüm alanlar isteğe bağlıdır."
+
+#. frappe 08
+msgid "App Home"
+msgstr "Uygulama Ana Sayfası"
+
+#. frappe 08
+msgid "App Title"
+msgstr "Uygulama Başlığı"
+
+#. frappe 08
+msgid "Control navigation with guards, redirects, aliases and route metadata"
+msgstr "Gezinmeyi korumalar, yönlendirmeler, takma adlar ve rota üst verileriyle denetleyin"
+
+#. frappe 08
+msgid "Favicon"
+msgstr "Favicon"
+
+#. frappe 08
+msgid "Frappe App (for export)"
+msgstr "Frappe Uygulaması (dışa aktarım için)"
+
+#. frappe 08
+msgid "Router"
+msgstr "Yönlendirici"
+
+#. frappe 08
+msgid "Router Script"
+msgstr "Yönlendirici Betiği"
+
+#. frappe 08
+msgid "Shown in the browser tab and as the app's icon on the desktop. Use a square PNG or SVG"
+msgstr "Tarayıcı sekmesinde ve masaüstünde uygulamanın simgesi olarak gösterilir. Kare bir PNG veya SVG kullanın"
+
+#. frappe 08
+msgid "App Name must be lowercase, with hyphens instead of spaces or punctuation."
+msgstr "Uygulama Adı küçük harfli olmalı; boşluk veya noktalama yerine tire kullanılmalıdır."
+
+#. frappe 08
+msgid "Custom component {0} is ambiguous: {1}"
+msgstr "{0} özel bileşeni belirsiz: {1}"
+
+#. frappe 08
+msgid "Duplicate component name"
+msgstr "Yinelenen bileşen adı"
+
+#. frappe 08
+msgid "Exported apps can only be renamed in developer mode."
+msgstr "Dışa aktarılan uygulamalar yalnızca geliştirici modunda yeniden adlandırılabilir."
+
+#. frappe 08
+msgid "File conflict"
+msgstr "Dosya çakışması"
+
+#. frappe 08
+msgid "Folder {0} already exists."
+msgstr "{0} klasörü zaten var."
+
+#. frappe 08
+msgid "Folder {0} exists and is not a Studio app."
+msgstr "{0} klasörü var ve bir Studio uygulaması değil."
+
+#. frappe 08
+msgid "Frappe App must be set to export the Studio App."
+msgstr "Studio Uygulamasını dışa aktarmak için Frappe Uygulaması ayarlanmalıdır."
+
+#. frappe 08
+msgid "Invalid copied file."
+msgstr "Geçersiz kopyalanan dosya."
+
+#. frappe 08
+msgid "Router Script restored from router.ts. Custom apps run it as plain JavaScript object. Remove import statements and TypeScript types if present."
+msgstr "Yönlendirici Betiği router.ts dosyasından geri yüklendi. Özel uygulamalar bunu düz JavaScript nesnesi olarak çalıştırır. Varsa import ifadelerini ve TypeScript türlerini kaldırın."
+
+#. frappe 08
+msgid "The copy contains conflicting versions of {0}."
+msgstr "Kopya, {0} için çakışan sürümler içeriyor."
+
+#. frappe 08
+msgid "Unsupported copied file: {0}"
+msgstr "Desteklenmeyen kopyalanan dosya: {0}"
+
+#. frappe 08
+msgid "You do not have permission to generate the app build"
+msgstr "Uygulama derlemesi oluşturma yetkiniz yok"
+
+#. frappe 08
+msgid "{0} already exists with different content. Rename it before pasting."
+msgstr "{0} farklı içerikle zaten var. Yapıştırmadan önce yeniden adlandırın."
+
+#. frappe 08
+msgid "Block"
+msgstr "Blok"
+
+#. frappe 08
+msgid "Exported to the app's files"
+msgstr "Uygulamanın dosyalarına aktarıldı"
+
+#. frappe 08
+msgid "Inputs"
+msgstr "Girdiler"
+
+#. frappe 08
+msgid "Interface"
+msgstr "Arayüz"
+
+#. frappe 08
+msgid "Is Disabled"
+msgstr "Devre Dışı mı"
+
+#. frappe 08
+msgid "Studio Component"
+msgstr "Studio Bileşeni"
+
+#. frappe 08
+msgid "Component ID cannot be empty or contain slashes."
+msgstr "Bileşen ID'si boş olamaz veya eğik çizgi içeremez."
+
+#. frappe 08
+msgid "Invalid Component ID"
+msgstr "Geçersiz Bileşen ID'si"
+
+#. frappe 08
+msgid "Input Name"
+msgstr "Girdi Adı"
+
+#. frappe 08
+msgid "Studio Component Input"
+msgstr "Studio Bileşen Girdisi"
+
+#. frappe 08
+msgid "Data source {0} already exists on this page."
+msgstr "{0} veri kaynağı bu sayfada zaten var."
+
+#. frappe 08
+msgid "Invalid Studio App."
+msgstr "Geçersiz Studio Uygulaması."
+
+#. frappe 08
+msgid "Invalid Studio Page."
+msgstr "Geçersiz Studio Sayfası."
+
+#. frappe 08
+msgid "Invalid component ID in copied content."
+msgstr "Kopyalanan içerikte geçersiz bileşen ID'si."
+
+#. frappe 08
+msgid "Invalid component definition in copied content."
+msgstr "Kopyalanan içerikte geçersiz bileşen tanımı."
+
+#. frappe 08
+msgid "Invalid component in copied content."
+msgstr "Kopyalanan içerikte geçersiz bileşen."
+
+#. frappe 08
+msgid "Invalid component inputs in copied content."
+msgstr "Kopyalanan içerikte geçersiz bileşen girdileri."
+
+#. frappe 08
+msgid "Invalid data source copy."
+msgstr "Geçersiz veri kaynağı kopyası."
+
+#. frappe 08
+msgid "Invalid data source name in copied content."
+msgstr "Kopyalanan içerikte geçersiz veri kaynağı adı."
+
+#. frappe 08
+msgid "Invalid guest access setting in copied content."
+msgstr "Kopyalanan içerikte geçersiz misafir erişimi ayarı."
+
+#. frappe 08
+msgid "Invalid page copy."
+msgstr "Geçersiz sayfa kopyası."
+
+#. frappe 08
+msgid "Invalid page title in copied content."
+msgstr "Kopyalanan içerikte geçersiz sayfa başlığı."
+
+#. frappe 08
+msgid "Invalid script in copied content."
+msgstr "Kopyalanan içerikte geçersiz betik."
+
+#. frappe 08
+msgid "Invalid tab title in copied content."
+msgstr "Kopyalanan içerikte geçersiz sekme başlığı."
+
+#. frappe 08
+msgid "Invalid {0} in copied content."
+msgstr "Kopyalanan içerikte geçersiz {0}."
+
+#. frappe 08
+msgid "The target page does not belong to the selected app."
+msgstr "Hedef sayfa seçilen uygulamaya ait değil."
+
+#. frappe 08
+msgid "Allow Guest Access"
+msgstr "Misafir Erişimine İzin Ver"
+
+#. frappe 08
+msgid "Defaults to the page title. Use {{ }} for dynamic data"
+msgstr "Varsayılan olarak sayfa başlığıdır. Dinamik veri için {{ }} kullanın"
+
+#. frappe 08
+msgid "Draft Blocks"
+msgstr "Taslak Bloklar"
+
+#. frappe 08
+msgid "Page Script"
+msgstr "Sayfa Betiği"
+
+#. frappe 08
+msgid "Render this page for logged-out visitors. Its layout and script become publicly readable; data it fetches depends on the data source permissions"
+msgstr "Bu sayfayı oturum açmamış ziyaretçiler için oluştur. Düzeni ve betiği herkese açık okunabilir olur; getirdiği veri, veri kaynağı izinlerine bağlıdır"
+
+#. frappe 08
+msgid "Resources"
+msgstr "Kaynaklar"
+
+#. frappe 08
+msgid "Studio Page"
+msgstr "Studio Sayfası"
+
+#. frappe 08
+msgid "Tab Title"
+msgstr "Sekme Başlığı"
+
+#. frappe 08
+msgid "Could not keep option \"{0}\" of variants block {1}. Reload the page and try again."
+msgstr "{1} varyant bloğunun \"{0}\" seçeneği korunamadı. Sayfayı yeniden yükleyip tekrar deneyin."
+
+#. frappe 08
+msgid "Duplicate variable name: {0}"
+msgstr "Yinelenen değişken adı: {0}"
+
+#. frappe 08
+msgid "Field {0} is not editable outside the Studio editor"
+msgstr "{0} alanı Studio düzenleyicisi dışında düzenlenemez"
+
+#. frappe 08
+msgid "Invalid Page Title"
+msgstr "Geçersiz Sayfa Başlığı"
+
+#. frappe 08
+msgid "Invalid variable name '{0}' — use letters, digits and underscores, starting with a letter."
+msgstr "Geçersiz değişken adı '{0}' — harf, rakam ve alt çizgi kullanın, bir harfle başlayın."
+
+#. frappe 08
+msgid "Page Title cannot be empty or contain slashes."
+msgstr "Sayfa Başlığı boş olamaz veya eğik çizgi içeremez."
+
+#. frappe 08
+msgid "Page changed"
+msgstr "Sayfa değişti"
+
+#. frappe 08
+msgid "Page(s) with duplicate Route or Page Title already exist in this app: {0}"
+msgstr "Bu uygulamada yinelenen Rota veya Sayfa Başlığına sahip sayfa(lar) zaten var: {0}"
+
+#. frappe 08
+msgid "Please set API URL for Data Source {0}"
+msgstr "Lütfen {0} Veri Kaynağı için API URL'sini ayarlayın"
+
+#. frappe 08
+msgid "Please set Document Type for Data Source {0}"
+msgstr "Lütfen {0} Veri Kaynağı için Belge Türünü ayarlayın"
+
+#. frappe 08
+msgid "Please set fields to fetch for Data Source {0}"
+msgstr "Lütfen {0} Veri Kaynağı için getirilecek alanları ayarlayın"
+
+#. frappe 08
+msgid "Please set filters to fetch the Data Source {0}"
+msgstr "Lütfen {0} Veri Kaynağını getirmek için filtreleri ayarlayın"
+
+#. frappe 08
+msgid "Please set the document name to fetch the Data Source {0}"
+msgstr "Lütfen {0} Veri Kaynağını getirmek için belge adını ayarlayın"
+
+#. frappe 08
+msgid "This page was changed outside the editor. Refresh to load the latest version before editing."
+msgstr "Bu sayfa düzenleyici dışında değiştirildi. Düzenlemeden önce en son sürümü yüklemek için yenileyin."
+
+#. frappe 08
+msgid "You do not have permission to preview this page"
+msgstr "Bu sayfayı önizleme yetkiniz yok"
+
+#. frappe 08
+msgid "API Parameters"
+msgstr "API Parametreleri"
+
+#. frappe 08
+msgid "API Resource"
+msgstr "API Kaynağı"
+
+#. frappe 08
+msgid "API URL"
+msgstr "API URL'si"
+
+#. frappe 08
+msgid "Auto fetch data on load"
+msgstr "Yüklemede veriyi otomatik getir"
+
+#. frappe 08
+msgid "Document List"
+msgstr "Belge Listesi"
+
+#. frappe 08
+msgid "Document Resource"
+msgstr "Belge Kaynağı"
+
+#. frappe 08
+msgid "Dynamically fetch document using filters"
+msgstr "Filtreleri kullanarak belgeyi dinamik olarak getir"
+
+#. frappe 08
+msgid "On Error"
+msgstr "Hatada"
+
+#. frappe 08
+msgid "On Success"
+msgstr "Başarıda"
+
+#. frappe 08
+msgid "Resource Type"
+msgstr "Kaynak Türü"
+
+#. frappe 08
+msgid "Studio Page Resource"
+msgstr "Studio Sayfa Kaynağı"
+
+#. frappe 08
+msgid "Transform"
+msgstr "Dönüştür"
+
+#. frappe 08
+msgid "Whitelisted Methods"
+msgstr "Beyaz Listedeki Yöntemler"
+
+#. frappe 08
+msgid "Boolean"
+msgstr "Boole"
+
+#. frappe 08
+msgid "Initial Value"
+msgstr "Başlangıç Değeri"
+
+#. frappe 08
+msgid "Object"
+msgstr "Nesne"
+
+#. frappe 08
+msgid "String"
+msgstr "Metin"
+
+#. frappe 08
+msgid "Studio Page Variable"
+msgstr "Studio Sayfa Değişkeni"
+
+#. frappe 08
+msgid "Variable Type"
+msgstr "Değişken Türü"
+
+#. frappe 08
+msgid "AI API Key"
+msgstr "Yapay Zeka API Anahtarı"
+
+#. frappe 08
+msgid "AI Settings"
+msgstr "Yapay Zeka Ayarları"
+
+#. frappe 08
+msgid "API key for the selected AI model provider"
+msgstr "Seçilen yapay zeka modeli sağlayıcısının API anahtarı"
+
+#. frappe 08
+msgid "Studio Settings"
+msgstr "Studio Ayarları"
+
+#. frappe 08
+msgid "Invalid export path: {0}"
+msgstr "Geçersiz dışa aktarma yolu: {0}"
+
+#. frappe 08
+msgid "Standard apps can only be edited in developer mode."
+msgstr "Standart uygulamalar yalnızca geliştirici modunda düzenlenebilir."
+
+#. frappe 08
+msgid "Editor"
+msgstr "Düzenleyici"
+
+#. frappe 08
+msgid "App {0} is not installed on this site."
+msgstr "{0} uygulaması bu sitede kurulu değil."
+
+#. frappe 08
+msgid "Invalid App"
+msgstr "Geçersiz Uygulama"
+
+#. frappe 08
+msgid "You do not have permission to modify pages"
+msgstr "Sayfaları değiştirme yetkiniz yok"
+
+#. frappe 08
+msgid "A chat can be shared only with someone who uses Flow."
+msgstr "Bir sohbet yalnızca Flow kullanan biriyle paylaşılabilir."
+
+#. frappe 08
+msgid "A screen or an error is required."
+msgstr "Bir ekran veya bir hata gereklidir."
+
+#. frappe 08
+msgid "Answers must be a JSON object."
+msgstr "Yanıtlar bir JSON nesnesi olmalıdır."
+
+#. frappe 08
+msgid "Attachments must be a list of File names."
+msgstr "Ekler, Dosya adlarından oluşan bir liste olmalıdır."
+
+#. frappe 08
+msgid "Enter a value."
+msgstr "Bir değer girin."
+
+#. frappe 08
+msgid "Feedback Too Long"
+msgstr "Geri Bildirim Çok Uzun"
+
+#. frappe 08
+msgid "Feedback applies to finished runs only (this run is {0})."
+msgstr "Geri bildirim yalnızca tamamlanan çalıştırmalar için geçerlidir (bu çalıştırma {0})."
+
+#. frappe 08
+msgid "File is required."
+msgstr "Dosya gereklidir."
+
+#. frappe 08
+msgid "General access must be \"Restricted\" (only the people added) or \"Everyone\" (every Flow user)."
+msgstr "Genel erişim \"Kısıtlı\" (yalnızca eklenen kişiler) veya \"Herkes\" (her Flow kullanıcısı) olmalıdır."
+
+#. frappe 08
+msgid "Invalid Access"
+msgstr "Geçersiz Erişim"
+
+#. frappe 08
+msgid "Invalid Answers"
+msgstr "Geçersiz Yanıtlar"
+
+#. frappe 08
+msgid "Invalid Attachment"
+msgstr "Geçersiz Ek"
+
+#. frappe 08
+msgid "Invalid Attachments"
+msgstr "Geçersiz Ekler"
+
+#. frappe 08
+msgid "Invalid Message"
+msgstr "Geçersiz Mesaj"
+
+#. frappe 08
+msgid "Invalid Model"
+msgstr "Geçersiz Model"
+
+#. frappe 08
+msgid "Invalid Path"
+msgstr "Geçersiz Yol"
+
+#. frappe 08
+msgid "Invalid Rating"
+msgstr "Geçersiz Derecelendirme"
+
+#. frappe 08
+msgid "Invalid Reasoning Effort"
+msgstr "Geçersiz Muhakeme Çabası"
+
+#. frappe 08
+msgid "Invalid Run"
+msgstr "Geçersiz Çalıştırma"
+
+#. frappe 08
+msgid "Invalid Screen"
+msgstr "Geçersiz Ekran"
+
+#. frappe 08
+msgid "Invalid Session"
+msgstr "Geçersiz Oturum"
+
+#. frappe 08
+msgid "Invalid Target"
+msgstr "Geçersiz Hedef"
+
+#. frappe 08
+msgid "Invalid Title"
+msgstr "Geçersiz Başlık"
+
+#. frappe 08
+msgid "Invalid Token"
+msgstr "Geçersiz Belirteç"
+
+#. frappe 08
+msgid "Invalid User"
+msgstr "Geçersiz Kullanıcı"
+
+#. frappe 08
+msgid "Keep feedback under {0} characters."
+msgstr "Geri bildirimi {0} karakterin altında tutun."
+
+#. frappe 08
+msgid "Message is required."
+msgstr "Mesaj gereklidir."
+
+#. frappe 08
+msgid "Model is required."
+msgstr "Model gereklidir."
+
+#. frappe 08
+msgid "Path must be active or all."
+msgstr "Yol active veya all olmalıdır."
+
+#. frappe 08
+msgid "Rating must be Up, Down, or None."
+msgstr "Derecelendirme Beğen, Beğenme veya Yok olmalıdır."
+
+#. frappe 08
+msgid "Reasoning effort must be one of {0}."
+msgstr "Muhakeme çabası {0} değerlerinden biri olmalıdır."
+
+#. frappe 08
+msgid "Rewind target must be a whole number."
+msgstr "Geri sarma hedefi tam sayı olmalıdır."
+
+#. frappe 08
+msgid "Run Not Finished"
+msgstr "Çalıştırma Bitmedi"
+
+#. frappe 08
+msgid "Run is required."
+msgstr "Çalıştırma gereklidir."
+
+#. frappe 08
+msgid "Session is required."
+msgstr "Oturum gereklidir."
+
+#. frappe 08
+msgid "Session or agent is required."
+msgstr "Oturum veya ajan gereklidir."
+
+#. frappe 08
+msgid "This password box is no longer waiting."
+msgstr "Bu parola kutusu artık beklemiyor."
+
+#. frappe 08
+msgid "Token is required."
+msgstr "Belirteç gereklidir."
+
+#. frappe 08
+msgid "Untitled chat"
+msgstr "Adsız sohbet"
+
+#. frappe 08
+msgid "User is required."
+msgstr "Kullanıcı gereklidir."
+
+#. frappe 08
+msgid "{0} shared the chat {1} with you"
+msgstr "{0}, {1} sohbetini sizinle paylaştı"
+
+#. frappe 08
+msgid "Couldn't reach {0} from this server."
+msgstr "{0} bu sunucudan erişilemedi."
+
+#. frappe 08
+msgid "Enter the server's address, starting with http:// or https://."
+msgstr "Sunucunun adresini http:// veya https:// ile başlayarak girin."
+
+#. frappe 08
+msgid "Flow can't connect {0} here. Add it in Settings."
+msgstr "Flow burada {0} bağlayamıyor. Ayarlar'dan ekleyin."
+
+#. frappe 08
+msgid "Ollama isn't answering on this server any more."
+msgstr "Ollama bu sunucuda artık yanıt vermiyor."
+
+#. frappe 08
+msgid "Paste the key first."
+msgstr "Önce anahtarı yapıştırın."
+
+#. frappe 08
+msgid "This {0} account is out of credit."
+msgstr "Bu {0} hesabının kredisi bitti."
+
+#. frappe 08
+msgid "{0} didn't accept this key."
+msgstr "{0} bu anahtarı kabul etmedi."
+
+#. frappe 08
+msgid "{0} doesn't offer this model to your key."
+msgstr "{0}, anahtarınıza bu modeli sunmuyor."
+
+#. frappe 08
+msgid "{0} has no model called {1}."
+msgstr "{0} içinde {1} adında model yok."
+
+#. frappe 08
+msgid "{0} would like to use Flow. Connect a model provider to set it up."
+msgstr "{0} Flow'u kullanmak istiyor. Kurmak için bir model sağlayıcısı bağlayın."
+
+#. frappe 08
+msgid "Enter {0} for {1} {2}"
+msgstr "{1} {2} için {0} girin"
+
+#. frappe 08
+msgid "Flow Server"
+msgstr "Flow Sunucusu"
+
+#. frappe 08
+msgid "Run \"{0}\" on {1}"
+msgstr "{1} üzerinde \"{0}\" çalıştır"
+
+#. frappe 08
+msgid "Run Python code"
+msgstr "Python kodu çalıştır"
+
+#. frappe 08
+msgid "Terminal sequence is required."
+msgstr "Terminal dizisi gereklidir."
+
+#. frappe 08
+msgid "The flow server did not expose terminal sequence {0}."
+msgstr "Flow sunucusu {0} terminal dizisini sunmadı."
+
+#. frappe 08
+msgid "The session's agent is disabled."
+msgstr "Oturumun ajanı devre dışı."
+
+#. frappe 08
+msgid "The session's owner is disabled."
+msgstr "Oturumun sahibi devre dışı."
+
+#. frappe 08
+msgid "The tool did not run: it waited too long for a background worker."
+msgstr "Araç çalışmadı: bir arka plan çalışanını çok uzun süre bekledi."
+
+#. frappe 08
+msgid "Unknown callback mode {0}."
+msgstr "Bilinmeyen geri çağırma modu {0}."
+
+#. frappe 08
+msgid "Unknown callback type {0}."
+msgstr "Bilinmeyen geri çağırma türü {0}."
+
+#. frappe 08
+msgid "Unknown session {0}."
+msgstr "Bilinmeyen oturum {0}."
+
+#. frappe 08
+msgid "Unknown tool {0}."
+msgstr "Bilinmeyen araç {0}."
+
+#. frappe 08
+msgid "{0} is not a sub-agent of {1}."
+msgstr "{0}, {1} ajanının alt ajanı değil."
+
+#. frappe 08
+msgid "Defined in code and owned by it: the Desk can enable or disable the agent and switch its model, nothing else."
+msgstr "Kodda tanımlıdır ve ona aittir: Masaüstü ajanı yalnızca etkinleştirebilir veya devre dışı bırakabilir ve modelini değiştirebilir, başka bir şey yapamaz."
+
+#. frappe 08
+msgid "Flow User"
+msgstr "Flow Kullanıcısı"
+
+#. frappe 08
+msgid "System message shown to the LLM. Describe the agent's role, scope, and rules. Jinja tags {{ user }}, {{ full_name }} and {{ today }} are filled in when a session starts."
+msgstr "LLM'e gösterilen sistem mesajı. Ajanın rolünü, kapsamını ve kurallarını açıklayın. {{ user }}, {{ full_name }} ve {{ today }} Jinja etiketleri oturum başladığında doldurulur."
+
+#. frappe 08
+msgid "The app that defines this agent in code."
+msgstr "Bu ajanı kodda tanımlayan uygulama."
+
+#. frappe 08
+msgid "An agent can bind at most {0} skills."
+msgstr "Bir ajan en fazla {0} beceri bağlayabilir."
+
+#. frappe 08
+msgid "An agent cannot be its own sub-agent."
+msgstr "Bir ajan kendi alt ajanı olamaz."
+
+#. frappe 08
+msgid "Could not fill in the instructions: {0}. To keep Jinja as plain text, wrap it in {1}."
+msgstr "Talimatlar doldurulamadı: {0}. Jinja'yı düz metin olarak tutmak için {1} içine alın."
+
+#. frappe 08
+msgid "Disabled Model"
+msgstr "Devre Dışı Model"
+
+#. frappe 08
+msgid "Invalid Instructions"
+msgstr "Geçersiz Talimatlar"
+
+#. frappe 08
+msgid "Invalid Max Iterations"
+msgstr "Geçersiz Maksimum Yineleme"
+
+#. frappe 08
+msgid "Invalid Sub-agent"
+msgstr "Geçersiz Alt Ajan"
+
+#. frappe 08
+msgid "Invalid Token Budget"
+msgstr "Geçersiz Token Bütçesi"
+
+#. frappe 08
+msgid "Max Iterations must be at least 1."
+msgstr "Maksimum Yineleme en az 1 olmalıdır."
+
+#. frappe 08
+msgid "Sub-agent {0} runs on Flow Model {1}, which is disabled."
+msgstr "{0} alt ajanı, devre dışı olan {1} Flow Modeli üzerinde çalışıyor."
+
+#. frappe 08
+msgid "Token Budget cannot be negative."
+msgstr "Token Bütçesi negatif olamaz."
+
+#. frappe 08
+msgid "Too Many Skills"
+msgstr "Çok Fazla Beceri"
+
+#. frappe 08
+msgid "Flow Agent Knowledge Base"
+msgstr "Flow Ajanı Bilgi Tabanı"
+
+#. frappe 08
+msgid "<code>Agent</code> memories are shared with everyone who uses the agent. <code>User</code> memories are visible only to their user."
+msgstr "<code>Ajan</code> anıları, ajanı kullanan herkesle paylaşılır. <code>Kullanıcı</code> anıları yalnızca kullanıcısı tarafından görülür."
+
+#. frappe 08
+msgid "Flow Agent Memory"
+msgstr "Flow Ajanı Belleği"
+
+#. frappe 08
+msgid "One short, self-contained fact."
+msgstr "Kısa, kendi başına anlamlı tek bir bilgi."
+
+#. frappe 08
+msgid "Source Run"
+msgstr "Kaynak Çalıştırma"
+
+#. frappe 08
+msgid "Empty Memory"
+msgstr "Boş Bellek"
+
+#. frappe 08
+msgid "Keep each memory under {0} characters — split or shorten it."
+msgstr "Her anıyı {0} karakterin altında tutun — bölün veya kısaltın."
+
+#. frappe 08
+msgid "Memory Too Long"
+msgstr "Bellek Çok Uzun"
+
+#. frappe 08
+msgid "Memory content is required."
+msgstr "Bellek içeriği gereklidir."
+
+#. frappe 08
+msgid "Missing User"
+msgstr "Eksik Kullanıcı"
+
+#. frappe 08
+msgid "User-scoped memories must have a user."
+msgstr "Kullanıcı kapsamlı anıların bir kullanıcısı olmalıdır."
+
+#. frappe 08
+msgid "Flow Agent Tool"
+msgstr "Flow Ajanı Aracı"
+
+#. frappe 08
+msgid "Tool"
+msgstr "Araç"
+
+#. frappe 08
+msgid "Sources Processing"
+msgstr "Kaynaklar İşleniyor"
+
+#. frappe 08
+msgid "{0} has sources still processing. Rename it once they finish."
+msgstr "{0} için hâlâ işlenen kaynaklar var. Bitince yeniden adlandırın."
+
+#. frappe 08
+msgid "Chunk Index"
+msgstr "Parça Dizini"
+
+#. frappe 08
+msgid "Flow Knowledge Chunk"
+msgstr "Flow Bilgi Parçası"
+
+#. frappe 08
+msgid "Hash of the source document's indexed text; lets re-sync skip unchanged rows."
+msgstr "Kaynak belgenin dizinlenen metninin özeti; yeniden eşitlemenin değişmeyen satırları atlamasını sağlar."
+
+#. frappe 08
+msgid "Position of this chunk within its source, starting at 0."
+msgstr "Bu parçanın kaynağı içindeki konumu, 0'dan başlar."
+
+#. frappe 08
+msgid "Flow Model used to embed chunks and queries. Its Model ID must be an embedding model, e.g. <code>openai/text-embedding-3-small</code>."
+msgstr "Parçaları ve sorguları gömmek için kullanılan Flow Modeli. Model ID'si bir gömme modeli olmalıdır, ör. <code>openai/text-embedding-3-small</code>."
+
+#. frappe 08
+msgid "Hybrid"
+msgstr "Karma"
+
+#. frappe 08
+msgid "Vector"
+msgstr "Vektör"
+
+#. frappe 08
+msgid "Chunk Overlap must be smaller than Chunk Size."
+msgstr "Parça Örtüşmesi Parça Boyutundan küçük olmalıdır."
+
+#. frappe 08
+msgid "Chunk Size must be at least 1."
+msgstr "Parça Boyutu en az 1 olmalıdır."
+
+#. frappe 08
+msgid "Embedding Model In Use"
+msgstr "Gömme Modeli Kullanımda"
+
+#. frappe 08
+msgid "Flow Knowledge Settings Required"
+msgstr "Flow Bilgi Ayarları Gerekli"
+
+#. frappe 08
+msgid "Invalid Chunking"
+msgstr "Geçersiz Parçalama"
+
+#. frappe 08
+msgid "Set an embedding model in Flow Knowledge Settings before adding knowledge bases or sources."
+msgstr "Bilgi tabanı veya kaynak eklemeden önce Flow Bilgi Ayarlarında bir gömme modeli ayarlayın."
+
+#. frappe 08
+msgid "{0} knowledge chunks were embedded with the current model. Delete all knowledge sources before changing the embedding model."
+msgstr "{0} bilgi parçası mevcut modelle gömüldü. Gömme modelini değiştirmeden önce tüm bilgi kaynaklarını silin."
+
+#. frappe 08
+msgid "Chunk settings changed. The {0} existing chunks for this source will be deleted and rebuilt with the new settings. Re-process now?"
+msgstr "Parça ayarları değişti. Bu kaynağın mevcut {0} parçası silinip yeni ayarlarla yeniden oluşturulacak. Şimdi yeniden işlensin mi?"
+
+#. frappe 08
+msgid "Re-ingestion started"
+msgstr "Yeniden alım başlatıldı"
+
+#. frappe 08
+msgid "Reconcile started"
+msgstr "Uzlaştırma başlatıldı"
+
+#. frappe 08
+msgid "Resync"
+msgstr "Yeniden Eşitle"
+
+#. frappe 08
+msgid "Resync started"
+msgstr "Yeniden eşitleme başlatıldı"
+
+#. frappe 08
+msgid "Auto Sync"
+msgstr "Otomatik Eşitleme"
+
+#. frappe 08
+msgid "Characters per chunk for this source. Leave 0 to inherit the global default from Flow Knowledge Settings."
+msgstr "Bu kaynak için parça başına karakter. Flow Bilgi Ayarlarındaki genel varsayılanı devralmak için 0 bırakın."
+
+#. frappe 08
+msgid "Characters shared between consecutive chunks. Leave 0 to inherit the global default."
+msgstr "Ardışık parçalar arasında paylaşılan karakterler. Genel varsayılanı devralmak için 0 bırakın."
+
+#. frappe 08
+msgid "Chunk Count"
+msgstr "Parça Sayısı"
+
+#. frappe 08
+msgid "Comma-separated fieldnames whose values are indexed, e.g. <code>subject, description, resolution</code>"
+msgstr "Değerleri dizinlenen, virgülle ayrılmış alan adları, ör. <code>subject, description, resolution</code>"
+
+#. frappe 08
+msgid "Content Fields"
+msgstr "İçerik Alanları"
+
+#. frappe 08
+msgid "Keep this source in sync with a daily incremental sweep."
+msgstr "Bu kaynağı günlük artımlı tarama ile eşitlenmiş tutun."
+
+#. frappe 08
+msgid "Optional JSON filters selecting which documents to index, e.g. <code>{\"status\": \"Resolved\"}</code>"
+msgstr "Hangi belgelerin dizinleneceğini seçen isteğe bağlı JSON filtreleri, ör. <code>{\"status\": \"Resolved\"}</code>"
+
+#. frappe 08
+msgid "Watermark for incremental DocType sync: rows modified after this are re-checked."
+msgstr "Artımlı Belge Türü eşitlemesi için filigran: bundan sonra değiştirilen satırlar yeniden denetlenir."
+
+#. frappe 08
+msgid "Content Fields is required for a DocType source."
+msgstr "Belge Türü kaynağı için İçerik Alanları gereklidir."
+
+#. frappe 08
+msgid "{0} is required for a {1} source."
+msgstr "{1} kaynağı için {0} gereklidir."
+
+#. frappe 08
+msgid "Connection OK"
+msgstr "Bağlantı Tamam"
+
+#. frappe 08
+msgid "Save the document before testing the connection."
+msgstr "Bağlantıyı test etmeden önce belgeyi kaydedin."
+
+#. frappe 08
+msgid "Test Connection"
+msgstr "Bağlantıyı Test Et"
+
+#. frappe 08
+msgid "Testing connection…"
+msgstr "Bağlantı test ediliyor…"
+
+#. frappe 08
+msgid "Context Window"
+msgstr "Bağlam Penceresi"
+
+#. frappe 08
+msgid "Endpoint for this model, e.g. a self-hosted Ollama (<code>http://localhost:11434</code>) or a proxy. Needed when no Provider is linked."
+msgstr "Bu modelin uç noktası, ör. kendi barındırdığınız bir Ollama (<code>http://localhost:11434</code>) veya bir proxy. Bağlı bir Sağlayıcı yoksa gereklidir."
+
+#. frappe 08
+msgid "Extra LiteLLM params sent with every call to this model, e.g. <code>{\"provider\": {\"zdr\": true}}</code> for OpenRouter's zero data retention. Flow Users can read them, so keep keys out."
+msgstr "Bu modele yapılan her çağrıyla gönderilen ek LiteLLM parametreleri, ör. OpenRouter'ın sıfır veri saklaması için <code>{\"provider\": {\"zdr\": true}}</code>. Flow Kullanıcıları bunları okuyabilir, bu yüzden anahtarları buraya koymayın."
+
+#. frappe 08
+msgid "LiteLLM model identifier. With a Provider linked, pick or type just the model (e.g. <code>claude-sonnet-4-6</code>); otherwise use <code>provider/model</code> form, e.g. <code>anthropic/claude-sonnet-4-6</code>, <code>openai/gpt-4.1</code>, <code>ollama/llama3.1</code>"
+msgstr "LiteLLM model tanımlayıcısı. Bağlı bir Sağlayıcı varsa yalnızca modeli seçin veya yazın (ör. <code>claude-sonnet-4-6</code>); aksi halde <code>provider/model</code> biçimini kullanın, ör. <code>anthropic/claude-sonnet-4-6</code>, <code>openai/gpt-4.1</code>, <code>ollama/llama3.1</code>"
+
+#. frappe 08
+msgid "Max input tokens. Auto-detected from the model on save; managed by Flow, not user-editable. 0 = unknown."
+msgstr "En fazla girdi tokeni. Kaydederken modelden otomatik algılanır; Flow tarafından yönetilir, kullanıcı tarafından düzenlenemez. 0 = bilinmiyor."
+
+#. frappe 08
+msgid "Who can use this model; empty means every Flow User. Others pick another model for agents that run on it, but a sub-agent on it works for anyone using its agent. Disabling a role also drops it here, which can leave the model open to every Flow User."
+msgstr "Bu modeli kimlerin kullanabileceği; boş olması her Flow Kullanıcısı demektir. Diğerleri, bu model üzerinde çalışan ajanlar için başka bir model seçer, ancak onun üzerindeki bir alt ajan, ajanını kullanan herkes için çalışır. Bir rolü devre dışı bırakmak onu burada da kaldırır; bu da modeli her Flow Kullanıcısına açık bırakabilir."
+
+#. frappe 08
+msgid "Base URL must be an absolute http(s) URL."
+msgstr "Temel URL mutlak bir http(s) URL'si olmalıdır."
+
+#. frappe 08
+msgid "Extra Params must be a JSON object."
+msgstr "Ek Parametreler bir JSON nesnesi olmalıdır."
+
+#. frappe 08
+msgid "Extra Params must be valid JSON."
+msgstr "Ek Parametreler geçerli JSON olmalıdır."
+
+#. frappe 08
+msgid "Invalid Base URL"
+msgstr "Geçersiz Temel URL"
+
+#. frappe 08
+msgid "Invalid Extra Params"
+msgstr "Geçersiz Ek Parametreler"
+
+#. frappe 08
+msgid "Invalid Model ID"
+msgstr "Geçersiz Model ID"
+
+#. frappe 08
+msgid "LiteLLM is not installed. Run <code>bench setup requirements</code>."
+msgstr "LiteLLM kurulu değil. <code>bench setup requirements</code> komutunu çalıştırın."
+
+#. frappe 08
+msgid "Model ID must be in <code>provider/model</code> form (e.g. <code>anthropic/claude-sonnet-4-6</code>). Only lowercase provider names and alphanumerics, dashes, dots, colons or slashes in the model part are allowed. The model part may start with ~."
+msgstr "Model ID <code>provider/model</code> biçiminde olmalıdır (ör. <code>anthropic/claude-sonnet-4-6</code>). Model kısmında yalnızca küçük harfli sağlayıcı adlarına ve alfasayısal karakterlere, tire, nokta, iki nokta veya eğik çizgiye izin verilir. Model kısmı ~ ile başlayabilir."
+
+#. frappe 08
+msgid "LiteLLM provider name, e.g. <code>openai</code>, <code>anthropic</code>, <code>openrouter</code>, <code>gemini</code>. Any Flow Model whose Model ID starts with this provider uses these credentials unless it sets its own."
+msgstr "LiteLLM sağlayıcı adı, ör. <code>openai</code>, <code>anthropic</code>, <code>openrouter</code>, <code>gemini</code>. Model ID'si bu sağlayıcıyla başlayan her Flow Modeli, kendi kimlik bilgilerini ayarlamadıkça bunları kullanır."
+
+#. frappe 08
+msgid "Invalid Provider"
+msgstr "Geçersiz Sağlayıcı"
+
+#. frappe 08
+msgid "Unknown provider {0}. It must be a LiteLLM provider name (e.g. openai, anthropic, openrouter, gemini)."
+msgstr "Bilinmeyen sağlayıcı {0}. Bir LiteLLM sağlayıcı adı olmalıdır (ör. openai, anthropic, openrouter, gemini)."
+
+#. frappe 08
+msgid "Approval Seq"
+msgstr "Onay Sırası"
+
+#. frappe 08
+msgid "Conversation this run belongs to."
+msgstr "Bu çalıştırmanın ait olduğu konuşma."
+
+#. frappe 08
+msgid "Denied"
+msgstr "Reddedildi"
+
+#. frappe 08
+msgid "DocType of the document that fired the trigger."
+msgstr "Tetikleyiciyi çalıştıran belgenin Belge Türü."
+
+#. frappe 08
+msgid "Document that fired the trigger."
+msgstr "Tetikleyiciyi çalıştıran belge."
+
+#. frappe 08
+msgid "Dotted path of a function Flow calls with this run once it ends; cleared once called."
+msgstr "Çalıştırma bittiğinde Flow'un bu çalıştırmayla çağırdığı işlevin noktalı yolu; çağrıldıktan sonra temizlenir."
+
+#. frappe 08
+msgid "Down"
+msgstr "Aşağı"
+
+#. frappe 08
+msgid "Feedback Comment"
+msgstr "Geri Bildirim Yorumu"
+
+#. frappe 08
+msgid "Final assistant message when the run completes."
+msgstr "Çalıştırma tamamlandığında son asistan mesajı."
+
+#. frappe 08
+msgid "Flow Server Run"
+msgstr "Flow Sunucusu Çalıştırması"
+
+#. frappe 08
+msgid "Flow Trigger that started this run, when source is Trigger."
+msgstr "Kaynak Tetikleyici olduğunda, bu çalıştırmayı başlatan Flow Tetikleyicisi."
+
+#. frappe 08
+msgid "Input"
+msgstr "Girdi"
+
+#. frappe 08
+msgid "Input → Output"
+msgstr "Girdi → Çıktı"
+
+#. frappe 08
+msgid "List of tool calls the agent executed."
+msgstr "Ajanın yürüttüğü araç çağrılarının listesi."
+
+#. frappe 08
+msgid "Log position of the approval batch the questions belong to."
+msgstr "Soruların ait olduğu onay grubunun günlük konumu."
+
+#. frappe 08
+msgid "On Complete"
+msgstr "Tamamlandığında"
+
+#. frappe 08
+msgid "Original user input that started the run."
+msgstr "Çalıştırmayı başlatan özgün kullanıcı girdisi."
+
+#. frappe 08
+msgid "Questions waiting on a user answer. Present only when status is Paused."
+msgstr "Kullanıcı yanıtı bekleyen sorular. Yalnızca durum Duraklatıldı olduğunda bulunur."
+
+#. frappe 08
+msgid "The flow server's id of this run's latest segment (a resume starts a new one)."
+msgstr "Flow sunucusunun bu çalıştırmanın son segmentinin ID'si (sürdürme yeni bir tane başlatır)."
+
+#. frappe 08
+msgid "Thumbs rating the user gave this response."
+msgstr "Kullanıcının bu yanıta verdiği beğeni derecelendirmesi."
+
+#. frappe 08
+msgid "Token Usage"
+msgstr "Token Kullanımı"
+
+#. frappe 08
+msgid "Tool Calls"
+msgstr "Araç Çağrıları"
+
+#. frappe 08
+msgid "Failed runs must include an error message."
+msgstr "Başarısız çalıştırmalar bir hata mesajı içermelidir."
+
+#. frappe 08
+msgid "Invalid JSON"
+msgstr "Geçersiz JSON"
+
+#. frappe 08
+msgid "Paused runs must have at least one pending question."
+msgstr "Duraklatılan çalıştırmaların en az bir bekleyen sorusu olmalıdır."
+
+#. frappe 08
+msgid "{0} must be valid JSON."
+msgstr "{0} geçerli JSON olmalıdır."
+
+#. frappe 08
+msgid "Cache Read"
+msgstr "Önbellekten Okuma"
+
+#. frappe 08
+msgid "Cache Write"
+msgstr "Önbelleğe Yazma"
+
+#. frappe 08
+msgid "Pending Questions"
+msgstr "Bekleyen Sorular"
+
+#. frappe 08
+msgid "View in Flow"
+msgstr "Flow'da Görüntüle"
+
+#. frappe 08
+msgid "Ask stops at every confirmation-gated tool call. Auto lets the helper model approve the calls the user asked for and asks about the rest. Auto-approve runs everything; always so for Trigger sessions."
+msgstr "Sor, onay gerektiren her araç çağrısında durur. Otomatik, yardımcı modelin kullanıcının istediği çağrıları onaylamasına izin verir ve kalanları sorar. Otomatik onay her şeyi çalıştırır; Tetikleyici oturumları için her zaman böyledir."
+
+#. frappe 08
+msgid "Auto-approve"
+msgstr "Otomatik onay"
+
+#. frappe 08
+msgid "Files attached across all runs in this conversation."
+msgstr "Bu konuşmadaki tüm çalıştırmalar boyunca eklenen dosyalar."
+
+#. frappe 08
+msgid "Full chat transcript across all runs in this conversation."
+msgstr "Bu konuşmadaki tüm çalıştırmalar boyunca tam sohbet dökümü."
+
+#. frappe 08
+msgid "How far the flow server's log has been mirrored into this session."
+msgstr "Flow sunucusunun günlüğünün bu oturuma ne kadar yansıtıldığı."
+
+#. frappe 08
+msgid "Last Synced Seq"
+msgstr "Son Eşitlenen Sıra"
+
+#. frappe 08
+msgid "Runs"
+msgstr "Çalıştırmalar"
+
+#. frappe 08
+msgid "A chat can only be shared to view."
+msgstr "Bir sohbet yalnızca görüntülemek üzere paylaşılabilir."
+
+#. frappe 08
+msgid "Agent Locked"
+msgstr "Ajan Kilitli"
+
+#. frappe 08
+msgid "Approval mode must be Ask, Auto or Auto-approve."
+msgstr "Onay modu Sor, Otomatik veya Otomatik onay olmalıdır."
+
+#. frappe 08
+msgid "Cannot change the agent on an existing session."
+msgstr "Mevcut bir oturumdaki ajan değiştirilemez."
+
+#. frappe 08
+msgid "Disabled Agent"
+msgstr "Devre Dışı Ajan"
+
+#. frappe 08
+msgid "Flow Agent {0} is disabled."
+msgstr "{0} Flow Ajanı devre dışı."
+
+#. frappe 08
+msgid "Flow Model {0} is disabled."
+msgstr "{0} Flow Modeli devre dışı."
+
+#. frappe 08
+msgid "Invalid Approval Mode"
+msgstr "Geçersiz Onay Modu"
+
+#. frappe 08
+msgid "Nothing to Resume"
+msgstr "Sürdürülecek Bir Şey Yok"
+
+#. frappe 08
+msgid "The flow server is running a turn this site has no record of."
+msgstr "Flow sunucusu bu sitenin kaydı olmayan bir tur çalıştırıyor."
+
+#. frappe 08
+msgid "This session has no paused run."
+msgstr "Bu oturumda duraklatılmış çalıştırma yok."
+
+#. frappe 08
+msgid "To share a chat with everyone, use General access in its Share dialog."
+msgstr "Bir sohbeti herkesle paylaşmak için Paylaş penceresindeki Genel erişim'i kullanın."
+
+#. frappe 08
+msgid "Trigger sessions always auto-approve tool calls."
+msgstr "Tetikleyici oturumları araç çağrılarını her zaman otomatik onaylar."
+
+#. frappe 09
+msgid "View Only"
+msgstr "Yalnızca Görüntüleme"
+
+#. frappe 09
+msgid "No messages yet."
+msgstr "Henüz mesaj yok."
+
+#. frappe 09
+msgid "Extracted Text"
+msgstr "Çıkarılan Metin"
+
+#. frappe 09
+msgid "Flow Session Attachment"
+msgstr "Flow Oturum Eki"
+
+#. frappe 09
+msgid "Inline"
+msgstr "Satır İçi"
+
+#. frappe 09
+msgid "Inline: the text went into its turn's message. Retrieval: chunked and embedded (oversized files); the best matches are appended to each later turn. Image: sent to the model as an image."
+msgstr "Satır içi: metin, kendi turunun mesajına girdi. Getirme: parçalara bölünüp gömüldü (büyük dosyalar); en iyi eşleşmeler sonraki her tura eklenir. Resim: modele resim olarak gönderildi."
+
+#. frappe 09
+msgid "Mode"
+msgstr "Mod"
+
+#. frappe 09
+msgid "Retrieval"
+msgstr "Getirme"
+
+#. frappe 09
+msgid "Size in bytes."
+msgstr "Bayt cinsinden boyut."
+
+#. frappe 09
+msgid "The run (turn) this file was sent with."
+msgstr "Bu dosyanın gönderildiği çalıştırma (tur)."
+
+#. frappe 09
+msgid "Attach at most {0} files per message."
+msgstr "Mesaj başına en fazla {0} dosya ekleyin."
+
+#. frappe 09
+msgid "Attachment Indexing Failed"
+msgstr "Ek Dizinleme Başarısız"
+
+#. frappe 09
+msgid "Attachment Search Failed"
+msgstr "Ek Arama Başarısız"
+
+#. frappe 09
+msgid "Could not index the attached file. Please retry."
+msgstr "Eklenen dosya dizinlenemedi. Lütfen tekrar deneyin."
+
+#. frappe 09
+msgid "Could not search the attached files. Please retry."
+msgstr "Eklenen dosyalar aranamadı. Lütfen tekrar deneyin."
+
+#. frappe 09
+msgid "Empty File"
+msgstr "Boş Dosya"
+
+#. frappe 09
+msgid "No readable text found in this file."
+msgstr "Bu dosyada okunabilir metin bulunamadı."
+
+#. frappe 09
+msgid "No readable text found in {0}."
+msgstr "{0} içinde okunabilir metin bulunamadı."
+
+#. frappe 09
+msgid "Not permitted to use this file."
+msgstr "Bu dosyayı kullanma izniniz yok."
+
+#. frappe 09
+msgid "Relevant excerpts from the attached files:"
+msgstr "Eklenen dosyalardan ilgili alıntılar:"
+
+#. frappe 09
+msgid "Too Many Files"
+msgstr "Çok Fazla Dosya"
+
+#. frappe 09
+msgid "Unsupported file type: .{0}"
+msgstr "Desteklenmeyen dosya türü: .{0}"
+
+#. frappe 09
+msgid "{0} is an image; it has no text to read."
+msgstr "{0} bir resim; okunacak metni yok."
+
+#. frappe 09
+msgid "{0} is not attached to this chat."
+msgstr "{0} bu sohbete eklenmemiş."
+
+#. frappe 09
+msgid "Flow Session Message"
+msgstr "Flow Oturum Mesajı"
+
+#. frappe 09
+msgid "Message body. Null for assistant turns that only call tools."
+msgstr "Mesaj gövdesi. Yalnızca araç çağıran asistan turları için Null."
+
+#. frappe 09
+msgid "Seq"
+msgstr "Sıra"
+
+#. frappe 09
+msgid "The Flow Run that produced this message."
+msgstr "Bu mesajı üreten Flow Çalıştırması."
+
+#. frappe 09
+msgid "The flow server log row this message was recorded from."
+msgstr "Bu mesajın kaydedildiği flow sunucusu günlük satırı."
+
+#. frappe 09
+msgid "Tool Call ID"
+msgstr "Araç Çağrısı ID"
+
+#. frappe 09
+msgid "When role is 'assistant', the list of tool calls the model requested."
+msgstr "Rol 'assistant' olduğunda, modelin istediği araç çağrılarının listesi."
+
+#. frappe 09
+msgid "When role is 'tool', the assistant tool_call.id this result answers."
+msgstr "Rol 'tool' olduğunda, bu sonucun yanıtladığı asistan tool_call.id değeri."
+
+#. frappe 09
+msgid "Does quick side jobs, like chat titles. A cheaper model saves credits."
+msgstr "Sohbet başlıkları gibi hızlı yan işleri yapar. Daha ucuz bir model kredi tasarrufu sağlar."
+
+#. frappe 09
+msgid "Helper Model"
+msgstr "Yardımcı Model"
+
+#. frappe 09
+msgid "Search API Key"
+msgstr "Arama API Anahtarı"
+
+#. frappe 09
+msgid "Search Provider"
+msgstr "Arama Sağlayıcısı"
+
+#. frappe 09
+msgid "The service agents use to search the web."
+msgstr "Ajanların web'de aramak için kullandığı hizmet."
+
+#. frappe 09
+msgid "Missing API Key"
+msgstr "Eksik API Anahtarı"
+
+#. frappe 09
+msgid "{0} needs a Search API Key."
+msgstr "{0} için bir Arama API Anahtarı gerekir."
+
+#. frappe 09
+msgid "Anyone chatting with an agent that has this skill can start it by typing /skill: and its name. Agents can load it either way."
+msgstr "Bu beceriye sahip bir ajanla sohbet eden herkes /skill: ve adını yazarak başlatabilir. Ajanlar bunu her iki şekilde de yükleyebilir."
+
+#. frappe 09
+msgid "The app that ships this skill in its skills folder."
+msgstr "Bu beceriyi beceriler klasöründe sunan uygulama."
+
+#. frappe 09
+msgid "A user-invocable skill needs a letter or digit in its title."
+msgstr "Kullanıcı tarafından çağrılabilen bir becerinin başlığında bir harf veya rakam bulunmalıdır."
+
+#. frappe 09
+msgid "At most {0} skills can be available to all agents."
+msgstr "Tüm ajanlara açık en fazla {0} beceri olabilir."
+
+#. frappe 09
+msgid "Description Too Long"
+msgstr "Açıklama Çok Uzun"
+
+#. frappe 09
+msgid "Description must be at most {0} characters."
+msgstr "Açıklama en fazla {0} karakter olmalıdır."
+
+#. frappe 09
+msgid "Duplicate Skill Command"
+msgstr "Yinelenen Beceri Komutu"
+
+#. frappe 09
+msgid "File Too Large"
+msgstr "Dosya Çok Büyük"
+
+#. frappe 09
+msgid "Invalid skill {0}: {1}"
+msgstr "Geçersiz beceri {0}: {1}"
+
+#. frappe 09
+msgid "No skill named {0}. Available: {1}"
+msgstr "{0} adında beceri yok. Mevcut: {1}"
+
+#. frappe 09
+msgid "Not a Text File"
+msgstr "Metin Dosyası Değil"
+
+#. frappe 09
+msgid "Skill {0} has no file {1}."
+msgstr "{0} becerisinde {1} dosyası yok."
+
+#. frappe 09
+msgid "Skill {0} has no files."
+msgstr "{0} becerisinde dosya yok."
+
+#. frappe 09
+msgid "Skills folder {0} has more than {1} entries."
+msgstr "{0} beceri klasöründe {1} girdiden fazlası var."
+
+#. frappe 09
+msgid "Too Many Global Skills"
+msgstr "Çok Fazla Genel Beceri"
+
+#. frappe 09
+msgid "Unknown File"
+msgstr "Bilinmeyen Dosya"
+
+#. frappe 09
+msgid "Unknown Skill"
+msgstr "Bilinmeyen Beceri"
+
+#. frappe 09
+msgid "{0} already answers to /skill:{1}. Choose a different name."
+msgstr "{0} zaten /skill:{1} komutuna yanıt veriyor. Farklı bir ad seçin."
+
+#. frappe 09
+msgid "{0} is larger than {1} KB."
+msgstr "{0}, {1} KB'tan büyük."
+
+#. frappe 09
+msgid "{0} is not a text file."
+msgstr "{0} bir metin dosyası değil."
+
+#. frappe 09
+msgid "<code>Imported</code> tools are loaded from a Python module by path. <code>Script</code> tools store code in the database and run it in a <code>safe_exec</code> sandbox. <code>Server</code> tools are extension tools the flow server loaded, mirrored here by the app."
+msgstr "<code>İçe aktarılan</code> araçlar bir Python modülünden yola göre yüklenir. <code>Betik</code> araçları kodu veritabanında saklar ve bir <code>safe_exec</code> korumalı alanında çalıştırır. <code>Sunucu</code> araçları, flow sunucusunun yüklediği ve uygulamanın burada yansıttığı uzantı araçlarıdır."
+
+#. frappe 09
+msgid "Defined in code and owned by it: the Desk can only enable or disable the tool."
+msgstr "Kodda tanımlıdır ve ona aittir: Masaüstü aracı yalnızca etkinleştirebilir veya devre dışı bırakabilir."
+
+#. frappe 09
+msgid "Dotted Python path to the <code>Tool</code> object, e.g. <code>frappe.flow.tools.builtins.search_doctypes</code>."
+msgstr "<code>Tool</code> nesnesinin noktalı Python yolu, ör. <code>frappe.flow.tools.builtins.search_doctypes</code>."
+
+#. frappe 09
+msgid "Optional plain-English summary for human reviewers."
+msgstr "İnsan inceleyiciler için isteğe bağlı sade dilde özet."
+
+#. frappe 09
+msgid "Python source. Must define a top-level <code>main</code> function. Executed in a server-script sandbox. Requires server scripts to be enabled in the bench configuration."
+msgstr "Python kaynağı. Üst düzey bir <code>main</code> işlevi tanımlamalıdır. Sunucu betiği korumalı alanında çalıştırılır. Bench yapılandırmasında sunucu betiklerinin etkin olmasını gerektirir."
+
+#. frappe 09
+msgid "Server"
+msgstr "Sunucu"
+
+#. frappe 09
+msgid "Summary (human-facing)"
+msgstr "Özet (insanlara yönelik)"
+
+#. frappe 09
+msgid "<code>main</code> must not accept <code>*args</code> or <code>**kwargs</code>."
+msgstr "<code>main</code>, <code>*args</code> veya <code>**kwargs</code> kabul etmemelidir."
+
+#. frappe 09
+msgid "Code has invalid Python syntax: {0}"
+msgstr "Kodun Python sözdizimi geçersiz: {0}"
+
+#. frappe 09
+msgid "Code is required for Script tools."
+msgstr "Betik araçları için kod gereklidir."
+
+#. frappe 09
+msgid "Code must define a top-level <code>main</code> function."
+msgstr "Kod, üst düzey bir <code>main</code> işlevi tanımlamalıdır."
+
+#. frappe 09
+msgid "Code must not call <code>main()</code> directly (line {0})."
+msgstr "Kod <code>main()</code> işlevini doğrudan çağırmamalıdır (satır {0})."
+
+#. frappe 09
+msgid "Function Name must be snake_case: start with a lowercase letter, then lowercase letters, digits or underscores."
+msgstr "İşlev Adı snake_case olmalıdır: küçük harfle başlayıp küçük harf, rakam veya alt çizgi içermelidir."
+
+#. frappe 09
+msgid "Function Name {0} is reserved for Flow's own tools and app tools."
+msgstr "{0} İşlev Adı, Flow'un kendi araçları ve uygulama araçları için ayrılmıştır."
+
+#. frappe 09
+msgid "Import Path is required for Imported tools."
+msgstr "İçe aktarılan araçlar için İçe Aktarma Yolu gereklidir."
+
+#. frappe 09
+msgid "Import Path must be a dotted Python path (e.g. <code>frappe.flow.tools.builtins.search</code>)."
+msgstr "İçe Aktarma Yolu noktalı bir Python yolu olmalıdır (ör. <code>frappe.flow.tools.builtins.search</code>)."
+
+#. frappe 09
+msgid "Imported tools must not define inline code."
+msgstr "İçe aktarılan araçlar satır içi kod tanımlamamalıdır."
+
+#. frappe 09
+msgid "Invalid Code"
+msgstr "Geçersiz Kod"
+
+#. frappe 09
+msgid "Invalid Function Name"
+msgstr "Geçersiz İşlev Adı"
+
+#. frappe 09
+msgid "Invalid Import Path"
+msgstr "Geçersiz İçe Aktarma Yolu"
+
+#. frappe 09
+msgid "Invalid Signature"
+msgstr "Geçersiz İmza"
+
+#. frappe 09
+msgid "Invalid Type"
+msgstr "Geçersiz Tür"
+
+#. frappe 09
+msgid "Missing Code"
+msgstr "Eksik Kod"
+
+#. frappe 09
+msgid "Missing Import Path"
+msgstr "Eksik İçe Aktarma Yolu"
+
+#. frappe 09
+msgid "Missing main()"
+msgstr "Eksik main()"
+
+#. frappe 09
+msgid "Reserved Function Name"
+msgstr "Ayrılmış İşlev Adı"
+
+#. frappe 09
+msgid "Script tools must not specify an Import Path."
+msgstr "Betik araçları bir İçe Aktarma Yolu belirtmemelidir."
+
+#. frappe 09
+msgid "Server Tool"
+msgstr "Sunucu Aracı"
+
+#. frappe 09
+msgid "Server tools come from the flow server's extensions; add an extension instead."
+msgstr "Sunucu araçları flow sunucusunun uzantılarından gelir; bunun yerine bir uzantı ekleyin."
+
+#. frappe 09
+msgid "Server tools have no code here; the flow server provides them."
+msgstr "Sunucu araçlarının burada kodu yoktur; flow sunucusu sağlar."
+
+#. frappe 09
+msgid "Type must be Imported, Script or Server."
+msgstr "Tür İçe Aktarılan, Betik veya Sunucu olmalıdır."
+
+#. frappe 09
+msgid "Unexpected Code"
+msgstr "Beklenmeyen Kod"
+
+#. frappe 09
+msgid "Unexpected Import Path"
+msgstr "Beklenmeyen İçe Aktarma Yolu"
+
+#. frappe 09
+msgid "Jinja template rendered into the agent input. <code>doc</code> and <code>now</code> are in scope, e.g. <code>Summarize {{ doc.doctype }} {{ doc.name }} and suggest next steps: {{ doc.description }}</code>"
+msgstr "Ajan girdisine işlenen Jinja şablonu. <code>doc</code> ve <code>now</code> kullanılabilir, ör. <code>Summarize {{ doc.doctype }} {{ doc.name }} and suggest next steps: {{ doc.description }}</code>"
+
+#. frappe 09
+msgid "Last Fired At"
+msgstr "Son Tetiklenme Zamanı"
+
+#. frappe 09
+msgid "Last time this scheduled trigger fired. Set by the system."
+msgstr "Bu zamanlanmış tetikleyicinin son tetiklendiği zaman. Sistem tarafından ayarlanır."
+
+#. frappe 09
+msgid "Optional Python condition; the trigger fires only if it is truthy. A single expression (e.g. <code>doc.status == \"Open\"</code>), or a multi-line script that must assign the verdict to a variable named <code>result</code>. Runs in the server-script sandbox with <code>doc</code> in scope for DocType events. Requires server scripts to be enabled in the bench configuration; without it the condition is treated as not met and the trigger does not fire."
+msgstr "İsteğe bağlı Python koşulu; tetikleyici yalnızca doğruysa çalışır. Tek bir ifade (ör. <code>doc.status == \"Open\"</code>) veya kararı <code>result</code> adlı bir değişkene ataması gereken çok satırlı bir betik. Belge Türü olayları için <code>doc</code> kullanılabilir şekilde sunucu betiği korumalı alanında çalışır. Bench yapılandırmasında sunucu betiklerinin etkin olmasını gerektirir; aksi halde koşul karşılanmamış sayılır ve tetikleyici çalışmaz."
+
+#. frappe 09
+msgid "Run the agent as this user, so its tools act with a defined, least-privilege permission scope. Defaults to the trigger's owner when empty. Prefer a purpose-scoped service user over a full administrator."
+msgstr "Ajanı bu kullanıcı olarak çalıştırın; böylece araçları tanımlı, en az ayrıcalıklı bir izin kapsamıyla çalışır. Boşsa tetikleyicinin sahibi varsayılır. Tam yönetici yerine amaca yönelik bir hizmet kullanıcısını tercih edin."
+
+#. frappe 09
+msgid "Standard 5-field cron, e.g. '0 9 * * 5' for every Friday 09:00."
+msgstr "Standart 5 alanlı cron, ör. her Cuma 09:00 için '0 9 * * 5'."
+
+#. frappe 09
+msgid "The app that ships this trigger."
+msgstr "Bu tetikleyiciyi sunan uygulama."
+
+#. frappe 09
+msgid "Cron Expression is required for Scheduled triggers."
+msgstr "Zamanlanmış tetikleyiciler için Cron İfadesi gereklidir."
+
+#. frappe 09
+msgid "Doc Event is required for DocType Event triggers."
+msgstr "Belge Türü Olayı tetikleyicileri için Belge Olayı gereklidir."
+
+#. frappe 09
+msgid "Invalid Cron"
+msgstr "Geçersiz Cron"
+
+#. frappe 09
+msgid "Invalid Doc Event: {0}"
+msgstr "Geçersiz Belge Olayı: {0}"
+
+#. frappe 09
+msgid "Invalid Jinja template: {0}"
+msgstr "Geçersiz Jinja şablonu: {0}"
+
+#. frappe 09
+msgid "Invalid Run As"
+msgstr "Geçersiz Şu Olarak Çalıştır"
+
+#. frappe 09
+msgid "Invalid Template"
+msgstr "Geçersiz Şablon"
+
+#. frappe 09
+msgid "Run As must be an enabled user."
+msgstr "Şu Olarak Çalıştır etkin bir kullanıcı olmalıdır."
+
+#. frappe 09
+msgid "Target DocType is required for DocType Event triggers."
+msgstr "Belge Türü Olayı tetikleyicileri için Hedef Belge Türü gereklidir."
+
+#. frappe 09
+msgid "{0} cannot use agent {1}."
+msgstr "{0}, {1} ajanını kullanamaz."
+
+#. frappe 09
+msgid "Embedding Failed"
+msgstr "Gömme Başarısız"
+
+#. frappe 09
+msgid "Embedding provider returned {0} vectors for {1} inputs."
+msgstr "Gömme sağlayıcısı {1} girdi için {0} vektör döndürdü."
+
+#. frappe 09
+msgid "Knowledge Not Configured"
+msgstr "Bilgi Yapılandırılmamış"
+
+#. frappe 09
+msgid "Model Disabled"
+msgstr "Model Devre Dışı"
+
+#. frappe 09
+msgid "Set an embedding model in Flow Knowledge Settings first."
+msgstr "Önce Flow Bilgi Ayarlarında bir gömme modeli ayarlayın."
+
+#. frappe 09
+msgid "Blocked URL"
+msgstr "Engellenen URL"
+
+#. frappe 09
+msgid "Cannot Read PDF"
+msgstr "PDF Okunamıyor"
+
+#. frappe 09
+msgid "Child table fields are not supported as content fields: {0}"
+msgstr "Alt tablo alanları içerik alanı olarak desteklenmez: {0}"
+
+#. frappe 09
+msgid "Could not resolve URL host."
+msgstr "URL ana makinesi çözümlenemedi."
+
+#. frappe 09
+msgid "Filters must be a JSON object."
+msgstr "Filtreler bir JSON nesnesi olmalıdır."
+
+#. frappe 09
+msgid "Filters must be valid JSON."
+msgstr "Filtreler geçerli JSON olmalıdır."
+
+#. frappe 09
+msgid "Invalid Content Fields"
+msgstr "Geçersiz İçerik Alanları"
+
+#. frappe 09
+msgid "Invalid Source"
+msgstr "Geçersiz Kaynak"
+
+#. frappe 09
+msgid "No content fields configured."
+msgstr "Yapılandırılmış içerik alanı yok."
+
+#. frappe 09
+msgid "PDF is password protected and cannot be read."
+msgstr "PDF parola korumalıdır ve okunamaz."
+
+#. frappe 09
+msgid "Remote file exceeds the size limit."
+msgstr "Uzak dosya boyut sınırını aşıyor."
+
+#. frappe 09
+msgid "The URL redirects; enter the address it leads to."
+msgstr "URL yönlendiriyor; gittiği adresi girin."
+
+#. frappe 09
+msgid "URL has no host."
+msgstr "URL'de ana makine yok."
+
+#. frappe 09
+msgid "URL must use http or https."
+msgstr "URL http veya https kullanmalıdır."
+
+#. frappe 09
+msgid "URL resolves to a non-public address."
+msgstr "URL herkese açık olmayan bir adrese çözümleniyor."
+
+#. frappe 09
+msgid "Unknown fields for {0}: {1}"
+msgstr "{0} için bilinmeyen alanlar: {1}"
+
+#. frappe 09
+msgid "Unsupported Format"
+msgstr "Desteklenmeyen Biçim"
+
+#. frappe 09
+msgid "Unsupported file format: .{0}"
+msgstr "Desteklenmeyen dosya biçimi: .{0}"
+
+#. frappe 09
+msgid "Unsupported source type: {0}"
+msgstr "Desteklenmeyen kaynak türü: {0}"
+
+#. frappe 09
+msgid "Invalid Knowledge Base"
+msgstr "Geçersiz Bilgi Tabanı"
+
+#. frappe 09
+msgid "Knowledge base title is required."
+msgstr "Bilgi tabanı başlığı gereklidir."
+
+#. frappe 09
+msgid "Knowledge search requires at least one knowledge base."
+msgstr "Bilgi araması en az bir bilgi tabanı gerektirir."
+
+#. frappe 09
+msgid "No Knowledge Base"
+msgstr "Bilgi Tabanı Yok"
+
+#. frappe 09
+msgid "Embedding Dimension Mismatch"
+msgstr "Gömme Boyutu Uyuşmazlığı"
+
+#. frappe 09
+msgid "Knowledge Store Not Ready"
+msgstr "Bilgi Deposu Hazır Değil"
+
+#. frappe 09
+msgid "Knowledge store has dimension {0} but {1} was requested. Rebuild the knowledge store."
+msgstr "Bilgi deposunun boyutu {0} ancak {1} istendi. Bilgi deposunu yeniden oluşturun."
+
+#. frappe 09
+msgid "Knowledge store is not initialized. Configure Flow Knowledge Settings and ingest a source."
+msgstr "Bilgi deposu başlatılmamış. Flow Bilgi Ayarlarını yapılandırıp bir kaynak alın."
+
+#. frappe 09
+msgid "Agent Conflict"
+msgstr "Ajan Çakışması"
+
+#. frappe 09
+msgid "Flow Agent {0} already exists and is not owned by code."
+msgstr "{0} Flow Ajanı zaten var ve kod tarafından sahiplenilmiyor."
+
+#. frappe 09
+msgid "Flow Agent {0} is declared more than once."
+msgstr "{0} Flow Ajanı birden fazla kez bildirilmiş."
+
+#. frappe 09
+msgid "Invalid Tool"
+msgstr "Geçersiz Araç"
+
+#. frappe 09
+msgid "Tool Conflict"
+msgstr "Araç Çakışması"
+
+#. frappe 09
+msgid "Tool {0} must be exported as a module-level attribute by an installed app."
+msgstr "{0} aracı, kurulu bir uygulama tarafından modül düzeyinde öznitelik olarak dışa aktarılmalıdır."
+
+#. frappe 09
+msgid "Tools {0} and {1} are both named {2}. Name one differently with @tool(name=...)."
+msgstr "{0} ve {1} araçlarının ikisi de {2} olarak adlandırılmış. Birini @tool(name=...) ile farklı adlandırın."
+
+#. frappe 09
+msgid "Model Not Permitted"
+msgstr "Model İzinli Değil"
+
+#. frappe 09
+msgid "You don't have permission to use {0}. Use a different model instead."
+msgstr "{0} kullanma izniniz yok. Bunun yerine farklı bir model kullanın."
+
+#. frappe 09
+msgid "Could not import tool from {0}: {1}"
+msgstr "Araç {0} konumundan içe aktarılamadı: {1}"
+
+#. frappe 09
+msgid "Import path {0} is not a Tool or callable."
+msgstr "İçe aktarma yolu {0} bir Araç veya çağrılabilir değil."
+
+#. frappe 09
+msgid "Tool Import Failed"
+msgstr "Araç İçe Aktarma Başarısız"
+
+#. frappe 09
+msgid "Agent Mismatch"
+msgstr "Ajan Uyuşmazlığı"
+
+#. frappe 09
+msgid "Existing sessions keep the tools they started with. This applies to new sessions."
+msgstr "Mevcut oturumlar başladıkları araçları korur. Bu, yeni oturumlar için geçerlidir."
+
+#. frappe 09
+msgid "Missing Default Agent"
+msgstr "Varsayılan Ajan Eksik"
+
+#. frappe 09
+msgid "The {0} agent is missing. Create a Flow Model first to auto-provision it."
+msgstr "{0} ajanı eksik. Otomatik oluşturmak için önce bir Flow Modeli oluşturun."
+
+#. frappe 09
+msgid "This session is bound to agent {0} and cannot be switched."
+msgstr "Bu oturum {0} ajanına bağlı ve değiştirilemez."
+
+#. frappe 09
+msgid "Flow Trigger {0} is declared more than once."
+msgstr "{0} Flow Tetikleyicisi birden fazla kez bildirilmiş."
+
+#. frappe 09
+msgid "Flow Trigger {0} needs a doctype or a cron, not both."
+msgstr "{0} Flow Tetikleyicisi bir belge türü veya bir cron gerektirir, ikisini birden değil."
+
+#. frappe 09
+msgid "Invalid Trigger"
+msgstr "Geçersiz Tetikleyici"
+
+#. frappe 09
+msgid "Invalid Scope"
+msgstr "Geçersiz Kapsam"
+
+#. frappe 09
+msgid "Memory Limit"
+msgstr "Bellek Sınırı"
+
+#. frappe 09
+msgid "Memory limit reached — revise or consolidate existing memories (pass memory_id) instead of adding."
+msgstr "Bellek sınırına ulaşıldı — eklemek yerine mevcut anıları gözden geçirin veya birleştirin (memory_id verin)."
+
+#. frappe 09
+msgid "No editable memory {0} — check the id in <memory>."
+msgstr "Düzenlenebilir {0} anısı yok — <memory> içindeki ID'yi kontrol edin."
+
+#. frappe 09
+msgid "Unknown Memory"
+msgstr "Bilinmeyen Bellek"
+
+#. frappe 09
+msgid "scope must be 'agent' or 'user'."
+msgstr "scope 'agent' veya 'user' olmalıdır."
+
+#. frappe 09
+msgid "Create {0} {1} record(s):\n\n{2}"
+msgstr "{0} {1} kaydı oluştur:\n\n{2}"
+
+#. frappe 09
+msgid "Delete {0} {1}: {2}"
+msgstr "{0} {1} sil: {2}"
+
+#. frappe 09
+msgid "Invalid API"
+msgstr "Geçersiz API"
+
+#. frappe 09
+msgid "It tried to write."
+msgstr "Yazmayı denedi."
+
+#. frappe 09
+msgid "Memory Unavailable"
+msgstr "Bellek Kullanılamıyor"
+
+#. frappe 09
+msgid "Memory is not configured for this agent."
+msgstr "Bu ajan için bellek yapılandırılmamış."
+
+#. frappe 09
+msgid "No permission to delete {0} {1}."
+msgstr "{0} {1} silme izniniz yok."
+
+#. frappe 09
+msgid "No permission to update {0} {1}."
+msgstr "{0} {1} güncelleme izniniz yok."
+
+#. frappe 09
+msgid "Pass a whitelisted API's path from find_apis."
+msgstr "find_apis içinden beyaz listedeki bir API'nin yolunu verin."
+
+#. frappe 09
+msgid "Run '{0}' on {1} {2}: {3}"
+msgstr "{1} {2} üzerinde '{0}' çalıştır: {3}"
+
+#. frappe 09
+msgid "Skill Unavailable"
+msgstr "Beceri Kullanılamıyor"
+
+#. frappe 09
+msgid "Skills are not configured for this agent."
+msgstr "Bu ajan için beceriler yapılandırılmamış."
+
+#. frappe 09
+msgid "The user entered nothing, so nothing was saved."
+msgstr "Kullanıcı hiçbir şey girmedi, bu yüzden hiçbir şey kaydedilmedi."
+
+#. frappe 09
+msgid "There is no DocType {0}."
+msgstr "{0} adında Belge Türü yok."
+
+#. frappe 09
+msgid "This chat approves calls by itself, so it cannot show the password box. Ask the user to switch the chat to Ask for approval, then call this again."
+msgstr "Bu sohbet çağrıları kendisi onaylıyor, bu yüzden parola kutusunu gösteremez. Kullanıcıdan sohbeti Onay İste moduna almasını isteyin, sonra bunu tekrar çağırın."
+
+#. frappe 09
+msgid "This code changes something, so it can't run as read_only. Call execute again without read_only; the user approves it before it runs."
+msgstr "Bu kod bir şeyi değiştiriyor, bu yüzden read_only olarak çalışamaz. execute'u read_only olmadan tekrar çağırın; kullanıcı çalışmadan önce onaylar."
+
+#. frappe 09
+msgid "Update {0} {1} ({2}):\n\n{3}"
+msgstr "{0} {1} güncelle ({2}):\n\n{3}"
+
+#. frappe 09
+msgid "You don't have permission to change {0} on {1} {2}."
+msgstr "{1} {2} üzerindeki {0} değerini değiştirme izniniz yok."
+
+#. frappe 09
+msgid "doctype, name and fieldname are required."
+msgstr "doctype, name ve fieldname gereklidir."
+
+#. frappe 09
+msgid "read_screen can only answer a call that waits for a result."
+msgstr "read_screen yalnızca sonuç bekleyen bir çağrıyı yanıtlayabilir."
+
+#. frappe 09
+msgid "{0} has no Password field {1}."
+msgstr "{0} içinde {1} Parola alanı yok."
+
+#. frappe 09
+msgid "{0} is a child table; ask for a Password field on its parent record."
+msgstr "{0} bir alt tablodur; üst kaydında bir Parola alanı isteyin."
+
+#. frappe 09
+msgid "{0} tried to write, so it is not a read. Nothing was saved."
+msgstr "{0} yazmayı denedi, bu yüzden okuma değil. Hiçbir şey kaydedilmedi."
+
+#. frappe 09
+msgid "{0} {1} does not exist; create it first."
+msgstr "{0} {1} mevcut değil; önce oluşturun."
+
+#. frappe 09
+msgid "A multi-line condition must set a <code>result</code> variable."
+msgstr "Çok satırlı bir koşul bir <code>result</code> değişkeni ayarlamalıdır."
+
+#. frappe 09
+msgid "Invalid condition: {0}"
+msgstr "Geçersiz koşul: {0}"
+
+#. frappe 09
+msgid "No permission to read file {0}"
+msgstr "{0} dosyasını okuma izniniz yok"
+
+#. frappe 09
+msgid "No permission to read {0} {1}"
+msgstr "{0} {1} okuma izniniz yok"
+
+#. frappe 09
+msgid "{0} can't run in read-only code."
+msgstr "{0} salt okunur kodda çalışamaz."
+
+#. frappe 09
+msgid "Cannot change {0} of system-generated {1} {2}."
+msgstr "Sistem tarafından oluşturulan {1} {2} için {0} değiştirilemez."
+
+#. frappe 09
+msgid "Cannot delete system-generated {0} {1}."
+msgstr "Sistem tarafından oluşturulan {0} {1} silinemez."
+
+#. frappe 09
+msgid "Cannot remove the system-generated flag from {0} {1}."
+msgstr "{0} {1} için sistem tarafından oluşturuldu işareti kaldırılamaz."
+
+#. frappe 09
+msgid "Cannot rename system-generated {0} {1}."
+msgstr "Sistem tarafından oluşturulan {0} {1} yeniden adlandırılamaz."
+
+#. frappe 09
+msgid "Invalid Name"
+msgstr "Geçersiz Ad"
+
+#. frappe 09
+msgid "Only an app can create a system-generated {0}."
+msgstr "Sistem tarafından oluşturulan bir {0} yalnızca bir uygulama oluşturabilir."
+
+#. frappe 09
+msgid "Protected"
+msgstr "Korumalı"
+
+#. frappe 09
+msgid "{0} names cannot contain /."
+msgstr "{0} adları / içeremez."
+
+#. frappe 09
+msgid "App {0} is disabled on this site"
+msgstr "{0} uygulaması bu sitede devre dışı"
+
+#. frappe 09
+msgid "API discovery cache is being generated. Please try again in 10 seconds."
+msgstr "API keşif önbelleği oluşturuluyor. Lütfen 10 saniye sonra tekrar deneyin."
+
+#. frappe 09
+msgid "DocType {0} is not available for discovery"
+msgstr "{0} Belge Türü keşif için kullanılamıyor"
+
+#. frappe 09
+msgid "Method {0} is not available for discovery"
+msgstr "{0} yöntemi keşif için kullanılamıyor"
+
+#. frappe 09
+msgid "Method {0} is not available for discovery on DocType {1}"
+msgstr "{0} yöntemi, {1} Belge Türünde keşif için kullanılamıyor"
+
+#. frappe 09
+msgid "App {} is disabled on this site"
+msgstr "{} uygulaması bu sitede devre dışı"
+
+#. frappe 09
+msgid "App {} is not installed"
+msgstr "{} uygulaması kurulu değil"
+
+#. frappe 09
+msgid "Too many failed login attempts. Please try again after {0} seconds"
+msgstr "Çok fazla başarısız giriş denemesi. Lütfen {0} saniye sonra tekrar deneyin"
+
+#. frappe 09
+msgid "Server is busy. Please try again in a few seconds."
+msgstr "Sunucu meşgul. Lütfen birkaç saniye sonra tekrar deneyin."
+
+#. frappe 09
+msgid "Can only unlink an Address or a Contact"
+msgstr "Yalnızca bir Adres veya Kişi bağlantısı kaldırılabilir"
+
+#. frappe 09
+msgid "Invalid or expired key"
+msgstr "Geçersiz veya süresi dolmuş anahtar"
+
+#. frappe 09
+msgid "Only pending invitations can be resent"
+msgstr "Yalnızca bekleyen davetler yeniden gönderilebilir"
+
+#. frappe 09
+msgid "Please set at least one filter: User or DocType"
+msgstr "Lütfen en az bir filtre ayarlayın: Kullanıcı veya Belge Türü"
+
+#. frappe 09
+msgid "{0} has no is_app_disabled column. Run bench migrate first."
+msgstr "{0} için is_app_disabled sütunu yok. Önce bench migrate çalıştırın."
+
+#. frappe 09
+msgid "{0} is not a customization doctype."
+msgstr "{0} bir özelleştirme belge türü değil."
+
+#. frappe 09
+msgid "{0} must be a doctype name in a {1} filter."
+msgstr "{0}, {1} filtresinde bir belge türü adı olmalıdır."
+
+#. frappe 09
+msgid "Allow users to upload documents first and attach them to a new document using the Upload First workflow."
+msgstr "Kullanıcıların önce belge yüklemesine ve Önce Yükle iş akışıyla bunları yeni bir belgeye eklemesine izin verin."
+
+#. frappe 09
+msgid "Enable Upload First Workflow"
+msgstr "Önce Yükle İş Akışını Etkinleştir"
+
+#. frappe 09
+msgid "Enable bulk edit for child table fields in Form view."
+msgstr "Form görünümünde alt tablo alanları için toplu düzenlemeyi etkinleştir."
+
+#. frappe 09
+msgid "`doctype` and `fieldname` are required for deleting property setters."
+msgstr "Özellik ayarlayıcılarını silmek için `doctype` ve `fieldname` gereklidir."
+
+#. frappe 09
+msgid "Commit or roll back the open transaction before starting a read-only one."
+msgstr "Salt okunur bir işlem başlatmadan önce açık işlemi onaylayın veya geri alın."
+
+#. frappe 09
+msgid "Open Transaction"
+msgstr "Açık İşlem"
+
+#. frappe 09
+msgid "This runs in a read-only transaction, so it can not write."
+msgstr "Bu salt okunur bir işlemde çalışır, bu yüzden yazamaz."
+
+#. frappe 09
+msgid "Cannot change field type in {0}: some existing values cannot be converted to the new type"
+msgstr "{0} içinde alan türü değiştirilemez: bazı mevcut değerler yeni türe dönüştürülemez"
+
+#. frappe 09
+msgid "Incompatible Values"
+msgstr "Uyumsuz Değerler"
+
+#. frappe 09
+msgid "Multiple SQL statements in one query are not allowed"
+msgstr "Tek sorguda birden çok SQL ifadesine izin verilmez"
+
+#. frappe 09
+msgid "Child table fields need 'name' in `fields` when using distinct or aggregate queries."
+msgstr "Ayrık veya toplama sorguları kullanılırken alt tablo alanları `fields` içinde 'name' gerektirir."
+
+#. frappe 09
+msgid "Field not found: {0}"
+msgstr "Alan bulunamadı: {0}"
+
+#. frappe 09
+msgid "Invalid Field"
+msgstr "Geçersiz Alan"
+
+#. frappe 09
+msgid "Fieldname is limited to {0} bytes ({1})"
+msgstr "Alan adı {0} bayt ile sınırlıdır ({1})"
+
+#. frappe 09
+msgid "Fieldname is limited to {0} characters ({1})"
+msgstr "Alan adı {0} karakter ile sınırlıdır ({1})"
+
+#. frappe 09
+msgid "You are not allowed to update this onboarding step"
+msgstr "Bu karşılama adımını güncelleme yetkiniz yok"
+
+#. frappe 09
+msgid "Only CSV and Excel formats are supported for export"
+msgstr "Dışa aktarma için yalnızca CSV ve Excel biçimleri desteklenir"
+
+#. frappe 09
+msgid "Unsupported file format: {0}"
+msgstr "Desteklenmeyen dosya biçimi: {0}"
+
+#. frappe 09
+msgid "Error validating \"Ignore User Permissions\""
+msgstr "\"Kullanıcı İzinlerini Yoksay\" doğrulanırken hata"
+
+#. frappe 09
+msgid "Guests are not allowed to upload files for {0} Doctype"
+msgstr "Misafirlerin {0} Belge Türü için dosya yüklemesine izin verilmiyor"
+
+#. frappe 09
+msgid "Method not found"
+msgstr "Yöntem bulunamadı"
+
+#. frappe 09
+msgid "Value cannot be less than {0} for"
+msgstr "Değer şundan küçük olamaz: {0}, alan:"
+
+#. frappe 09
+msgid "Value cannot be more than {0} for"
+msgstr "Değer şundan büyük olamaz: {0}, alan:"
+
+#. frappe 09
+msgid "Value is too large"
+msgstr "Değer çok büyük"
+
+#. frappe 09
+msgid "Value is too small"
+msgstr "Değer çok küçük"
+
+#. frappe 09
+msgid "Single DocTypes cannot be renamed"
+msgstr "Tekil Belge Türleri yeniden adlandırılamaz"
+
+#. frappe 09
+msgid "No Workflow applies to this document"
+msgstr "Bu belge için geçerli İş Akışı yok"
+
+#. frappe 09
+msgid "These users would share an email: {0}. Change their emails so that each one is unique, then run migrate again."
+msgstr "Bu kullanıcılar aynı e-postayı paylaşacak: {0}. Her biri benzersiz olacak şekilde e-postalarını değiştirin, ardından migrate'i yeniden çalıştırın."
+
+#. frappe 09
+msgid "Either key, IP flag, or User flag is required."
+msgstr "Anahtar, IP bayrağı veya Kullanıcı bayrağından biri gereklidir."
