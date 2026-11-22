@@ -36,6 +36,9 @@ CADRO_LOCALE_OVERLAY="${CADRO_LOCALE_OVERLAY:-/home/frappe/cadro-locale/${CADRO_
 CADRO_LOCALE_PATCH="${CADRO_LOCALE_PATCH:-/home/frappe/cadro-locale/frappe_${CADRO_LANGUAGE}_overlay.po}"
 CADRO_LOCALE_MERGE="${CADRO_LOCALE_MERGE:-/home/frappe/cadro-locale/merge_po.py}"
 CADRO_ERPNEXT_SRC="${CADRO_ERPNEXT_SRC:-/home/frappe/cadro-erpnext/erpnext}"
+CADRO_BANKING_SRC="${CADRO_BANKING_SRC:-/home/frappe/cadro-erpnext/banking/src}"
+# Hashes of the CADRO code applied to the bench; lives in the bench volume.
+CADRO_STATE_DIR="${FRAPPE_BENCH_PATH}/.cadro-state"
 
 # Check out an app at a pinned commit. bench get-app clones with --depth 1 and names
 # the remote "upstream", so the remote is looked up instead of assumed.
@@ -46,13 +49,46 @@ pin_app() {
     git -C "${app_dir}" fetch --depth 1 "${remote}" "${commit}" && git -C "${app_dir}" checkout "${commit}"
 }
 
-# Overlay the CADRO erpnext package (shipped in the image) onto the pinned upstream app.
-overlay_cadro_erpnext() {
+dir_hash() {
+    (cd "$1" && find . -type f -not -name '*.pyc' -not -path '*/__pycache__/*' -print0 \
+        | LC_ALL=C sort -z | xargs -0 sha1sum | sha1sum | cut -d' ' -f1)
+}
+
+# Overlay the CADRO erpnext package and banking sources (shipped in the image) onto the
+# pinned upstream app, only when they differ from what was applied last time.
+#   fresh  - first provisioning; assets are built later by the provisioning steps
+#   update - restart of an existing bench; migrate / rebuild what changed
+apply_cadro_code() {
+    local mode="$1" app="${FRAPPE_BENCH_PATH}/apps/erpnext" new old
+    mkdir -p "${CADRO_STATE_DIR}"
+
     if [ -d "${CADRO_ERPNEXT_SRC}" ]; then
-        cp -a "${CADRO_ERPNEXT_SRC}/." "${FRAPPE_BENCH_PATH}/apps/erpnext/erpnext/" && \
-            echo "Applied CADRO erpnext package over ${ERPNEXT_COMMIT}"
+        new="$(dir_hash "${CADRO_ERPNEXT_SRC}")"
+        old="$(cat "${CADRO_STATE_DIR}/erpnext.sha" 2>/dev/null || true)"
+        if [ "${new}" != "${old}" ]; then
+            cp -a "${CADRO_ERPNEXT_SRC}/." "${app}/erpnext/" && \
+                echo "Applied CADRO erpnext package (${mode})"
+            if [ "${mode}" = "update" ]; then
+                (cd "${FRAPPE_BENCH_PATH}" && bench --site "${SITE_NAME}" migrate && bench build --app erpnext) || \
+                    echo "WARNING: migrate/build after erpnext update had issues"
+            fi
+            echo "${new}" > "${CADRO_STATE_DIR}/erpnext.sha"
+        fi
     else
         echo "WARNING: ${CADRO_ERPNEXT_SRC} not found; running upstream erpnext unmodified"
+    fi
+
+    if [ -d "${CADRO_BANKING_SRC}" ]; then
+        new="$(dir_hash "${CADRO_BANKING_SRC}")"
+        old="$(cat "${CADRO_STATE_DIR}/banking.sha" 2>/dev/null || true)"
+        if [ "${new}" != "${old}" ]; then
+            rm -rf "${app}/banking/src" && cp -a "${CADRO_BANKING_SRC}" "${app}/banking/src" && \
+                echo "Applied CADRO banking sources (${mode})"
+            if [ "${mode}" = "update" ]; then
+                (cd "${app}/banking" && yarn build) || echo "WARNING: banking build had issues"
+            fi
+            echo "${new}" > "${CADRO_STATE_DIR}/banking.sha"
+        fi
     fi
 }
 
@@ -90,6 +126,7 @@ strip_watch() {
 if [ -f "${FRAPPE_BENCH_PATH}/sites/${SITE_NAME}/site_config.json" ]; then
     echo "Site ${SITE_NAME} already provisioned, skipping to bench start..."
     cd "${FRAPPE_BENCH_PATH}"
+    apply_cadro_code update
     apply_cadro_locale
     strip_watch
     exec "$@"
@@ -119,7 +156,7 @@ fi
 # Get apps at pinned commits (skip assets during get-app, build all together later)
 bench get-app --skip-assets erpnext --branch develop
 pin_app erpnext "${ERPNEXT_COMMIT}" || echo "WARNING: could not pin erpnext to ${ERPNEXT_COMMIT}; running upstream develop HEAD"
-overlay_cadro_erpnext
+apply_cadro_code fresh
 
 # payments is optional; gracefully skip on any failure
 bench get-app --skip-assets payments --branch develop || true

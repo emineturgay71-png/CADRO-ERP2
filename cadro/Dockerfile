@@ -55,6 +55,7 @@ COPY --chown=${FRAPPE_USER}:${FRAPPE_USER} scripts/healthcheck.py /home/${FRAPPE
 # overlays it onto the upstream app after checking out the pinned commit, so the running
 # code is exactly this repository, including erpnext/locale/tr.po.
 COPY --chown=${FRAPPE_USER}:${FRAPPE_USER} erpnext/ /home/${FRAPPE_USER}/cadro-erpnext/erpnext/
+COPY --chown=${FRAPPE_USER}:${FRAPPE_USER} banking/src/ /home/${FRAPPE_USER}/cadro-erpnext/banking/src/
 # Translation patch for strings missing upstream (frappe core, unmarked erpnext text).
 COPY --chown=${FRAPPE_USER}:${FRAPPE_USER} cadro/locale/frappe_tr_overlay.po cadro/locale/merge_po.py /home/${FRAPPE_USER}/cadro-locale/
 
