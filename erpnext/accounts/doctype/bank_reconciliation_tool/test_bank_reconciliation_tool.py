@@ -44,6 +44,8 @@ from erpnext.accounts.doctype.bank_account.bank_account import (
 )
 from erpnext.tests.utils import ERPNextTestSuite
 
+RATE_METHOD = "erpnext.accounts.doctype.bank_reconciliation_tool.bank_reconciliation_tool.get_exchange_rate"
+
 
 class TestBankReconciliationTool(ERPNextTestSuite, AccountsTestMixin):
 	def setUp(self):
@@ -903,11 +905,11 @@ class TestBankReconciliationTool(ERPNextTestSuite, AccountsTestMixin):
 		self.assertRaises(frappe.ValidationError, clear_clearing_date, "Sales Order", "SO-MISSING-0001")
 
 	def test_get_closing_balance_fences_the_bank_account(self):
-		"""A user without Bank Account read permission must not read closing balance."""
+		"""A user fenced to another company must not read closing balance."""
 		set_closing_balance_as_per_statement(self.bank_account, today(), 500)
-		user = make_fenced_user("brt-read@example.com", ["Accounts User"])
+		user = make_company_fenced_user("brt-read@example.com", ["Accounts User"], "_Test Company 1")
 		with as_user(user):
-			# No Bank Account permission → refused
+			# Bank Account belongs to another company → refused
 			assert_refused(
 				self, get_closing_balance_as_per_statement, self.bank_account, str(today())
 			)
@@ -915,7 +917,7 @@ class TestBankReconciliationTool(ERPNextTestSuite, AccountsTestMixin):
 	def test_get_older_unreconciled_transactions_fences_the_bank_account(self):
 		"""An unauthorised user must not probe unreconciled counts."""
 		transaction = self.make_bank_transaction(add_days(today(), -30))
-		user = make_fenced_user("brt-older@example.com", ["Accounts User"])
+		user = make_company_fenced_user("brt-older@example.com", ["Accounts User"], "_Test Company 1")
 		with as_user(user):
 			assert_refused(
 				self, get_older_unreconciled_transactions, self.bank_account, str(today())
@@ -927,7 +929,7 @@ class TestBankReconciliationTool(ERPNextTestSuite, AccountsTestMixin):
 	def test_search_for_transfer_refuses_an_unauthorised_transaction(self):
 		"""The source transaction must be readable."""
 		transaction = self.make_bank_transaction(today())
-		user = make_fenced_user("brt-search@example.com", ["Accounts User"])
+		user = make_company_fenced_user("brt-search@example.com", ["Accounts User"], "_Test Company 1")
 		with as_user(user):
 			assert_refused(self, search_for_transfer_transaction, transaction.name)
 
