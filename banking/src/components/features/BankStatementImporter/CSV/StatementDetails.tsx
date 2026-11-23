@@ -203,7 +203,7 @@ const StatementDetails = ({ data }: Props) => {
                                     </Tooltip>
                                 </div>
                             </TableHead>
-                            <TableCell>{data.doc.detected_amount_format}</TableCell>
+                            <TableCell>{_(data.doc.detected_amount_format)}</TableCell>
                         </TableRow>
                         <TableRow>
                             <TableHead>
@@ -218,8 +218,7 @@ const StatementDetails = ({ data }: Props) => {
                                 </div>
                             </TableHead>
                             <TableCell>
-                                {dateFormat || data.date_format} (e.g.{" "}
-                                {formatDate(new Date(), dateFormat || "YYYY-MM-DD")})
+                                {_("{0} (e.g. {1})", [dateFormat || data.date_format, formatDate(new Date(), dateFormat || "YYYY-MM-DD")])}
                             </TableCell>
                         </TableRow>
                     </TableBody>

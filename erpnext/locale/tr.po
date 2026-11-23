@@ -76499,7 +76499,7 @@ msgstr "teslim alındı, faturalanmadı"
 
 #: erpnext/accounts/doctype/sales_invoice/services/fixed_assets.py:204
 msgid "returned"
-msgstr "i̇ade Edildi"
+msgstr "iade edildi"
 
 #. Label of the rgt (Int) field in DocType 'Cost Center'
 #. Label of the rgt (Int) field in DocType 'Location'
@@ -76598,7 +76598,7 @@ msgstr "yarın"
 #: banking/src/components/features/BankStatementImporter/CSV/StatementDetails.tsx:185
 #: banking/src/components/features/BankStatementImporter/CSV/StatementDetails.tsx:189
 msgid "transaction"
-msgstr "i̇şlem"
+msgstr "işlem"
 
 #: banking/src/components/features/BankReconciliation/MatchAndReconcile.tsx:458
 msgid "transaction selected"
@@ -76607,7 +76607,7 @@ msgstr "işlem seçildi"
 #: banking/src/components/features/BankStatementImporter/CSV/StatementDetails.tsx:185
 #: banking/src/components/features/BankStatementImporter/CSV/StatementDetails.tsx:189
 msgid "transactions"
-msgstr "i̇şlemler"
+msgstr "işlem"
 
 #: banking/src/components/features/BankReconciliation/MatchAndReconcile.tsx:458
 msgid "transactions selected"

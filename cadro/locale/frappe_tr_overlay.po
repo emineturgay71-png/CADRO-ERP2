@@ -12645,3 +12645,35 @@ msgstr "siparişler"
 #. erpnext
 msgid "invoices or orders"
 msgstr "faturalar veya siparişler"
+
+#. banking
+msgid "Closing Balance as of {}"
+msgstr "{} itibarıyla kapanış bakiyesi"
+
+#. erpnext
+msgid "Separate columns for withdrawal and deposit"
+msgstr "Para çekme ve mevduat için ayrı sütunlar"
+
+#. erpnext
+msgid "Amount column has \"CR\"/\"DR\" values"
+msgstr "Tutar sütununda \"CR\"/\"DR\" değerleri var"
+
+#. erpnext
+msgid "Amount column has positive/negative values"
+msgstr "Tutar sütununda pozitif/negatif değerler var"
+
+#. erpnext
+msgid "Transaction type column has \"CR\"/\"DR\" values"
+msgstr "İşlem türü sütununda \"CR\"/\"DR\" değerleri var"
+
+#. erpnext
+msgid "Transaction type column has \"Deposit\"/\"Withdrawal\" values"
+msgstr "İşlem türü sütununda \"Deposit\"/\"Withdrawal\" değerleri var"
+
+#. erpnext
+msgid "Transaction type column has \"C\"/\"D\" values"
+msgstr "İşlem türü sütununda \"C\"/\"D\" değerleri var"
+
+#. banking
+msgid "{0} (e.g. {1})"
+msgstr "{0} (örn. {1})"
