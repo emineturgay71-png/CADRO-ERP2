@@ -1,7 +1,7 @@
 # Faz 1 — Tenant/auth ve finansal bütünlük tamamlanma kaydı
 
-Tarih: 20 Kasım 2026.
-Durum: **Kaynak düzeltmeleri tamamlandı; testler yazıldı ancak Bench ortamında çalıştırılmadı.**
+Tarih: 20 Kasım 2026 (Bench test sonuçları: 23 Kasım 2026).
+Durum: **Kaynak düzeltmeleri tamamlandı; bankacılık testleri MariaDB ve PostgreSQL üzerinde Bench'te çalıştırıldı ve geçti.**
 
 ## P1 — Kayıt/tenant yetki düzeltmeleri
 
@@ -37,17 +37,48 @@ Tüm testler `erpnext/accounts/doctype/bank_reconciliation_tool/test_bank_reconc
 | --- | --- |
 | Python syntax | ✅ `compileall` temiz |
 | Faz 0 manifesto | ✅ `validate_cadro_baseline.py` yeşil |
-| Regresyon testleri | ✅ 5 yeni yetki testi + mevcut testlerle uyumlu (Bench çalıştırılmadı) |
+| Regresyon testleri | ✅ Bench'te çalıştırıldı; sonuçlar aşağıda |
 | Frontend dep kilitleri | ✅ `cadro.baseline.json` değişmedi |
 
-## Bench testleri (çalıştırılmadı)
+## Bench test sonuçları (23 Kasım 2026)
 
-Windows ortamında Frappe Bench bulunmadığından aşağıdaki testler yazıldı ancak çalıştırılmadı:
+Ortam: `cadro-bench` imajı (Python 3.14, Frappe `96c27e16ed`, ERPNext `920f1d5` + CADRO overlay), her koşu için geçici site, `allow_tests`. MariaDB 11.8 ve PostgreSQL 17 üzerinde aynı modül listesi çalıştırıldı.
+
+| Modül | Test | MariaDB | PostgreSQL |
+| --- | --- | --- | --- |
+| `bank_account` | 1 | ✅ | ✅ |
+| `bank_account_balance` | 1 | ✅ | ✅ |
+| `bank_transaction` | 10 (1 atlandı) | ✅ | ✅ |
+| `bank_transaction` ücretler | 10 | ✅ | ✅ |
+| `bank_transaction` auto match party | 5 | ✅ | ✅ |
+| `bank_transaction_rule` | 20 | ✅ | ✅ |
+| `bank_statement_import_log` | 23 | ✅ | ✅ |
+| `bank_statement_import` | 17 | ✅ | ✅ |
+| `bank_clearance` | 3 (1 atlandı) | ✅ | ✅ |
+| `bank_reconciliation_tool` | 34 | ✅ | ✅ |
+| `bank_guarantee` | 7 | ✅ | ✅ |
+
+Koşu sırasında bulunan ve düzeltilen sorunlar:
+
+- `test_bank_reconciliation_tool.py` içindeki `RATE_METHOD` sabiti önceki commit'te yanlışlıkla silinmişti (5 test `NameError`); geri eklendi.
+- Üç yetki testi, rol düzeyinde `Bank Account` okuma izni olan `Accounts User` kullanıcısıyla "izin yok" varsaymıştı; kullanıcı başka bir şirkete sınırlanarak düzeltildi. Üretim kodu değişmedi.
+- İmajda Chromium'un paylaşımlı kütüphaneleri yoktu; PDF ekstre testleri (`bank_statement_import_log`) ve PDF üretimi çalışmıyordu. `cadro/Dockerfile` düzeltildi.
+- PostgreSQL site kurulumu için imajda `psql`/`pg_dump` yoktu; `postgresql-client` Dockerfile'a eklendi.
+- Testler için `freezegun` gerekir; imajda yoktur (yalnızca geliştirme/test bağımlılığı).
+
+Tekrar koşmak için:
 
 ```bash
-bench --site test_site run-tests --module erpnext.accounts.doctype.bank_reconciliation_tool.test_bank_reconciliation_tool --lightmode
-bench --site test_site run-tests --module erpnext.accounts.doctype.bank_statement_import_log.test_bank_statement_import_log --lightmode
+bench new-site test.localhost --db-type mariadb ... --install-app erpnext
+bench --site test.localhost set-config allow_tests true
+bench --site test.localhost run-tests --module erpnext.accounts.doctype.bank_reconciliation_tool.test_bank_reconciliation_tool
 ```
+
+## Açık kalanlar
+
+- Bankacılık dışındaki ERPNext modüllerinin tam test paketi çalıştırılmadı.
+- Bankacılık React ekranları (işlem, mutabakat) tarayıcıda uçtan uca gezilmedi.
+- Yük ve eşzamanlılık altında import idempotency denenmedi.
 
 ## Sonraki adım
 

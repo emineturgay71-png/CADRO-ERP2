@@ -28,6 +28,11 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     libxfixes3 libxkbcommon0 libxrandr2 \
     && apt-get clean && rm -rf /var/lib/apt/lists/*
 
+# PostgreSQL client tools (psql, pg_dump): required by `bench new-site --db-type postgres`
+# and by PostgreSQL site backup/restore. MariaDB remains the default database.
+RUN apt-get update && apt-get install -y --no-install-recommends postgresql-client \
+    && apt-get clean && rm -rf /var/lib/apt/lists/*
+
 # Node.js 24 (required by Frappe pinned commit)
 RUN curl -fsSL https://deb.nodesource.com/setup_24.x | bash - \
     && apt-get install -y nodejs \
