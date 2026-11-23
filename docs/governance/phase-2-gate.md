@@ -77,7 +77,7 @@ FRAPPE_COMMIT=$(python scripts/ci_pin_resolver.py --component frappe)
 | Canlı Bench testleri | ✅ MariaDB + PostgreSQL (bkz. Faz 1) |
 | CADRO imaj etiketi | ⏳ Hâlâ `:eval`; sürümleme kararı bekliyor |
 | Yük ve kapasite testi | ⏳ Yapılmadı |
-| Yedekleme/geri yükleme tatbikatı | ⚠️ Pilotta elle geri yükleme yapıldı; `scripts/backup_site.sh`/`restore_site.sh` ile belgelenmiş tatbikat yapılmadı |
+| Yedekleme/geri yükleme tatbikatı | ✅ 23 Kasım 2026, ayrıntılar aşağıda. Zamanlama ve site dışı kopya hâlâ yok |
 | TLS / harici ters vekil, izleme/alarm | ⏳ Yapılmadı |
 
 ### Zafiyet taraması (Trivy, `cadro-bench:eval`)
@@ -93,7 +93,23 @@ FRAPPE_COMMIT=$(python scripts/ci_pin_resolver.py --component frappe)
 - Düzeltmesi yayımlanmış kalan 11 HIGH bench sanal ortamındaki Python paketleri (`urllib3`, `setuptools`, `msgpack`) ve Node/npm içindeki paketlerdir (`undici`, `brace-expansion`). Python paketleri Frappe'nin kendi bağımlılıklarıdır, Frappe pin'i güncellenerek çözülür.
 - Bu bir değerlendirme taramasıdır; üretim onayı için risk kabulü ve düzenli yeniden tarama gerekir (`dependency-audit.yml` upstream'e aittir).
 
-## Üretim öncesi yapılması gerekenler (bu fazda kapatılmaz)
+### Yedekleme/geri yükleme tatbikatı (23 Kasım 2026)
+
+Pilot site yedeklendi, ayrı bir tatbikat sitesine (`cadro-drill.localhost`) geri yüklendi ve karşılaştırıldı. Pilota dokunulmadı.
+
+| Ölçüt | Sonuç |
+| --- | --- |
+| Yedekleme süresi / boyut | 5 sn / 1,4 MB (veritabanı 1,1 MB, özel dosyalar 0,2 MB) |
+| Geri yükleme süresi | 107 sn (çoğu `migrate`); bu küçük bir pilot veri kümesidir, büyük veride artar |
+| Tablo ve satır sayısı | 807 tablo, 26.856 satır; kaynak ve geri yüklenen arasında **0 fark** |
+| Yönetici girişi | ✅ geri yüklenen sitede parola ile giriş çalışıyor |
+| Şifreli alan | ✅ kaynakta saklanan değer (Türkçe karakterli) tatbikat sitesinde doğru çözüldü; geri yükleme `encryption_key`'i de yeniden uyguluyor |
+| Bozulmuş yedek | ✅ sağlama toplamı uyuşmazlığında geri yükleme reddedildi (çıkış kodu 1), hiçbir veri değişmedi |
+| Yanlış onay | ✅ `RESTORE-<site>` yazılmazsa iptal (çıkış kodu 2) |
+
+Betikler bu tatbikatta düzeltildi: eski geri yükleme dizini `bench restore`'a veriyordu (dosya bekler), kök parolayı geçmiyordu, site config'i/şifreleme anahtarını geri yüklemiyordu ve betikler imajda yoktu. Yeni sürüm sağlama toplamı manifesti (`SHA256SUMS`), uygulama commit'leri (`backup_metadata.json`) ve onay denetimi içerir; imaja kopyalanır (`docker exec cadro-bench bash scripts/backup_site.sh <site>`).
+
+Sınırlar: Yedekler varsayılan olarak bench volume'unda (`cadro-data/cadro-backups`) durur, yani volume kaybolursa onlar da kaybolur; site dışına (nesne depolama, başka disk) kopyalama otomatik değildir. Tatbikatta işlem kaydı yoktu (GL Entry, fatura vb. 0); büyük ve hareketli veriyle yeniden denenmelidir. Zamanlanmış yedek ve saklama (retention) tanımlı değildir.
 
 | Madde | Açıklama |
 | --- | --- |

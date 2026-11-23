@@ -69,6 +69,8 @@ COPY --chown=${FRAPPE_USER}:${FRAPPE_USER} cadro.baseline.json /home/${FRAPPE_US
 
 # Container healthcheck (cadro/docker-compose.yml runs `python scripts/healthcheck.py`).
 COPY --chown=${FRAPPE_USER}:${FRAPPE_USER} scripts/healthcheck.py /home/${FRAPPE_USER}/scripts/healthcheck.py
+# Backup and restore tooling: docker exec cadro-bench bash scripts/backup_site.sh <site>
+COPY --chown=${FRAPPE_USER}:${FRAPPE_USER} scripts/backup_site.sh scripts/restore_site.sh /home/${FRAPPE_USER}/scripts/
 # CADRO's erpnext package (the repo is a fork of the pinned upstream commit). The entrypoint
 # overlays it onto the upstream app after checking out the pinned commit, so the running
 # code is exactly this repository, including erpnext/locale/tr.po.

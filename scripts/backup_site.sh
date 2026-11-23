@@ -2,50 +2,56 @@
 # ---------------------------------------------------------------------------
 # CADRO site backup
 #
-# Creates a timestamped, compressed backup of a Frappe site (database dump +
-# files) in a target directory. The backup can later be restored onto an
-# identical Bench (same app commits) with restore_site.sh.
+# Creates a timestamped backup of a Frappe site: compressed database dump, public and
+# private files, the site configuration (it holds the encryption key that the encrypted
+# fields in the database need), a checksum manifest and a metadata file with the app
+# commits. Restore it with restore_site.sh.
 #
-# Usage:
-#   ./scripts/backup_site.sh <site-name> [backup-dir]
+# Usage (inside the bench container):
+#   bash scripts/backup_site.sh <site-name> [backup-dir]
+#
+# The default backup directory lives in the persistent bench volume, next to the bench
+# (<bench>/../cadro-backups). That is NOT an off-host copy: copy the directory out of the
+# volume (docker cp, object storage) to keep a backup that survives losing the volume.
 # ---------------------------------------------------------------------------
 
 set -euo pipefail
 
 SITE_NAME="${1:?Site name required}"
-BACKUP_DIR="${2:-$(pwd)/cadro-backups}"
+BENCH_PATH="${FRAPPE_BENCH_PATH:-${HOME}/frappe-bench}"
+BACKUP_ROOT="${2:-$(dirname "${BENCH_PATH}")/cadro-backups}"
 TIMESTAMP=$(date -u +"%Y%m%dT%H%M%SZ")
-BACKUP_PATH="${BACKUP_DIR}/${SITE_NAME}-${TIMESTAMP}"
-SITE_PATH="${FRAPPE_BENCH_PATH:-${HOME}/frappe-bench}/sites/${SITE_NAME}"
+BACKUP_PATH="${BACKUP_ROOT}/${SITE_NAME}-${TIMESTAMP}"
 
-if [ ! -d "${SITE_PATH}" ]; then
-    echo "ERROR: site directory not found: ${SITE_PATH}"
+if [ ! -d "${BENCH_PATH}/sites/${SITE_NAME}" ]; then
+    echo "ERROR: site directory not found: ${BENCH_PATH}/sites/${SITE_NAME}" >&2
     exit 1
 fi
 
 mkdir -p "${BACKUP_PATH}"
 echo "Backing up ${SITE_NAME} to ${BACKUP_PATH} ..."
 
-# Database dump
-bench --site "${SITE_NAME}" backup \
-    --with-files \
-    --backup-path "${BACKUP_PATH}/db"
+cd "${BENCH_PATH}"
+bench --site "${SITE_NAME}" backup --with-files --backup-path "${BACKUP_PATH}"
 
-# Site files (excluding rebuildable assets)
-tar -czf "${BACKUP_PATH}/site_files.tar.gz" \
-    -C "$(dirname "${SITE_PATH}")" \
-    --exclude="${SITE_NAME}/assets" \
-    --exclude="${SITE_NAME}/.cache" \
-    "${SITE_NAME}"
+app_commit() {
+    git -C "${BENCH_PATH}/apps/$1" rev-parse HEAD 2>/dev/null || echo "unknown"
+}
 
-# Metadata file
 cat > "${BACKUP_PATH}/backup_metadata.json" <<EOF
 {
     "site_name": "${SITE_NAME}",
     "timestamp": "${TIMESTAMP}",
-    "frappe_bench_path": "${FRAPPE_BENCH_PATH:-HOME/frappe-bench}",
-    "cadro_baseline_commit": "$(git -C "$(dirname "$0")/.." rev-parse HEAD 2>/dev/null || echo 'unknown')"
+    "apps": {
+        "frappe": "$(app_commit frappe)",
+        "erpnext": "$(app_commit erpnext)",
+        "payments": "$(app_commit payments)"
+    }
 }
 EOF
 
+# Integrity manifest: verified again by restore_site.sh before anything is replaced.
+(cd "${BACKUP_PATH}" && sha256sum -- * | grep -v 'SHA256SUMS$' > SHA256SUMS)
+
 echo "Backup complete: ${BACKUP_PATH}"
+ls -l "${BACKUP_PATH}"
