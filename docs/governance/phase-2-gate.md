@@ -1,14 +1,17 @@
 # Faz 2 — Tekrarlanabilir üretim ve kontrollü pilot altyapısı tamamlanma kaydı
 
-Tarih: 20 Kasım 2026.
-Durum: **Altyapı dosyaları oluşturuldu; canlı build/test çalıştırılmadı.**
+Tarih: 20 Kasım 2026 (sertleştirme: 23 Kasım 2026).
+Durum: **Altyapı kuruldu ve pilot üzerinde çalışıyor. Üretim sertleştirmesinin büyük kısmı yapıldı; üretim onayı verilmedi.**
 
 ## Oluşturulan altyapı dosyaları
 
 | Dosya | Amaç |
 | --- | --- |
 | `cadro/Dockerfile` | Python 3.14 + Node 24 tabanlı Bench imajı; entrypoint'te pinli commit'lerle kurulum |
-| `cadro/docker-compose.yml` | MariaDB 11.8 + 3× Redis + Bench servisi; healthcheck'li |
+| `cadro/docker-compose.yml` | MariaDB 11.8 + 3× Redis + bench (gunicorn) + socketio + worker + scheduler + nginx; digest pin'li, secret'lı, healthcheck'li |
+| `cadro/nginx/cadro.conf` | Statik dosya, uygulama ve socket.io vekili; giriş hız sınırı |
+| `scripts/image_security_scan.py` | Trivy ile CycloneDX SBOM ve zafiyet özeti |
+| `.github/workflows/cadro-image.yml` | Baseline, compose/entrypoint denetimi, imaj build, SBOM |
 | `cadro/entrypoint.sh` | İlk çalıştırmada Bench provisioning; `cadro.baseline.json` pin'lerini kullanır |
 | `cadro/mariadb/conf.d/cadro.cnf` | UTF8mb4, 512M buffer pool, staging uygunluk ayarları |
 | `scripts/backup_site.sh` | Site bazlı veritabanı + dosya yedeği; metadata dosyası üretir |
@@ -16,32 +19,39 @@ Durum: **Altyapı dosyaları oluşturuldu; canlı build/test çalıştırılmad�
 | `scripts/healthcheck.py` | Docker HEALTHCHECK için Redis/DB/scheduler denetimi |
 | `scripts/ci_pin_resolver.py` | `cadro.baseline.json`'dan CI ortam değişkeni için commit SHA çözücü |
 
-## Compose servis mimarisi
+## Compose servis mimarisi (23 Kasım 2026)
 
 ```
-┌──────────┐  ┌───────────────┐  ┌───────────────┐  ┌───────────────┐
-│  MariaDB │  │ redis-cache   │  │ redis-queue   │  │redis-socketio │
-│   11.8   │  │   7-alpine    │  │   7-alpine    │  │   7-alpine    │
-└────┬─────┘  └───────┬───────┘  └───────┬───────┘  └───────┬───────┘
-     │                │                  │                  │
-     └────────────────┴──────────────────┴──────────────────┘
-                              │
-                    ┌─────────┴─────────┐
-                    │   cadro-bench     │
-                    │  Python 3.14      │
-                    │  Node 24          │
-                    │  Port 8000        │
-                    └───────────────────┘
+                 :8001
+              ┌─────────┐   /assets, /files (bench volume, salt okunur)
+ tarayıcı ──► │  nginx  │──┬─► bench      gunicorn (gthread), :8000
+              └─────────┘  └─► socketio   node, :9000  (/socket.io)
+
+ worker (bench worker)   scheduler (bench schedule)   ← aynı imaj, aynı bench volume'u
+ ┌──────────┐  ┌───────────────┐  ┌───────────────┐  ┌───────────────┐
+ │ MariaDB  │  │ redis-cache   │  │ redis-queue   │  │redis-socketio │
+ │  11.8    │  │   7-alpine    │  │   7-alpine    │  │   7-alpine    │
+ └──────────┘  └───────────────┘  └───────────────┘  └───────────────┘
 ```
+
+- `bench` servisi (`cadro-web`) bench'i kurar/günceller, hazır işaretçisini yazar ve gunicorn ile sunar. `socketio`, `worker` ve `scheduler` servisleri işaretçiyi bekleyip başlar.
+- Yalnızca nginx dışarı açılır (`8001`). Uygulama ve gerçek zamanlı portu ağ içindedir.
+- `bench start` (Werkzeug geliştirme sunucusu, `DEV_SERVER=1`) artık yalnızca tek konteynerli geliştirme modudur (imajın varsayılan CMD'si).
+- Giriş uç noktası nginx'te hız sınırlıdır (dakikada 10 istek, 10 burst; sonrası `429`).
+- Parolalar Docker secret olarak verilir (`cadro/secrets/*`, git dışı; `*_FILE` ortam değişkenleri).
 
 ## Kullanım
 
 ```bash
-# İlk çalıştırma (pin'li commit'lerle kurulum)
-export DB_PASSWORD="guclu-bir-sifre"
-export SITE_NAME="cadro-pilot.localhost"
-export ADMIN_PASSWORD="admin-sifresi"
-docker compose -f cadro/docker-compose.yml up -d
+# Sırlar (bir kez üretilir, git'e girmez)
+mkdir -p cadro/secrets
+printf '%s' "guclu-bir-sifre"  > cadro/secrets/db_password
+printf '%s' "admin-sifresi"    > cadro/secrets/admin_password
+echo "SITE_NAME=cadro-pilot.localhost" > cadro/.env
+
+# İlk çalıştırma (pin'li commit'lerle kurulum), depo kökünden
+docker compose -p cadro --project-directory . --env-file cadro/.env \
+  -f cadro/docker-compose.yml up -d --build
 
 # Yedekleme
 docker exec cadro-bench bash scripts/backup_site.sh cadro-pilot.localhost
@@ -53,18 +63,46 @@ docker exec cadro-bench bash scripts/restore_site.sh cadro-pilot.localhost /path
 FRAPPE_COMMIT=$(python scripts/ci_pin_resolver.py --component frappe)
 ```
 
+## Sertleştirme durumu (23 Kasım 2026)
+
+| Madde | Durum |
+| --- | --- |
+| İmaj digest pin'leme | ✅ `mariadb:11.8`, `redis:7-alpine`, `nginx:1.27-alpine` ve taban `python:3.14-slim` `@sha256` ile sabit |
+| Secret yönetimi | ✅ Docker secret + `*_FILE` desteği (compose'ta parola ortam değişkeni yok). Vault/secret manager üretimde ayrıca gerekir |
+| Üretim web sunucusu | ✅ gunicorn + nginx; geliştirme sunucusu yalnızca geliştirme modunda |
+| Giriş hız sınırı | ✅ nginx `limit_req` (DDoS koruması için önde WAF/CDN gerekir) |
+| SBOM | ✅ `docs/governance/sbom/cadro-bench.cdx.json` (CycloneDX, Trivy 0.76.2, ~1.6 bin bileşen); `scripts/image_security_scan.py` ile yenilenir. Lisans envanteri ayrıca çıkarılmadı |
+| CVE taraması | ✅ Aşağıya bakın |
+| CI entegrasyonu | ✅ `.github/workflows/cadro-image.yml` (baseline doğrulama, compose/entrypoint denetimi, imaj build, SBOM) — GitHub'da henüz çalıştırılmadı |
+| Canlı Bench testleri | ✅ MariaDB + PostgreSQL (bkz. Faz 1) |
+| CADRO imaj etiketi | ⏳ Hâlâ `:eval`; sürümleme kararı bekliyor |
+| Yük ve kapasite testi | ⏳ Yapılmadı |
+| Yedekleme/geri yükleme tatbikatı | ⚠️ Pilotta elle geri yükleme yapıldı; `scripts/backup_site.sh`/`restore_site.sh` ile belgelenmiş tatbikat yapılmadı |
+| TLS / harici ters vekil, izleme/alarm | ⏳ Yapılmadı |
+
+### Zafiyet taraması (Trivy, `cadro-bench:eval`)
+
+| | `apt upgrade` öncesi | sonrası |
+| --- | --- | --- |
+| CRITICAL | 1 | 1 |
+| HIGH | 235 | 160 |
+| MEDIUM | 834 | 679 |
+| HIGH, düzeltmesi yayımlanmış | 86 | 11 |
+
+- Dockerfile artık `apt-get upgrade` çalıştırır; Debian'ın yayımladığı düzeltmeler uygulandı. Kalan OS zafiyetlerinin Debian'da henüz düzeltmesi yok (ör. `libxml2` CRITICAL, `curl`, `openssl`, `git`, `systemd`); izlenmeli.
+- Düzeltmesi yayımlanmış kalan 11 HIGH bench sanal ortamındaki Python paketleri (`urllib3`, `setuptools`, `msgpack`) ve Node/npm içindeki paketlerdir (`undici`, `brace-expansion`). Python paketleri Frappe'nin kendi bağımlılıklarıdır, Frappe pin'i güncellenerek çözülür.
+- Bu bir değerlendirme taramasıdır; üretim onayı için risk kabulü ve düzenli yeniden tarama gerekir (`dependency-audit.yml` upstream'e aittir).
+
 ## Üretim öncesi yapılması gerekenler (bu fazda kapatılmaz)
 
 | Madde | Açıklama |
 | --- | --- |
-| İmaj digest pin'leme | `mariadb:11.8` ve `redis:7-alpine` yerine `@sha256:...` |
-| Secret yönetimi | DB_PASSWORD compose env yerine vault/secret manager |
-| SBOM ve lisans envanteri | İmaj içindeki tüm bağımlılıklar için |
-| CADRO imaj etiketi | Değerlendirme `:eval` yerine sürümlü etiket |
+| Vault / secret manager | Docker secret dosyaları yerine merkezi sır yönetimi |
+| CADRO imaj etiketi | Değerlendirme `:eval` yerine sürümlü etiket ve kayıt defteri |
 | Yük ve kapasite testi | Gerçek import/mutabakat yükleriyle |
-| Güvenlik taraması | İmaj ve bağımlılık CVE taraması |
-| CI pipeline entegrasyonu | GitHub Actions'ta compose build/test |
-| Canlı Bench testleri | MariaDB + PostgreSQL üzerinde test koşusu |
+| TLS, WAF/CDN, izleme | Dış ters vekil, sertifikalar, alarm |
+| Yedekleme tatbikatı | Betiklerle, zamanlanmış ve belgelenmiş |
+| Kalan zafiyetlerin risk kabulü | Düzeltmesi olmayan OS paketleri |
 
 ## Değişen dosya listesi
 
@@ -87,11 +125,14 @@ docs/governance/
 
 | Kapı | Sonuç |
 | --- | --- |
-| Python syntax | ✅ healthcheck.py, ci_pin_resolver.py |
-| Shell syntax | ⚠️ bash -n kontrol edilmedi (Windows bash yok) |
-| Faz 0 manifesto | ✅ geçerli |
+| Python syntax | ✅ healthcheck.py, ci_pin_resolver.py, image_security_scan.py |
+| Shell syntax | ✅ `bash -n cadro/entrypoint.sh` |
+| Faz 0 manifesto ve testleri | ✅ geçerli, 8/8 |
 | CI pin çözücü | ✅ doğru SHA'ları döndürüyor |
-| Docker build | ❌ Çalıştırılmadı (Docker yok / Bench yok) |
+| Docker build | ✅ imaj derleniyor (Debian 13, `apt upgrade`, Chromium kütüphaneleri, `postgresql-client`) |
+| Pilot yığını | ✅ 9 konteyner sağlıklı; nginx → gunicorn, `/assets`, `/socket.io`, socket.io kökene geri çağrı |
+| Duman taraması (yeni topoloji) | ✅ Faz 0, 2, 4: 0 hata sayfası; sonuçlar eski topolojiyle aynı |
+| Giriş hız sınırı | ✅ 16 istekte 11 × `401`, 5 × `429` |
 
 ## Sonraki adım
 

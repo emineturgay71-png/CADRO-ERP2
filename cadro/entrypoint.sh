@@ -16,12 +16,27 @@ set -uo pipefail
 # exit codes for warnings (e.g. redis_cache unavailable during build). We
 # check critical steps explicitly below.
 
+# Docker secrets: VAR_FILE=/run/secrets/x makes VAR the content of that file.
+file_env() {
+    local var="$1" file_var="$1_FILE"
+    if [ -n "${!file_var:-}" ]; then
+        if [ -r "${!file_var}" ]; then
+            export "${var}=$(cat "${!file_var}")"
+        else
+            echo "ERROR: ${file_var}=${!file_var} is not readable" >&2
+            exit 1
+        fi
+    fi
+}
+file_env DB_PASSWORD
+file_env ADMIN_PASSWORD
+
 FRAPPE_BENCH_PATH="${FRAPPE_BENCH_PATH:-/home/frappe/cadro-data/frappe-bench}"
 SITE_NAME="${SITE_NAME:-cadro-pilot.localhost}"
 ADMIN_PASSWORD="${ADMIN_PASSWORD:-admin}"
 DB_HOST="${DB_HOST:-db}"
 DB_PORT="${DB_PORT:-3306}"
-DB_PASSWORD="${DB_PASSWORD:?DB_PASSWORD is required}"
+DB_PASSWORD="${DB_PASSWORD:?DB_PASSWORD (or DB_PASSWORD_FILE) is required}"
 FRAPPE_COMMIT="${FRAPPE_COMMIT:-96c27e16ed5cfcfaf27d1db2f40c5c7acf871bbd}"
 ERPNEXT_COMMIT="${ERPNEXT_COMMIT:-920f1d5b3d18142cf3c4cc6edf59e53950a7832b}"
 PAYMENTS_COMMIT="${PAYMENTS_COMMIT:-d6df15a6ce91e508d58fe34ba53e27f3b63d344e}"
@@ -39,6 +54,53 @@ CADRO_ERPNEXT_SRC="${CADRO_ERPNEXT_SRC:-/home/frappe/cadro-erpnext/erpnext}"
 CADRO_BANKING_SRC="${CADRO_BANKING_SRC:-/home/frappe/cadro-erpnext/banking/src}"
 # Hashes of the CADRO code applied to the bench; lives in the bench volume.
 CADRO_STATE_DIR="${FRAPPE_BENCH_PATH}/.cadro-state"
+
+# Process role. `cadro-web` provisions/updates the bench and then serves it with gunicorn.
+# `cadro-socketio`, `cadro-worker` and `cadro-scheduler` run the same image against the
+# shared bench volume and wait until the web role reports the bench ready. Any other
+# command (the image default `bench start`) is the single-container development mode.
+ROLE=""
+case "${1:-}" in
+    cadro-web|cadro-socketio|cadro-worker|cadro-scheduler)
+        ROLE="${1#cadro-}"
+        shift
+        ;;
+esac
+CADRO_READY_FILE="${CADRO_STATE_DIR}/ready"
+
+# Start the process of the current role (or the given command in development mode).
+launch() {
+    cd "${FRAPPE_BENCH_PATH}"
+    case "${ROLE}" in
+        web)
+            mkdir -p "${CADRO_STATE_DIR}" && touch "${CADRO_READY_FILE}"
+            exec "${FRAPPE_BENCH_PATH}/env/bin/gunicorn" \
+                --chdir="${FRAPPE_BENCH_PATH}/sites" \
+                --bind=0.0.0.0:8000 \
+                --workers="${GUNICORN_WORKERS:-3}" \
+                --threads="${GUNICORN_THREADS:-4}" \
+                --worker-class=gthread \
+                --worker-tmp-dir=/dev/shm \
+                --timeout=120 \
+                --max-requests=5000 --max-requests-jitter=500 \
+                --preload \
+                frappe.app:application
+            ;;
+        socketio) exec bench socketio ;;
+        worker) exec bench worker ;;
+        scheduler) exec bench schedule ;;
+        *) exec "$@" ;;
+    esac
+}
+
+# Secondary roles do not provision anything: wait for the web role, then start.
+if [ -n "${ROLE}" ] && [ "${ROLE}" != "web" ]; then
+    echo "Role ${ROLE}: waiting for the bench to be ready ..."
+    until [ -f "${CADRO_READY_FILE}" ]; do sleep 5; done
+    launch
+fi
+# The web role marks the bench ready only after provisioning/update has finished.
+rm -f "${CADRO_READY_FILE}" 2>/dev/null || true
 
 # Check out an app at a pinned commit. bench get-app clones with --depth 1 and names
 # the remote "upstream", so the remote is looked up instead of assumed.
@@ -129,7 +191,7 @@ if [ -f "${FRAPPE_BENCH_PATH}/sites/${SITE_NAME}/site_config.json" ]; then
     apply_cadro_code update
     apply_cadro_locale
     strip_watch
-    exec "$@"
+    launch "$@"
 fi
 
 # Fresh provision needed (the bench is a sub-directory of the volume mount).
@@ -231,4 +293,4 @@ if [ -f "${PROCFILE}" ] && grep -q 'web:' "${PROCFILE}"; then
 fi
 strip_watch
 
-exec "$@"
+launch "$@"

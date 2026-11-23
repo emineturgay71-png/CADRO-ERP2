@@ -1,0 +1,71 @@
+name: CADRO image and baseline
+
+on:
+  pull_request:
+    paths:
+      - "cadro/**"
+      - "scripts/**"
+      - "cadro.baseline.json"
+      - "pyproject.toml"
+      - "package.json"
+      - ".github/workflows/cadro-image.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: cadro-image-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  baseline:
+    name: Baseline manifest
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+
+      - uses: actions/setup-python@v6
+        with:
+          python-version: "3.14"
+
+      - name: Validate the pinned baseline
+        run: python scripts/validate_cadro_baseline.py
+
+      - name: Baseline validator tests
+        run: python -m unittest discover -s scripts -p 'test_*.py' -v
+
+      - name: Pins resolve from the manifest
+        run: |
+          for component in frappe erpnext payments; do
+            echo "$component $(python scripts/ci_pin_resolver.py --component "$component")"
+          done
+
+  image:
+    name: Compose file and image
+    runs-on: ubuntu-latest
+    needs: baseline
+    steps:
+      - uses: actions/checkout@v6
+
+      - name: Compose file is valid
+        run: |
+          mkdir -p cadro/secrets
+          echo "ci-only" > cadro/secrets/db_password
+          echo "ci-only" > cadro/secrets/admin_password
+          SITE_NAME=ci.localhost docker compose -p cadro --project-directory . \
+            -f cadro/docker-compose.yml config --quiet
+
+      - name: Entrypoint is valid shell
+        run: bash -n cadro/entrypoint.sh
+
+      - name: Build the bench image
+        run: docker build -f cadro/Dockerfile -t cadro-bench:ci .
+
+      - name: SBOM and vulnerability summary
+        run: python scripts/image_security_scan.py --image cadro-bench:ci --out sbom
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: cadro-bench-sbom
+          path: sbom/

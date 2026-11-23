@@ -33,3 +33,5 @@ cadro/.env
 # Yarn cache / install artifacts (kept in yarn.lock)
 .yarn/
 .pnp.*
+# CADRO Docker secrets (passwords)
+cadro/secrets/

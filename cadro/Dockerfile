@@ -1,17 +1,19 @@
 # CADRO evaluation bench image
-# Python 3.14 + Node 22 LTS + Frappe Bench
-# Digest pinning and SBOM are required before production use.
+# Python 3.14 + Node 24 + Frappe Bench
+# The base image is pinned by digest (python:3.14-slim, Debian 13). When PYTHON_VERSION
+# changes, update the digest too: docker buildx imagetools inspect python:<version>-slim
 
 ARG PYTHON_VERSION=3.14
-FROM python:${PYTHON_VERSION}-slim
+FROM python:${PYTHON_VERSION}-slim@sha256:9aaa474097d094040649f2162a627c0049b408f52138d980916788d80f04802f
 
 ARG FRAPPE_USER=frappe
 # The bench lives inside the persistent volume mounted at /home/frappe/cadro-data.
 ARG FRAPPE_BENCH_PATH=/home/${FRAPPE_USER}/cadro-data/frappe-bench
 ENV FRAPPE_BENCH_PATH=${FRAPPE_BENCH_PATH}
 
-# System packages (mariadb-client provides the 'mariadb' CLI binary needed for site creation)
-RUN apt-get update && apt-get install -y --no-install-recommends \
+# System packages (mariadb-client provides the 'mariadb' CLI binary needed for site creation).
+# `upgrade` pulls the security fixes Debian published after the pinned base image was built.
+RUN apt-get update && apt-get upgrade -y --no-install-recommends && apt-get install -y --no-install-recommends \
     git curl build-essential libmariadb-dev libcups2-dev pkgconf \
     redis-tools redis-server cron libssl-dev gnupg ca-certificates \
     mariadb-client file procps \
