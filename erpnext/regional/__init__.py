@@ -18,6 +18,33 @@ def get_country_package(country: str) -> str:
 	return COUNTRY_PACKAGE_ALIASES.get(country) or frappe.scrub(country)
 
 
+# Country-specific standard reports and the country they are meant for.
+COUNTRY_REPORTS = {
+	"IRS 1099": "United States",
+	"VAT Audit Report": "South Africa",
+	"UAE VAT 201": "United Arab Emirates",
+	"Electronic Invoice Register": "Italy",
+}
+
+
+def apply_country_report_visibility(doc=None, method=None):
+	"""Disable the country-specific reports unless a company (or the system) is in that country.
+
+	Runs after migrate and whenever a Company is saved, so a company in another country
+	switches its reports on again.
+	"""
+	countries = set(frappe.get_all("Company", pluck="country"))
+	countries.add(frappe.db.get_single_value("System Settings", "country"))
+
+	for report, country in COUNTRY_REPORTS.items():
+		current = frappe.db.get_value("Report", report, "disabled")
+		if current is None:
+			continue
+		disabled = 0 if country in countries else 1
+		if current != disabled:
+			frappe.db.set_value("Report", report, "disabled", disabled, update_modified=False)
+
+
 def sync_system_defaults():
 	"""Copy System Settings (language, date/number format, ...) into the global defaults.
 

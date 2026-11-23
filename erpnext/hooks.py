@@ -101,6 +101,7 @@ setup_wizard_requires = "assets/erpnext/js/setup_wizard.js"
 setup_wizard_stages = "erpnext.setup.setup_wizard.setup_wizard.get_setup_stages"
 
 after_install = "erpnext.setup.install.after_install"
+after_migrate = ["erpnext.regional.apply_country_report_visibility"]
 
 after_app_install = "erpnext.setup.install.after_app_install"
 after_app_uninstall = "erpnext.setup.install.after_app_uninstall"
@@ -463,6 +464,7 @@ doc_events = {
 	},
 	"Company": {
 		"after_rename": "erpnext.regional.rename_vat_settings",
+		"on_update": "erpnext.regional.apply_country_report_visibility",
 	},
 	"Address": {
 		"validate": [
