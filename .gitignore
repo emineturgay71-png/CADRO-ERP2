@@ -35,3 +35,4 @@ cadro/.env
 .pnp.*
 # CADRO Docker secrets (passwords)
 cadro/secrets/
+cadro/backups/

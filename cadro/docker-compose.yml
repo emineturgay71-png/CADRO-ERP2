@@ -79,7 +79,7 @@ services:
       dockerfile: cadro/Dockerfile
       args:
         - PYTHON_VERSION=3.14
-    image: cadro-bench:eval
+    image: cadro-bench:${CADRO_IMAGE_TAG:-eval}
     container_name: cadro-bench
     restart: unless-stopped
     command: ["cadro-web"]
@@ -120,7 +120,7 @@ services:
       - cadro-net
 
   socketio:
-    image: cadro-bench:eval
+    image: cadro-bench:${CADRO_IMAGE_TAG:-eval}
     container_name: cadro-socketio
     restart: unless-stopped
     command: ["cadro-socketio"]
@@ -140,7 +140,7 @@ services:
       - cadro-net
 
   worker:
-    image: cadro-bench:eval
+    image: cadro-bench:${CADRO_IMAGE_TAG:-eval}
     container_name: cadro-worker
     restart: unless-stopped
     command: ["cadro-worker"]
@@ -160,7 +160,7 @@ services:
       - cadro-net
 
   scheduler:
-    image: cadro-bench:eval
+    image: cadro-bench:${CADRO_IMAGE_TAG:-eval}
     container_name: cadro-scheduler
     restart: unless-stopped
     command: ["cadro-scheduler"]
@@ -175,6 +175,33 @@ services:
       - admin_password
     volumes:
       - bench-data:/home/frappe/cadro-data
+    mem_limit: 512m
+    networks:
+      - cadro-net
+
+  # Scheduled site backups into a host directory (outside the bench volume), with retention.
+  # CADRO_BACKUP_DIR (host path, default ./cadro/backups), CADRO_BACKUP_KEEP (default 14),
+  # CADRO_BACKUP_INTERVAL_HOURS (default 24). On Linux hosts the directory must be writable
+  # by uid 1000. Copy it off the machine as well (object storage, another disk).
+  backup:
+    image: cadro-bench:${CADRO_IMAGE_TAG:-eval}
+    container_name: cadro-backup
+    restart: unless-stopped
+    command: ["cadro-backup"]
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      <<: *bench-env
+      CADRO_BACKUP_DIR: /backups
+      CADRO_BACKUP_KEEP: ${CADRO_BACKUP_KEEP:-14}
+      CADRO_BACKUP_INTERVAL_HOURS: ${CADRO_BACKUP_INTERVAL_HOURS:-24}
+    secrets:
+      - db_password
+      - admin_password
+    volumes:
+      - bench-data:/home/frappe/cadro-data
+      - ${CADRO_BACKUP_DIR:-./cadro/backups}:/backups
     mem_limit: 512m
     networks:
       - cadro-net

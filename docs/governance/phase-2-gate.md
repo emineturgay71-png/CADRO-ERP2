@@ -75,9 +75,10 @@ FRAPPE_COMMIT=$(python scripts/ci_pin_resolver.py --component frappe)
 | CVE taraması | ✅ Aşağıya bakın |
 | CI entegrasyonu | ✅ `.github/workflows/cadro-image.yml` (baseline doğrulama, compose/entrypoint denetimi, imaj build, SBOM) — GitHub'da henüz çalıştırılmadı |
 | Canlı Bench testleri | ✅ MariaDB + PostgreSQL (bkz. Faz 1) |
-| CADRO imaj etiketi | ⏳ Hâlâ `:eval`; sürümleme kararı bekliyor |
-| Yük ve kapasite testi | ⏳ Yapılmadı |
-| Yedekleme/geri yükleme tatbikatı | ✅ 23 Kasım 2026, ayrıntılar aşağıda. Zamanlama ve site dışı kopya hâlâ yok |
+| CADRO imaj etiketi | ✅ Etiket `CADRO_IMAGE_TAG` ile verilir (varsayılan `eval`); örnek: `CADRO_IMAGE_TAG=$(git rev-parse --short HEAD)`. Kayıt defterine gönderme ve sürüm numaralandırma kararı bekliyor |
+| Yük ve kapasite testi | ⚠️ Duman düzeyinde taban değerler çıkarıldı (aşağıda); gerçek veriyle yük testi yapılmadı |
+| Yedekleme/geri yükleme tatbikatı | ✅ 23 Kasım 2026, ayrıntılar aşağıda |
+| Zamanlanmış yedek ve site dışı kopya | ✅ `backup` servisi: günde bir, son 14 yedek, ana makine dizinine (`cadro/backups`, bench volume'u dışında). Makine dışına kopyalama (nesne depolama, başka disk) hâlâ yok |
 | TLS / harici ters vekil, izleme/alarm | ⏳ Yapılmadı |
 
 ### Zafiyet taraması (Trivy, `cadro-bench:eval`)
@@ -111,13 +112,30 @@ Betikler bu tatbikatta düzeltildi: eski geri yükleme dizini `bench restore`'a 
 
 Sınırlar: Yedekler varsayılan olarak bench volume'unda (`cadro-data/cadro-backups`) durur, yani volume kaybolursa onlar da kaybolur; site dışına (nesne depolama, başka disk) kopyalama otomatik değildir. Tatbikatta işlem kaydı yoktu (GL Entry, fatura vb. 0); büyük ve hareketli veriyle yeniden denenmelidir. Zamanlanmış yedek ve saklama (retention) tanımlı değildir.
 
+Zamanlanmış yedek: `backup` servisi (`cadro-backup` rolü) ilk yedeği başlangıçta, sonra her `CADRO_BACKUP_INTERVAL_HOURS` (24) saatte bir alır ve ana makinedeki `CADRO_BACKUP_DIR` dizinine (varsayılan `cadro/backups`) yazar; son `CADRO_BACKUP_KEEP` (14) yedek tutulur. İlk yedek ana makine dizininde doğrulandı. Linux ana makinede dizin uid 1000 tarafından yazılabilir olmalıdır.
+
+### Yük taban değerleri (duman düzeyi, 23 Kasım 2026)
+
+`scripts/load_smoke.py` ile nginx üzerinden, tek bir Windows makinede (istemci ve sunucu aynı makine), küçük pilot veri kümesiyle, her düzeyde 8 sn. Hata sayısı tüm düzeylerde 0.
+
+| Uç nokta | 20 eşzamanlı | 50 eşzamanlı |
+| --- | --- | --- |
+| `ping` (herkese açık) | ~880 istek/sn, p95 47 ms | ~840 istek/sn, p95 125 ms |
+| `/login` sayfası | ~83 istek/sn, p95 484 ms | ~73 istek/sn, p95 1,3 sn |
+| Hesap listesi (kimlikli API) | ~580 istek/sn, p95 63 ms | ~560 istek/sn, p95 188 ms |
+| DocType listesi (kimlikli API) | ~390 istek/sn, p95 79 ms | ~390 istek/sn, p95 250 ms |
+
+Gunicorn 3 işçi × 4 iş parçacığı ile çalışır; sayfa oluşturma (`/login`) ilk doyan uç noktadır. İstemci zamanlayıcısı ~15 ms çözünürlüklüdür, düşük gecikmeler yaklaşıktır. Bu değerler gerçek veri, çok kullanıcılı iş akışı veya üretim donanımı için kapasite iddiası oluşturmaz.
+
+Bulunan ve düzeltilen: nginx başlangıçta `bench` adresini bir kez çözüyordu; `bench` konteyneri yeniden oluşturulunca eski IP'ye bağlı kalıp `502` veriyordu. Artık adresler istek anında Docker DNS ile çözülür (`resolver 127.0.0.11`); `bench` yeniden oluşturulduktan sonra `ping` `200` döndü.
+
 | Madde | Açıklama |
 | --- | --- |
 | Vault / secret manager | Docker secret dosyaları yerine merkezi sır yönetimi |
-| CADRO imaj etiketi | Değerlendirme `:eval` yerine sürümlü etiket ve kayıt defteri |
-| Yük ve kapasite testi | Gerçek import/mutabakat yükleriyle |
+| Sürüm numaralandırma ve kayıt defteri | Etiket değişkeni hazır; hangi sürüm şemasının ve deponun kullanılacağı kararı |
+| Gerçek veriyle yük ve kapasite testi | Gerçek import/mutabakat yükleri ve çok kullanıcılı senaryolar |
 | TLS, WAF/CDN, izleme | Dış ters vekil, sertifikalar, alarm |
-| Yedekleme tatbikatı | Betiklerle, zamanlanmış ve belgelenmiş |
+| Yedeklerin makine dışına kopyalanması | Nesne depolama veya ikinci disk; geri yükleme tatbikatının periyodik tekrarı |
 | Kalan zafiyetlerin risk kabulü | Düzeltmesi olmayan OS paketleri |
 
 ## Değişen dosya listesi

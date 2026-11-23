@@ -56,12 +56,12 @@ CADRO_BANKING_SRC="${CADRO_BANKING_SRC:-/home/frappe/cadro-erpnext/banking/src}"
 CADRO_STATE_DIR="${FRAPPE_BENCH_PATH}/.cadro-state"
 
 # Process role. `cadro-web` provisions/updates the bench and then serves it with gunicorn.
-# `cadro-socketio`, `cadro-worker` and `cadro-scheduler` run the same image against the
+# `cadro-socketio`, `cadro-worker`, `cadro-scheduler` and `cadro-backup` run the same image against the
 # shared bench volume and wait until the web role reports the bench ready. Any other
 # command (the image default `bench start`) is the single-container development mode.
 ROLE=""
 case "${1:-}" in
-    cadro-web|cadro-socketio|cadro-worker|cadro-scheduler)
+    cadro-web|cadro-socketio|cadro-worker|cadro-scheduler|cadro-backup)
         ROLE="${1#cadro-}"
         shift
         ;;
@@ -89,6 +89,21 @@ launch() {
         socketio) exec bench socketio ;;
         worker) exec bench worker ;;
         scheduler) exec bench schedule ;;
+        backup)
+            # Scheduled backups into CADRO_BACKUP_DIR (a host bind mount, outside the bench
+            # volume), pruned to the newest CADRO_BACKUP_KEEP backups.
+            local dir="${CADRO_BACKUP_DIR:-/backups}" keep="${CADRO_BACKUP_KEEP:-14}"
+            local hours="${CADRO_BACKUP_INTERVAL_HOURS:-24}"
+            mkdir -p "${dir}" || { echo "ERROR: cannot create ${dir}" >&2; exit 1; }
+            while true; do
+                if bash /home/frappe/scripts/backup_site.sh "${SITE_NAME}" "${dir}"; then
+                    ls -1dt "${dir}/${SITE_NAME}-"* 2>/dev/null | tail -n +$((keep + 1)) | xargs -r rm -rf
+                else
+                    echo "ERROR: scheduled backup of ${SITE_NAME} failed" >&2
+                fi
+                sleep "$((hours * 3600))"
+            done
+            ;;
         *) exec "$@" ;;
     esac
 }
