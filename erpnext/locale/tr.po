@@ -3342,7 +3342,7 @@ msgstr "Gerçek Bitiş Tarihi"
 #. Label of the act_end_date (Date) field in DocType 'Task'
 #: erpnext/projects/doctype/task/task.json:282
 msgid "Actual End Date (via Timesheet)"
-msgstr "Gerçek bitiş tarihi (Zaman Tablosu'ndan)"
+msgstr "Gerçek Bitiş Tarihi (Zaman Çizelgesi Üzerinden)"
 
 #: erpnext/manufacturing/doctype/work_order/work_order.py:371
 msgid "Actual End Date cannot be before Actual Start Date"
@@ -3450,7 +3450,7 @@ msgstr "Gerçekleşen Başlama Tarihi"
 #. Label of the act_start_date (Date) field in DocType 'Task'
 #: erpnext/projects/doctype/task/task.json:262
 msgid "Actual Start Date (via Timesheet)"
-msgstr "Gerçek başlangış tarihi (Zaman Tablosu'ndan)"
+msgstr "Gerçek Başlangıç Tarihi (Zaman Çizelgesi Üzerinden)"
 
 #. Label of the actual_start_time (Datetime) field in DocType 'Work Order
 #. Operation'
@@ -3477,7 +3477,7 @@ msgstr "Gerçek Süre ve Maliyet"
 #. Label of the actual_time (Float) field in DocType 'Task'
 #: erpnext/projects/doctype/task/task.json:271
 msgid "Actual Time in Hours (via Timesheet)"
-msgstr "Toplam Saat (Zaman Çizgelgesi)"
+msgstr "Gerçek Süre, Saat (Zaman Çizelgesi Üzerinden)"
 
 #. Label of the actual_time (Float) field in DocType 'Project'
 #: erpnext/projects/doctype/project/project.json:288
@@ -3593,7 +3593,7 @@ msgstr "Amaç Tablosuna Öğeler Ekleyin"
 
 #: erpnext/crm/doctype/lead/lead.js:84
 msgid "Add Lead to Prospect"
-msgstr "Potansiyel Müşteriye Ekle"
+msgstr "Potansiyel Müşteriyi Aday Firmaya Ekle"
 
 #: erpnext/public/js/event.js:16
 msgid "Add Leads"
@@ -3904,7 +3904,7 @@ msgstr "Tatillere Ekle"
 
 #: erpnext/crm/doctype/lead/lead.js:38
 msgid "Add to Prospect"
-msgstr "Potansiyel Müşteriye Ekle"
+msgstr "Aday Firmaya Ekle"
 
 #. Label of the add_to_transit (Check) field in DocType 'Stock Entry'
 #. Label of the add_to_transit (Check) field in DocType 'Stock Entry Type'
@@ -3948,7 +3948,7 @@ msgstr "{0} kullanıcısına {1} rolü eklendi."
 
 #: erpnext/crm/doctype/lead/lead.js:81
 msgid "Adding Lead to Prospect..."
-msgstr "Müşteri Adayı Potansiyel Müşteriye Ekleniyor..."
+msgstr "Potansiyel Müşteri Aday Firmaya Ekleniyor..."
 
 #: erpnext/selling/page/point_of_sale/pos_item_cart.js:454
 msgid "Additional"
@@ -16574,7 +16574,7 @@ msgstr "Proje Şablonu Oluştur"
 
 #: erpnext/crm/doctype/lead/lead_list.js:8
 msgid "Create Prospect"
-msgstr "Potansiyel Müşteri Oluştur"
+msgstr "Aday Firma Oluştur"
 
 #. Label of an action in the Onboarding Step 'Enter a supplier's bill'
 #. Label of an action in the Onboarding Step 'Enter their bill'
@@ -34458,7 +34458,7 @@ msgstr "Potansiyel Müşteri"
 
 #: erpnext/crm/doctype/lead/lead.py:427
 msgid "Lead -> Prospect"
-msgstr "Müşteri Adayı > Potansiyel Müşteri"
+msgstr "Potansiyel Müşteri > Aday Firma"
 
 #. Name of a report
 #: erpnext/crm/report/lead_conversion_time/lead_conversion_time.json:16
@@ -34558,7 +34558,7 @@ msgstr "Aday Müşteri Türü"
 #: erpnext/crm/doctype/lead/lead.py:426
 #, python-brace-format
 msgid "Lead {0} has been added to prospect {1}."
-msgstr "{0} isimli müşteri adayı {1} potansiyel müşteri listesine eklendi."
+msgstr "{0} potansiyel müşterisi {1} aday firmasına eklendi."
 
 #: erpnext/crm/doctype/prospect/prospect.py:55
 #, python-brace-format
@@ -49295,12 +49295,12 @@ msgstr "Orantılı Dağıtım"
 #: erpnext/selling/doctype/customer/customer.json:678
 #: erpnext/workspace_sidebar/crm.json:404
 msgid "Prospect"
-msgstr "Potansiyel Müşteri"
+msgstr "Aday Firma"
 
 #. Name of a DocType
 #: erpnext/crm/doctype/prospect_lead/prospect_lead.json:83
 msgid "Prospect Lead"
-msgstr "Potansiyel Müşteri Adayı"
+msgstr "Aday Firma Potansiyel Müşterisi"
 
 #: erpnext/crm/doctype/lead/lead.js:127
 msgid "Prospect Name"
@@ -49309,17 +49309,17 @@ msgstr "Aday Firma Adı"
 #. Name of a DocType
 #: erpnext/crm/doctype/prospect_opportunity/prospect_opportunity.json:94
 msgid "Prospect Opportunity"
-msgstr "Portnasiyel Müşteri Fırsatı"
+msgstr "Aday Firma Fırsatı"
 
 #. Label of the prospect_owner (Link) field in DocType 'Prospect'
 #: erpnext/crm/doctype/prospect/prospect.json:110
 msgid "Prospect Owner"
-msgstr "Potansiyel Sahibi"
+msgstr "Aday Firma Sahibi"
 
 #: erpnext/crm/doctype/lead/lead.py:334
 #, python-brace-format
 msgid "Prospect {0} already exists"
-msgstr "Potansiyel Müşteri {0} zaten mevcut"
+msgstr "Aday Firma {0} zaten mevcut"
 
 #: erpnext/crm/doctype/prospect/prospect.py:159
 #: erpnext/selling/doctype/customer/customer.py:484
@@ -49344,7 +49344,7 @@ msgstr "Araştırma"
 #: erpnext/crm/report/prospects_engaged_but_not_converted/prospects_engaged_but_not_converted.json:16
 #: erpnext/crm/sidebar/crm/crm.json:171 erpnext/workspace_sidebar/crm.json:129
 msgid "Prospects Engaged But Not Converted"
-msgstr "Etkileşimde Bulunulan Ancak Dönüşmeyen Adaylar"
+msgstr "Etkileşimde Bulunulan Ancak Dönüşmeyen Aday Firmalar"
 
 #: erpnext/setup/doctype/transaction_deletion_record/transaction_deletion_record.py:196
 #: erpnext/setup/doctype/transaction_deletion_record/transaction_deletion_record.py:921
@@ -61573,7 +61573,7 @@ msgstr "Hissedar Yönetimi"
 #: erpnext/accounts/report/share_ledger/share_ledger.py:59
 #: erpnext/accounts/workspace/accounting/accounting.json:781
 msgid "Share Transfer"
-msgstr "Transferi Paylaş"
+msgstr "Hisse Devri"
 
 #. Label of the share_type (Link) field in DocType 'Share Balance'
 #. Label of the share_type (Link) field in DocType 'Share Transfer'
@@ -61586,7 +61586,7 @@ msgstr "Transferi Paylaş"
 #: erpnext/accounts/report/share_ledger/share_ledger.py:54
 #: erpnext/accounts/workspace/accounting/accounting.json:791
 msgid "Share Type"
-msgstr "Paylaşım Türü"
+msgstr "Hisse Türü"
 
 #: erpnext/accounts/doctype/share_balance/share_balance.py:33
 #: erpnext/accounts/doctype/share_balance/share_balance.py:36
@@ -69315,7 +69315,7 @@ msgstr "Zamanlayıcı belirtilen saati aştı."
 #: erpnext/templates/pages/projects.html:65
 #: erpnext/workspace_sidebar/projects.json:63
 msgid "Timesheet"
-msgstr "Zaman Planı"
+msgstr "Zaman Çizelgesi"
 
 #. Name of a report
 #. Label of a Sidebar Item
@@ -70011,7 +70011,7 @@ msgstr "Toplam Faturalandırılabilir Tutar"
 #. Label of the total_billing_amount (Currency) field in DocType 'Task'
 #: erpnext/projects/doctype/task/task.json:311
 msgid "Total Billable Amount (via Timesheet)"
-msgstr "Toplam Faturalandırılabilir Tutar (Çalışma Sayfası Tablosu ile)"
+msgstr "Toplam Faturalandırılabilir Tutar (Zaman Çizelgesi Üzerinden)"
 
 #. Label of the total_billable_hours (Float) field in DocType 'Timesheet'
 #: erpnext/projects/doctype/timesheet/timesheet.json:190
@@ -70141,7 +70141,7 @@ msgstr "Toplam Maliyet Tutarı"
 #: erpnext/projects/doctype/project/project.json:322
 #: erpnext/projects/doctype/task/task.json:297
 msgid "Total Costing Amount (via Timesheet)"
-msgstr "Toplam Maliyetleme Tutarı (Çalışma Sayfası Tablosu Üzerinden)"
+msgstr "Toplam Maliyetleme Tutarı (Zaman Çizelgesi Üzerinden)"
 
 #. Label of the total_credit (Currency) field in DocType 'Journal Entry'
 #: banking/src/components/features/BankReconciliation/BankEntryModalContent.tsx:764
