@@ -12621,3 +12621,27 @@ msgstr "Bu kullanıcılar aynı e-postayı paylaşacak: {0}. Her biri benzersiz 
 #. frappe 09
 msgid "Either key, IP flag, or User flag is required."
 msgstr "Anahtar, IP bayrağı veya Kullanıcı bayrağından biri gereklidir."
+
+#. banking
+msgid "or"
+msgstr "veya"
+
+#. banking
+msgid "Select {0}"
+msgstr "{0} Seç"
+
+#. banking
+msgid "Please select {0} to view the incorrectly cleared entries."
+msgstr "Yanlış takas edilen girişleri görüntülemek için lütfen {0} seçin."
+
+#. erpnext
+msgid "invoices"
+msgstr "faturalar"
+
+#. erpnext
+msgid "orders"
+msgstr "siparişler"
+
+#. erpnext
+msgid "invoices or orders"
+msgstr "faturalar veya siparişler"

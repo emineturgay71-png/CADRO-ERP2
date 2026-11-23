@@ -37,7 +37,9 @@ function App() {
 					swrConfig={{
 						errorRetryCount: 2
 					}}
-					socketPort={import.meta.env.VITE_SOCKET_PORT}
+					// The SDK assumes a development setup (socket.io on :9000) whenever the page is served
+					// from a non-default port. Behind the reverse proxy socket.io shares the page's port.
+					socketPort={import.meta.env.VITE_SOCKET_PORT || window.location.port}
 					siteName={window.frappe?.boot?.sitename ?? import.meta.env.VITE_SITE_NAME}>
 					<ThemeProvider
 						defaultTheme={window.frappe?.boot?.desk_theme ?? "Automatic"}

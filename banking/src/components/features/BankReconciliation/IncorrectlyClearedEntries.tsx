@@ -35,7 +35,7 @@ const IncorrectlyClearedEntries = () => {
         if (!dates) {
             missingFields.push('Dates')
         }
-        return <MissingFiltersBanner text={`Please select ${missingFields.join(', ')} to view the incorrectly cleared entries.`} />
+        return <MissingFiltersBanner text={_("Please select {0} to view the incorrectly cleared entries.", [missingFields.map((field) => _(field)).join(', ')])} />
     }
 
     return <IncorrectlyClearedEntriesView />
