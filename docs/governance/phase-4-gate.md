@@ -170,6 +170,10 @@ Sınırlar:
 - Düzeltme yalnızca yeni kurulan şirketleri etkiler. Eski plana göre kurulmuş şirketlerin hesapları aynen kalır (mevcut hesapların kökünü değiştirmek raporları etkiler); pilot için yeni planla ikinci bir şirket kuruldu (aşağıya bakın).
 - Dövizli işlemler için kambiyo, banka masrafı ve yazılan fark hesapları ve varsayılanları sonraki turda eklendi (aşağıya bakın).
 
+### Pilot şirketi (24 Kasım 2026)
+
+Pilot sitede (`cadro-pilot.localhost`) yeni planla ikinci bir şirket kuruldu: **CADRO Teknoloji A.Ş.** (`CTA`), varsayılan şirket olarak ayarlandı. Tüm varsayılanlar (alıcı, satıcı, gelir, maliyet, stok, faturasız mallar, yuvarlama, banka, kasa, kambiyo, banka masrafı, yazılan fark) ve çek/havale/nakit ödeme yöntemleri doğrulandı; `621`/`632` gider kökünde, `102.02` EUR cinsinden. Banka hesabı `Vadesiz TL (CTA)` bağlandı. Eski şirket (**CADRO Teknoloji**, `CADRO`) eski plan ve demo verisiyle duruyor; silinmedi. Yeni plana geçmeden önceki yedek: `D:\dev\cadro-backups\20261124-pre-new-chart`.
+
 ## Sonraki adım
 
 Faz 5 — SaaS ticarileştirme ve ölçek.  
