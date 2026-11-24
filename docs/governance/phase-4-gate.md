@@ -114,7 +114,34 @@ bench --site <site> run-tests --module erpnext.regional.turkey.test_main_flow
 | Ana akış | Mizan dengeli, stok değeri = `153`, alıcılar/satıcılar = açık faturalar, tüm hesap bakiyeleri beklenen, kâr = 3.200 − 2.000 |
 | Varyasyonlar | Kısmi ödeme, stok sayım farkı (`940`), yetersiz stokla satışın reddi, satış iadesi (stok + maliyet + KDV), karşılıksız çek, satışın iptali |
 
-Sonuç: taze MariaDB sitesinde 15/15 geçti (iki ardışık koşu). PostgreSQL'de koşulmadı.
+Sonuç: taze MariaDB sitesinde 15/15 geçti (iki ardışık koşu).
+
+### Tamamlayıcı akışlar (`test_main_flow_extended.py`, 12 test)
+
+Aynı şirket ve adım yardımcılarıyla ana akışın dışında kalan uçlar:
+
+| Senaryo | Doğrulanan |
+| --- | --- |
+| Raporlar defterle tutarlı | Mizan (genel toplam dengeli, hesap bakiyeleri beklenen), Kâr-Zarar (gelir kökü 3.200, gider kökü 2.000 → net kâr 1.200), Bilanço (varlık = yükümlülük + özkaynak + dönem kârı), Stok Bakiyesi (miktar ve değer = Bin) |
+| Alıcı/Satıcı özeti | Açık satış faturası 3.840, açık alış faturası 6.000 |
+| Hareketli ortalama | 100 × 50 + 50 × 80 → ortalama 60; 40 adet satış maliyeti 2.400 |
+| FIFO | Aynı alımlarla 40 adet en eski katmandan: maliyet 2.000 |
+| Alış iadesi | İrsaliye ve fatura iadesi: stok, indirilecek KDV ve borç geri alınır |
+| Müşteri avansı | Avans `120`'de müşteri lehine bakiye; faturaya Ödeme Mutabakatı ile mahsup; kalan havale |
+| KDV oranları ve iskonto | %10 → `391.01.05`, %1 → `391.01.03`, %20 + iskonto → matrah 900, KDV 180 |
+| Kısmi teslimat | Bir sipariş, 25 + 15 adet iki irsaliye ve iki fatura; sipariş %62,5 sonra %100 teslim/fatura |
+| Dönem kapanışı | Stok kapanışı + Dönem Kapanış Fişi: gelir/gider hesapları sıfırlanır, 1.200 kâr `590.01`'e geçer |
+| Dövizli satış | 120 EUR hizmet satışı kur 30, tahsilat kur 32: kambiyo kârı 240 (`646.01`); kur 28: kambiyo zararı 240 (`656.01`); EUR banka bakiyesi doğru |
+| Türkçe ekstre | CSV (`Tarih, Açıklama, Referans, Borç, Alacak`, `20.000,00` biçimli sayılar) içe aktarılır, 4 hareket otomatik uzlaştırılır; defter bakiyesi = ekstre toplamı |
+
+Sonuç: `test_turkey_regional` 16 + `test_main_flow` 15 + `test_main_flow_extended` 12 = **43/43, hem MariaDB hem PostgreSQL 17** (taze sitelerde).
+
+Bu turda bulunan ve düzeltilenler:
+
+- Şablon hesap planlarında `account_currency` yok sayılıyordu (her hesap şirket para birimine zorlanıyordu); `EUR KASA`/`USD KASA` aslında TRY hesaptı. Yükleyici artık şablondaki `account_currency` değerini uyguluyor; kasalar EUR/USD cinsinden, `102.02`/`102.03` banka, `120.02`/`120.03` alıcı ve `320.02`/`320.03` satıcı döviz hesapları eklendi.
+- Kambiyo (`646.01`, `656.01`, değerleme `646.02`), banka masrafı (`653.01`), yazılan fark (`659.01`) hesapları ve şirket varsayılanları eklendi; Dönem Kapanışı için `570.01`/`580.01`/`590.01` özkaynak yaprakları eklendi.
+- Varsayılan banka, alıcı ve satıcı hesapları `set_company_defaults` ile açıkça `102.01`/`120.01`/`320.01` yapılıyor (döviz hesapları artık aynı türde birden çok yaprak oluşturuyor).
+- Dönem kapanışı artık Stok Kapanış Kaydı gerektiriyor ve yıl bitmeden yapılamıyor (testte saat yıl sonrasına alınır).
 
 ### Ana akış testinin bulduğu eksikler (çözüldü)
 
@@ -140,9 +167,8 @@ Doğrulama:
 
 Sınırlar:
 
-- Düzeltme yalnızca yeni kurulan şirketleri etkiler. Pilot ve demo şirketleri eski planla duruyor: yeniden oluşturulmaları ya da bir geçiş yaması gerekir (mevcut hesapların kökünü değiştirmek raporları etkiler).
-- Kambiyo kâr/zarar, banka masrafı, şüpheli alacak ve yazılan fark hesapları için varsayılan tanımlanmadı; dövizli işlemler öncesinde yapılmalı.
-- EUR/USD banka hesapları kullanıcı tarafından eklenir; tek bir `Bank` yaprağı vardır (`102.01`).
+- Düzeltme yalnızca yeni kurulan şirketleri etkiler. Eski plana göre kurulmuş şirketlerin hesapları aynen kalır (mevcut hesapların kökünü değiştirmek raporları etkiler); pilot için yeni planla ikinci bir şirket kuruldu (aşağıya bakın).
+- Dövizli işlemler için kambiyo, banka masrafı ve yazılan fark hesapları ve varsayılanları sonraki turda eklendi (aşağıya bakın).
 
 ## Sonraki adım
 
