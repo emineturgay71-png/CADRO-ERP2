@@ -33,12 +33,23 @@ PAYMENT_METHOD_ACCOUNTS = {
 # kasalar; 153 ve 157 stok hesapları). Yeni Türkiye şirketinde varsayılanlar bilinçli seçilir.
 COMPANY_DEFAULT_ACCOUNTS = {
 	"default_cash_account": "100.01",
+	"default_bank_account": "102.01",
+	"default_receivable_account": "120.01",
+	"default_payable_account": "320.01",
 	"default_inventory_account": "153.01",
+	# Kambiyo: gerçekleşen kâr 646.01, zarar 656.01; değerleme (realize olmamış) farkı ayrı hesapta.
+	"exchange_gain_account": "646.01",
+	"exchange_loss_account": "656.01",
+	"exchange_gain_loss_account": "646.02",
+	"unrealized_exchange_gain_loss_account": "646.02",
+	"bank_charges_account": "653.01",
+	"write_off_account": "659.01",
 }
 
 
 def set_company_defaults(doc, method=None):
-	"""Company `on_update` kancası: yeni Türkiye şirketinin varsayılan kasa ve stok hesaplarını ayarla.
+	"""Company `on_update` kancası: yeni Türkiye şirketinin varsayılan kasa, stok, kambiyo, banka masrafı
+	ve yazılan fark hesaplarını ayarla.
 
 	ERPNext varsayılanları hesap türüne göre kendisi seçer ve seçim belirsiz kaldığında yanlış hesabı
 	(örn. USD KASA) alır; bu kanca ERPNext'in kendi atamasından sonra çalışır.

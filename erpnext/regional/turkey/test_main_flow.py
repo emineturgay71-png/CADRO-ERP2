@@ -28,6 +28,7 @@ ABBR = "CAT"
 SUPPLIER = "Akış Tedarikçi A.Ş."
 CUSTOMER = "Akış Müşteri Ltd."
 ITEM = "AKIS-MAL-001"
+SERVICE = "AKIS-HIZMET-001"
 BANK_NAME = "Akış Test Bankası"
 
 BUY_QTY, BUY_RATE = 100, 50
@@ -142,6 +143,17 @@ def setup_company():
 				"item_defaults": [{"company": COMPANY, "default_warehouse": f"Stores - {ABBR}"}],
 			}
 		).insert()
+	if not frappe.db.exists("Item", SERVICE):
+		frappe.get_doc(
+			{
+				"doctype": "Item",
+				"item_code": SERVICE,
+				"item_name": "Akış Test Hizmeti",
+				"item_group": frappe.db.get_value("Item Group", {"is_group": 0}),
+				"stock_uom": "Nos",
+				"is_stock_item": 0,
+			}
+		).insert()
 	frappe.db.commit()  # nosemgrep -- testler arası paylaşılan şirket verisi; her test sonda geri alınır
 
 
@@ -182,8 +194,8 @@ def outstanding(doctype, name):
 	return flt(frappe.db.get_value(doctype, name, "outstanding_amount"), 2)
 
 
-def apply_kdv(doc, master_doctype):
-	for row in _get_taxes_and_charges(master_doctype, f"KDV %20 - {ABBR}"):
+def apply_kdv(doc, master_doctype, rate="%20"):
+	for row in _get_taxes_and_charges(master_doctype, f"KDV {rate} - {ABBR}"):
 		doc.append("taxes", row)
 
 
@@ -323,7 +335,7 @@ class TradingFlow:
 		self.t.assertEqual(balance("153.01"), stock_before)
 
 	# -- 4. Satış: sipariş -> irsaliye -> fatura -----------------------------
-	def sell(self, qty=SELL_QTY):
+	def sell(self, qty=SELL_QTY, unit_cost=BUY_RATE):
 		self.purchase()
 		if not self._once("sell"):
 			return
@@ -360,7 +372,7 @@ class TradingFlow:
 		dn.insert()
 		dn.submit()
 		self.docs.update(so=so.name, dn=dn.name)
-		cost = qty * BUY_RATE
+		cost = qty * unit_cost
 		# Giden irsaliye: mal stoktan çıkar, maliyet gider yazılır.
 		self.assert_gl("Delivery Note", dn.name, {COGS_NO: cost, "153.01": -cost})
 		self.t.assertEqual(bin_of(ITEM, self.warehouse), (stock_qty - qty, stock_value - cost))
@@ -628,6 +640,11 @@ class TestMainFlow(ERPNextTestSuite):
 			"round_off_account": "689.01",
 			"default_bank_account": "102.01",
 			"default_cash_account": "100.01",  # TL kasa; EUR/USD kasalar varsayılan olmamalı
+			"exchange_gain_account": "646.01",
+			"exchange_loss_account": "656.01",
+			"unrealized_exchange_gain_loss_account": "646.02",
+			"bank_charges_account": "653.01",
+			"write_off_account": "659.01",
 		}
 		for field, number in expected_defaults.items():
 			self.assertEqual(company.get(field), acc(number), field)

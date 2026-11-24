@@ -17,11 +17,13 @@
                     },
                     "EUR KASA": {
                         "account_number": "100.02",
-                        "account_type": "Cash"
+                        "account_type": "Cash",
+                        "account_currency": "EUR"
                     },
                     "USD KASA": {
                         "account_number": "100.03",
-                        "account_type": "Cash"
+                        "account_type": "Cash",
+                        "account_currency": "USD"
                     }
                 },
                 "ALINAN \u00c7EKLER": {
@@ -39,6 +41,16 @@
                     "TL BANKA": {
                         "account_number": "102.01",
                         "account_type": "Bank"
+                    },
+                    "EUR BANKA": {
+                        "account_number": "102.02",
+                        "account_type": "Bank",
+                        "account_currency": "EUR"
+                    },
+                    "USD BANKA": {
+                        "account_number": "102.03",
+                        "account_type": "Bank",
+                        "account_currency": "USD"
                     }
                 },
                 "VER\u0130LEN \u00c7EKLER VE \u00d6DEME EM\u0130RLER\u0130(-)": {
@@ -80,6 +92,16 @@
                     "ALICILAR": {
                         "account_number": "120.01",
                         "account_type": "Receivable"
+                    },
+                    "ALICILAR EUR": {
+                        "account_number": "120.02",
+                        "account_type": "Receivable",
+                        "account_currency": "EUR"
+                    },
+                    "ALICILAR USD": {
+                        "account_number": "120.03",
+                        "account_type": "Receivable",
+                        "account_currency": "USD"
                     }
                 },
                 "ALACAK SENETLER\u0130": {
@@ -587,6 +609,16 @@
                     "FATURASI GELMEM\u0130\u015e MAL ALIMLARI": {
                         "account_number": "320.90",
                         "account_type": "Stock Received But Not Billed"
+                    },
+                    "SATICILAR EUR": {
+                        "account_number": "320.02",
+                        "account_type": "Payable",
+                        "account_currency": "EUR"
+                    },
+                    "SATICILAR USD": {
+                        "account_number": "320.03",
+                        "account_type": "Payable",
+                        "account_currency": "USD"
                     }
                 },
                 "BOR\u00c7 SENETLER\u0130": {
@@ -958,21 +990,30 @@
                 "account_number": "57",
                 "GE\u00c7M\u0130\u015e YILLAR K\u00c2RLARI": {
                     "account_number": "570",
-                    "is_group": 1
+                    "is_group": 1,
+                    "GE\u00c7M\u0130\u015e YILLAR K\u00c2RLARI TL": {
+                        "account_number": "570.01"
+                    }
                 }
             },
             "GE\u00c7M\u0130\u015e YILLAR ZARARLARI(-)": {
                 "account_number": "58",
                 "GE\u00c7M\u0130\u015e YILLAR ZARARLARI(-)": {
                     "account_number": "580",
-                    "is_group": 1
+                    "is_group": 1,
+                    "GE\u00c7M\u0130\u015e YILLAR ZARARLARI TL(-)": {
+                        "account_number": "580.01"
+                    }
                 }
             },
             "D\u00d6NEM NET K\u00c2RI (ZARARI)": {
                 "account_number": "59",
                 "D\u00d6NEM NET K\u00c2RI": {
                     "account_number": "590",
-                    "is_group": 1
+                    "is_group": 1,
+                    "D\u00d6NEM NET K\u00c2RI TL": {
+                        "account_number": "590.01"
+                    }
                 },
                 "D\u00d6NEM NET ZARARI(-)": {
                     "account_number": "591",
@@ -1045,7 +1086,13 @@
                 },
                 "KAMB\u0130YO K\u00c2RLARI": {
                     "account_number": "646",
-                    "is_group": 1
+                    "is_group": 1,
+                    "KAMB\u0130YO K\u00c2RLARI TL": {
+                        "account_number": "646.01"
+                    },
+                    "KAMB\u0130YO DE\u011eERLEME FARKLARI TL (REAL\u0130ZE OLMAMI\u015e)": {
+                        "account_number": "646.02"
+                    }
                 },
                 "REESKONT FA\u0130Z GEL\u0130RLER\u0130": {
                     "account_number": "647",
@@ -1142,7 +1189,10 @@
                 "account_number": "65",
                 "KOM\u0130SYON G\u0130DERLER\u0130(-)": {
                     "account_number": "653",
-                    "is_group": 1
+                    "is_group": 1,
+                    "BANKA KOM\u0130SYON VE MASRAFLARI TL": {
+                        "account_number": "653.01"
+                    }
                 },
                 "KAR\u015eILIK G\u0130DERLER\u0130(-)": {
                     "account_number": "654",
@@ -1154,7 +1204,10 @@
                 },
                 "KAMB\u0130YO ZARARLARI(-)": {
                     "account_number": "656",
-                    "is_group": 1
+                    "is_group": 1,
+                    "KAMB\u0130YO ZARARLARI TL": {
+                        "account_number": "656.01"
+                    }
                 },
                 "REESKONT FA\u0130Z G\u0130DERLER\u0130(-)": {
                     "account_number": "657",
@@ -1166,7 +1219,10 @@
                 },
                 "D\u0130\u011eER OLA\u011eAN G\u0130DER VE ZARARLAR(-)": {
                     "account_number": "659",
-                    "is_group": 1
+                    "is_group": 1,
+                    "TAHS\u0130L ED\u0130LEMEYEN K\u00dc\u00c7\u00dcK FARKLAR TL": {
+                        "account_number": "659.01"
+                    }
                 }
             },
             "F\u0130NANSMAN G\u0130DERLER\u0130(-)": {

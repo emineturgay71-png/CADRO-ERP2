@@ -228,10 +228,13 @@ class TestTurkeyChartOfAccounts(IntegrationTestCase):
 			"100.01": "Cash",
 			"101.01": "Cash",
 			"102.01": "Bank",
+			"102.02": "Bank",
 			"120.01": "Receivable",
+			"120.02": "Receivable",
 			"153.01": "Stock",
 			"191.01.04": "Tax",
 			"320.01": "Payable",
+			"320.02": "Payable",
 			"320.90": "Stock Received But Not Billed",
 			"391.01.04": "Tax",
 			"600.01": "Income Account",
@@ -241,14 +244,17 @@ class TestTurkeyChartOfAccounts(IntegrationTestCase):
 		}
 		for number, account_type in required.items():
 			self.assertEqual(by_number[number].get("account_type"), account_type, number)
+		# Döviz hesapları döviz cinsinden tanımlı olmalı.
+		for number, currency in (("100.02", "EUR"), ("100.03", "USD"), ("102.02", "EUR"), ("120.02", "EUR"), ("320.02", "EUR")):
+			self.assertEqual(by_number[number].get("account_currency"), currency, number)
+		# Kambiyo, banka masrafı, yazılan fark ve özkaynak yaprakları var.
+		for number in ("646.01", "646.02", "656.01", "653.01", "659.01", "570.01", "590.01"):
+			self.assertIn(number, by_number)
 
 	def test_types_erpnext_picks_by_itself_are_unambiguous(self):
 		# Aynı türde birden çok yaprak olursa ERPNext hangisini varsayılan yapacağını seçemez
-		# (kasa ve stok türleri `set_company_defaults` ile açıkça atanır).
+		# (kasa, banka, stok, alıcı ve satıcı türleri `set_company_defaults` ile açıkça atanır).
 		for account_type in (
-			"Payable",
-			"Receivable",
-			"Bank",
 			"Stock Received But Not Billed",
 			"Cost of Goods Sold",
 			"Income Account",
