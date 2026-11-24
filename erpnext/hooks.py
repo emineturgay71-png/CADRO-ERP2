@@ -464,7 +464,10 @@ doc_events = {
 	},
 	"Company": {
 		"after_rename": "erpnext.regional.rename_vat_settings",
-		"on_update": "erpnext.regional.apply_country_report_visibility",
+		"on_update": [
+			"erpnext.regional.apply_country_report_visibility",
+			"erpnext.regional.turkey.setup.set_company_defaults",
+		],
 	},
 	"Address": {
 		"validate": [

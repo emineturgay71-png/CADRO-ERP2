@@ -26,12 +26,20 @@
                 },
                 "ALINAN \u00c7EKLER": {
                     "account_number": "101",
-                    "is_group": 1
+                    "is_group": 1,
+                    "ALINAN \u00c7EKLER TL": {
+                        "account_number": "101.01",
+                        "account_type": "Cash"
+                    }
                 },
                 "BANKALAR": {
                     "account_number": "102",
                     "is_group": 1,
-                    "account_type": "Bank"
+                    "account_type": "Bank",
+                    "TL BANKA": {
+                        "account_number": "102.01",
+                        "account_type": "Bank"
+                    }
                 },
                 "VER\u0130LEN \u00c7EKLER VE \u00d6DEME EM\u0130RLER\u0130(-)": {
                     "account_number": "103",
@@ -154,7 +162,11 @@
                 },
                 "T\u0130CAR\u0130 MALLAR": {
                     "account_number": "153",
-                    "is_group": 1
+                    "is_group": 1,
+                    "T\u0130CAR\u0130 MALLAR TL": {
+                        "account_number": "153.01",
+                        "account_type": "Stock"
+                    }
                 },
                 "D\u0130\u011eER STOKLAR": {
                     "account_number": "157",
@@ -569,7 +581,12 @@
                 "SATICILAR": {
                     "account_number": "320",
                     "SATICILAR TRY": {
-                        "account_number": "320.01"
+                        "account_number": "320.01",
+                        "account_type": "Payable"
+                    },
+                    "FATURASI GELMEM\u0130\u015e MAL ALIMLARI": {
+                        "account_number": "320.90",
+                        "account_type": "Stock Received But Not Billed"
                     }
                 },
                 "BOR\u00c7 SENETLER\u0130": {
@@ -873,7 +890,10 @@
                 "account_number": "50",
                 "SERMAYE": {
                     "account_number": "500",
-                    "is_group": 1
+                    "is_group": 1,
+                    "SERMAYE TL": {
+                        "account_number": "500.01"
+                    }
                 },
                 "\u00d6DENMEM\u0130\u015e SERMAYE(-)": {
                     "account_number": "501",
@@ -960,14 +980,18 @@
                 }
             }
         },
-        "GEL\u0130R TABLOSU HESAPLARI": {
+        "GEL\u0130R TABLOSU HESAPLARI (GEL\u0130RLER)": {
             "account_number": "6",
             "root_type": "Income",
             "BR\u00dcT SATI\u015eLAR": {
                 "account_number": "60",
                 "YURT \u0130\u00c7\u0130 SATI\u015eLAR": {
                     "account_number": "600",
-                    "is_group": 1
+                    "is_group": 1,
+                    "YURT \u0130\u00c7\u0130 SATI\u015eLAR TL": {
+                        "account_number": "600.01",
+                        "account_type": "Income Account"
+                    }
                 },
                 "YURT DI\u015eI SATI\u015eLAR": {
                     "account_number": "601",
@@ -990,42 +1014,6 @@
                 },
                 "D\u0130\u011eER \u0130ND\u0130R\u0130MLER(-)": {
                     "account_number": "612",
-                    "is_group": 1
-                }
-            },
-            "SATI\u015eLARIN MAL\u0130YET\u0130(-)": {
-                "account_number": "62",
-                "SATILAN MAMULLER MAL\u0130YET\u0130(-)": {
-                    "account_number": "620",
-                    "is_group": 1
-                },
-                "SATILAN T\u0130CAR\u0130 MALLAR MAL\u0130YET\u0130(-)": {
-                    "account_number": "621",
-                    "is_group": 1
-                },
-                "SATILAN H\u0130ZMET MAL\u0130YET\u0130(-)": {
-                    "account_number": "622",
-                    "is_group": 1
-                },
-                "D\u0130\u011eER SATI\u015eLARIN MAL\u0130YET\u0130(-)": {
-                    "account_number": "623",
-                    "D\u0130\u011eR. SAT\u015e. MALYT.": {
-                        "account_number": "623.01"
-                    }
-                }
-            },
-            "FAAL\u0130YET G\u0130DERLER\u0130(-)": {
-                "account_number": "63",
-                "ARA\u015eTIRMA VE GEL\u0130\u015eT\u0130RME G\u0130DERLER\u0130(-)": {
-                    "account_number": "630",
-                    "is_group": 1
-                },
-                "PAZARLAMA SATI\u015e VE DA\u011eITIM G\u0130DERLER\u0130(-)": {
-                    "account_number": "631",
-                    "is_group": 1
-                },
-                "GENEL Y\u00d6NET\u0130M G\u0130DERLER\u0130(-)": {
-                    "account_number": "632",
                     "is_group": 1
                 }
             },
@@ -1072,6 +1060,84 @@
                     "is_group": 1
                 }
             },
+            "OLA\u011eAN DI\u015eI GEL\u0130R VE K\u00c2RLAR": {
+                "account_number": "67",
+                "\u00d6NCEK\u0130 D\u00d6NEM GEL\u0130R VE K\u00c2RLARI": {
+                    "account_number": "671",
+                    "is_group": 1
+                },
+                "D\u0130\u011eER OLA\u011eAN DI\u015eI GEL\u0130R VE K\u00c2RLAR": {
+                    "account_number": "679",
+                    "is_group": 1
+                }
+            },
+            "D\u00d6NEM NET K\u00c2RI VEYA ZARARI": {
+                "account_number": "69",
+                "D\u00d6NEM K\u00c2RI VEYA ZARARI": {
+                    "account_number": "690",
+                    "is_group": 1
+                },
+                "D\u00d6NEM K\u00c2RI VERG\u0130 VE D\u0130\u011eER YASAL Y\u00dcK\u00dcML\u00dcL\u00dcK KAR\u015eILIKLARI(-)": {
+                    "account_number": "691",
+                    "is_group": 1
+                },
+                "D\u00d6NEM NET K\u00c2RI VEYA ZARARI": {
+                    "account_number": "692",
+                    "is_group": 1
+                },
+                "YILLARA YAYGIN \u0130N\u015eAAT VE ENFLASYON D\u00dcZELTME HESABI": {
+                    "account_number": "697",
+                    "is_group": 1
+                },
+                "ENFLASYON D\u00dcZELTME HESABI": {
+                    "account_number": "698",
+                    "is_group": 1
+                }
+            }
+        },
+        "GEL\u0130R TABLOSU HESAPLARI (G\u0130DERLER)": {
+            "account_number": "6G",
+            "root_type": "Expense",
+            "SATI\u015eLARIN MAL\u0130YET\u0130(-)": {
+                "account_number": "62",
+                "SATILAN MAMULLER MAL\u0130YET\u0130(-)": {
+                    "account_number": "620",
+                    "is_group": 1
+                },
+                "SATILAN T\u0130CAR\u0130 MALLAR MAL\u0130YET\u0130(-)": {
+                    "account_number": "621",
+                    "is_group": 1,
+                    "SATILAN T\u0130CAR\u0130 MALLAR MAL\u0130YET\u0130 TL": {
+                        "account_number": "621.01",
+                        "account_type": "Cost of Goods Sold"
+                    }
+                },
+                "SATILAN H\u0130ZMET MAL\u0130YET\u0130(-)": {
+                    "account_number": "622",
+                    "is_group": 1
+                },
+                "D\u0130\u011eER SATI\u015eLARIN MAL\u0130YET\u0130(-)": {
+                    "account_number": "623",
+                    "D\u0130\u011eR. SAT\u015e. MALYT.": {
+                        "account_number": "623.01"
+                    }
+                }
+            },
+            "FAAL\u0130YET G\u0130DERLER\u0130(-)": {
+                "account_number": "63",
+                "ARA\u015eTIRMA VE GEL\u0130\u015eT\u0130RME G\u0130DERLER\u0130(-)": {
+                    "account_number": "630",
+                    "is_group": 1
+                },
+                "PAZARLAMA SATI\u015e VE DA\u011eITIM G\u0130DERLER\u0130(-)": {
+                    "account_number": "631",
+                    "is_group": 1
+                },
+                "GENEL Y\u00d6NET\u0130M G\u0130DERLER\u0130(-)": {
+                    "account_number": "632",
+                    "is_group": 1
+                }
+            },
             "D\u0130\u011eER FAAL\u0130YETLERDEN OLA\u011eAN G\u0130DER VE ZARARLAR(-)": {
                 "account_number": "65",
                 "KOM\u0130SYON G\u0130DERLER\u0130(-)": {
@@ -1114,17 +1180,6 @@
                     "is_group": 1
                 }
             },
-            "OLA\u011eAN DI\u015eI GEL\u0130R VE K\u00c2RLAR": {
-                "account_number": "67",
-                "\u00d6NCEK\u0130 D\u00d6NEM GEL\u0130R VE K\u00c2RLARI": {
-                    "account_number": "671",
-                    "is_group": 1
-                },
-                "D\u0130\u011eER OLA\u011eAN DI\u015eI GEL\u0130R VE K\u00c2RLAR": {
-                    "account_number": "679",
-                    "is_group": 1
-                }
-            },
             "OLA\u011eAN DI\u015eI G\u0130DER VE ZARARLAR(-)": {
                 "account_number": "68",
                 "\u00c7ALI\u015eMAYAN KISIM G\u0130DER VE ZARARLARI(-)": {
@@ -1137,30 +1192,11 @@
                 },
                 "D\u0130\u011eER OLA\u011eAN DI\u015eI G\u0130DER VE ZARARLAR(-)": {
                     "account_number": "689",
-                    "is_group": 1
-                }
-            },
-            "D\u00d6NEM NET K\u00c2RI VEYA ZARARI": {
-                "account_number": "69",
-                "D\u00d6NEM K\u00c2RI VEYA ZARARI": {
-                    "account_number": "690",
-                    "is_group": 1
-                },
-                "D\u00d6NEM K\u00c2RI VERG\u0130 VE D\u0130\u011eER YASAL Y\u00dcK\u00dcML\u00dcL\u00dcK KAR\u015eILIKLARI(-)": {
-                    "account_number": "691",
-                    "is_group": 1
-                },
-                "D\u00d6NEM NET K\u00c2RI VEYA ZARARI": {
-                    "account_number": "692",
-                    "is_group": 1
-                },
-                "YILLARA YAYGIN \u0130N\u015eAAT VE ENFLASYON D\u00dcZELTME HESABI": {
-                    "account_number": "697",
-                    "is_group": 1
-                },
-                "ENFLASYON D\u00dcZELTME HESABI": {
-                    "account_number": "698",
-                    "is_group": 1
+                    "is_group": 1,
+                    "YUVARLAMA FARKLARI": {
+                        "account_number": "689.01",
+                        "account_type": "Round Off"
+                    }
                 }
             }
         },

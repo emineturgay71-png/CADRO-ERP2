@@ -10,10 +10,9 @@ ihtiyaç duyduğu önceki adımları kendisi çalıştırır; böylece tek baş�
 Çalıştırma:
     bench --site <site> run-tests --module erpnext.regional.turkey.test_main_flow
 
-Taze bir Türkiye şirketi hesap planıyla ticarete hazır gelmediği için `setup_company` eksik
-hesapları ve şirket varsayılanlarını kurar. Neleri kurması gerektiği `GAPS` listesine yazılır
-ve test çıktısında "CADRO-GAP" satırlarıyla görünür: ürünün kendisinin karşılaması gereken
-eksiklerin listesidir.
+Şirket, kurulum sihirbazının yaptığı gibi yalnızca Türkiye hesap planıyla oluşturulur: hesap
+planı ve `erpnext.regional.turkey.setup` ticarete hazır gelmelidir (`test_company_is_ready_to_trade`).
+Testte hesap kurma ya da şirket varsayılanı düzeltme yoktur.
 """
 
 import frappe
@@ -47,11 +46,8 @@ COGS = SELL_QTY * BUY_RATE  # 2000
 CASH_PART, CHEQUE_PART = 1000, 1500
 BANK_PART = SALE_TOTAL - CASH_PART - CHEQUE_PART  # 1340
 
-GAPS: list[str] = []
-
-# Satılan malın maliyet hesabı. Türkiye planında 621 Income köküne bağlı olduğundan ERPNext'in
-# "varsayılan maliyet hesabı" kuralını (Expense kökü) karşılamıyor; bkz. setup_company.
-COGS_NO = "7.99"
+# Satılan malın maliyet hesabı (Expense kökü altında).
+COGS_NO = "621.01"
 
 
 # ---------------------------------------------------------------------------
@@ -65,29 +61,6 @@ def acc(number):
 	if not name:
 		raise AssertionError(f"{COMPANY} hesap planında {number} numaralı hesap yok")
 	return name
-
-
-def ensure_account(number, name, parent_number, account_type=""):
-	existing = frappe.db.get_value("Account", {"company": COMPANY, "account_number": number}, "name")
-	if existing:
-		if account_type and frappe.db.get_value("Account", existing, "account_type") != account_type:
-			frappe.db.set_value("Account", existing, "account_type", account_type)
-			GAPS.append(f"{number} hesabının türü '{account_type}' olmalı")
-		return existing
-	parent = acc(parent_number)
-	doc = frappe.get_doc(
-		{
-			"doctype": "Account",
-			"account_name": name,
-			"account_number": number,
-			"parent_account": parent,
-			"company": COMPANY,
-			"account_type": account_type,
-			"is_group": 0,
-		}
-	).insert()
-	GAPS.append(f"{number} {name} yaprak hesabı yok ({parent_number} grubunun altına eklendi)")
-	return doc.name
 
 
 def ensure_fiscal_year():
@@ -108,8 +81,7 @@ def ensure_fiscal_year():
 
 
 def setup_company():
-	"""Türkiye şirketini sihirbazın yaptığı gibi oluştur, ticarete hazır hale getir. Tekrar çalıştırılabilir."""
-	GAPS.clear()
+	"""Türkiye şirketini sihirbazın yaptığı gibi oluştur; yalnızca taraflar, ürün ve banka hesabı eklenir."""
 	ensure_fiscal_year()
 	if not frappe.db.exists("Company", COMPANY):
 		frappe.get_doc(
@@ -125,54 +97,15 @@ def setup_company():
 			}
 		).insert()
 
-	stock = ensure_account("153.01", "TİCARİ MALLAR TL", "153", "Stock")
-	cheques = ensure_account("101.01", "ALINAN ÇEKLER TL", "101", "Cash")
-	bank = ensure_account("102.01", "VADESİZ TL BANKA", "102", "Bank")
-	sales = ensure_account("600.01", "YURT İÇİ SATIŞLAR TL", "600", "Income Account")
-	cogs = ensure_account(COGS_NO, "SATILAN TİCARİ MALLAR MALİYETİ TL", "7", "Cost of Goods Sold")
-	GAPS.append(
-		"621 Satılan Ticari Mallar Maliyeti, 6 numaralı Income köküne bağlı: ERPNext varsayılan gider/maliyet "
-		"hesabı için Expense kökü ister; test maliyet hesabını 7 köküne (7.99) koyuyor"
-	)
-	srbnb = ensure_account("320.90", "ALINAN FATURASIZ MALLAR", "320", "Stock Received But Not Billed")
-	payable = ensure_account("320.01", "SATICILAR TRY", "320", "Payable")
-	capital = ensure_account("500.01", "ÖDENMİŞ SERMAYE TL", "500")
-
-	company = frappe.get_doc("Company", COMPANY)
-	wanted = {
-		"default_inventory_account": stock,
-		"default_payable_account": payable,
-		"default_income_account": sales,
-		"default_expense_account": cogs,
-		"stock_received_but_not_billed": srbnb,
-		"default_bank_account": bank,
-		"default_cash_account": acc("100.01"),
-	}
-	changed = [field for field, value in wanted.items() if company.get(field) != value]
-	for field in changed:
-		company.set(field, wanted[field])
-	if changed:
-		GAPS.append("şirket varsayılan hesapları kuruldu: " + ", ".join(changed))
-		company.save()
-
-	for mode, account in (("Cash", acc("100.01")), ("Cheque", cheques), ("Wire Transfer", bank)):
-		if not frappe.db.exists("Mode of Payment", mode):
-			frappe.get_doc({"doctype": "Mode of Payment", "mode_of_payment": mode, "type": "Bank"}).insert()
-		mop = frappe.get_doc("Mode of Payment", mode)
-		if not any(row.company == COMPANY for row in mop.accounts):
-			mop.append("accounts", {"company": COMPANY, "default_account": account})
-			mop.save()
-			GAPS.append(f"ödeme yöntemi '{mode}' için şirket hesabı tanımlandı")
-
 	if not frappe.db.exists("Bank", BANK_NAME):
 		frappe.get_doc({"doctype": "Bank", "bank_name": BANK_NAME}).insert()
-	if not frappe.db.exists("Bank Account", {"bank": BANK_NAME, "account": bank}):
+	if not frappe.db.exists("Bank Account", {"bank": BANK_NAME, "account": acc("102.01")}):
 		frappe.get_doc(
 			{
 				"doctype": "Bank Account",
 				"account_name": "Vadesiz TL",
 				"bank": BANK_NAME,
-				"account": bank,
+				"account": acc("102.01"),
 				"company": COMPANY,
 				"is_company_account": 1,
 			}
@@ -676,30 +609,50 @@ class TestMainFlow(ERPNextTestSuite):
 		super().setUpClass()
 		setup_company()
 
-	@classmethod
-	def tearDownClass(cls):
-		for gap in GAPS:
-			print("CADRO-GAP:", gap)
-
 	def setUp(self):
 		self.flow = TradingFlow(self)
 
 	# ---- Alt senaryolar (her biri kendi önkoşullarını çalıştırır) ----------
 
 	def test_company_is_ready_to_trade(self):
+		"""Taze Türkiye şirketi hesap planından ve ülke kurulumundan ticarete hazır gelmeli."""
 		company = frappe.get_doc("Company", COMPANY)
-		for field in (
-			"default_receivable_account",
-			"default_payable_account",
-			"default_income_account",
-			"default_expense_account",
-			"default_inventory_account",
-			"stock_received_but_not_billed",
-			"default_bank_account",
-			"default_cash_account",
-		):
-			self.assertTrue(company.get(field), field)
+		expected_defaults = {
+			"default_receivable_account": "120.01",
+			"default_payable_account": "320.01",
+			"default_income_account": "600.01",
+			"default_expense_account": COGS_NO,
+			"default_inventory_account": "153.01",
+			"stock_received_but_not_billed": "320.90",
+			"stock_adjustment_account": "940.01",
+			"round_off_account": "689.01",
+			"default_bank_account": "102.01",
+			"default_cash_account": "100.01",  # TL kasa; EUR/USD kasalar varsayılan olmamalı
+		}
+		for field, number in expected_defaults.items():
+			self.assertEqual(company.get(field), acc(number), field)
 		self.assertTrue(company.enable_perpetual_inventory)
+
+		# Gelir tablosu: gelirler Income, maliyet ve giderler Expense köküne bağlı.
+		for number, root_type in (
+			("600", "Income"),
+			("610", "Income"),
+			("621", "Expense"),
+			("632", "Expense"),
+			("660", "Expense"),
+			("689", "Expense"),
+			("646", "Income"),
+		):
+			self.assertEqual(frappe.db.get_value("Account", acc(number), "root_type"), root_type, number)
+
+		# Çek ve havale ödeme yöntemleri şirketin hesaplarına bağlı.
+		for mode, number in (("Cash", "100.01"), ("Cheque", "101.01"), ("Wire Transfer", "102.01")):
+			self.assertEqual(
+				frappe.db.get_value("Mode of Payment Account", {"parent": mode, "company": COMPANY}, "default_account"),
+				acc(number),
+				mode,
+			)
+
 		for template in ("%20", "%10", "%1"):
 			self.assertTrue(frappe.db.exists("Sales Taxes and Charges Template", f"KDV {template} - {ABBR}"))
 			self.assertTrue(frappe.db.exists("Purchase Taxes and Charges Template", f"KDV {template} - {ABBR}"))

@@ -116,21 +116,33 @@ bench --site <site> run-tests --module erpnext.regional.turkey.test_main_flow
 
 Sonuç: taze MariaDB sitesinde 15/15 geçti (iki ardışık koşu). PostgreSQL'de koşulmadı.
 
-### Bulunan eksikler: Türkiye hesap planı ticarete hazır gelmiyor
+### Ana akış testinin bulduğu eksikler (çözüldü)
 
-Taze bir Türkiye şirketinde akışın çalışması için testin kendisinin kurması gereken şeyler (`CADRO-GAP` çıktısı):
+İlk koşuda taze Türkiye şirketi ticarete hazır gelmiyordu: 6. sınıf tek `Income` kökündeydi (`621` Satılan Ticari Mallar Maliyeti varsayılan maliyet hesabı olamıyordu), `101`/`102`/`153`/`600`/`500` altında yaprak hesap yoktu, `320.01` `Payable` değildi, `Stock Received But Not Billed` hesabı ve şirket varsayılanları yoktu, çek/havale ödeme yöntemlerinde şirket hesabı yoktu. Pilotta `Allow Negative Stock` kapalı; yetersiz stokla satış reddediliyor.
 
-| Eksik | Etki |
+### Hesap planı düzeltmesi (24 Kasım 2026)
+
+Ana akış testi taze bir Türkiye şirketinin ticarete hazır gelmediğini gösterdi; hesap planı ve ülke kurulumu şöyle düzeltildi (`tr_chart_of_accounts.json`, `regional/turkey/setup.py`, `hooks.py`):
+
+| Sorun | Düzeltme |
 | --- | --- |
-| **6. sınıf tek `Income` kökü altında**: `621 Satılan Ticari Mallar Maliyeti`, `62`, `63 Faaliyet Giderleri`, `65`, `66`, `68` gelir kökünde | ERPNext varsayılan maliyet/gider hesabı olarak kabul etmez ("invalid root_type"); gider raporları ve Kâr-Zarar sınıflaması yanlış. Pilot sitede de `621` ve `632` `Income` kökünde. **Yapısal hata.** |
-| `153 Ticari Mallar`, `101 Alınan Çekler`, `102 Bankalar`, `600 Yurt İçi Satışlar`, `500 Sermaye` altında **yaprak hesap yok** | Ürün, çek tahsilatı, banka hesabı bağlama, satış ve sermaye hareketi yapılamaz |
-| `320.01 Satıcılar` türü `Payable` değil | Tedarikçi borcu için varsayılan hesap olamaz |
-| `Stock Received But Not Billed` türünde hesap yok | Sürekli envanterde alış irsaliyesi kaydedilemez |
-| Şirket varsayılanları boş: ödenecek, gelir, gider, stok girişi, banka; kasa varsayılanı `USD KASA` | Belgeler hesap bulamaz; nakit tahsilat yanlış kasaya gider |
-| `Cash`/`Bank`/`Receivable` türü olmayan hesap ödeme yöntemine bağlanamaz | `101 Alınan Çekler` yaprağı bir tür taşımalı (testte `Cash`) |
-| `Cheque` ve `Wire Transfer` ödeme yöntemlerinde şirket hesabı yok | Çek/havale tahsilatı hesabı bulamaz |
+| 6. sınıf tek `Income` kökünde (`621`, `632` gider olduğu hâlde gelir) | Kök ikiye bölündü: `6` GELİR TABLOSU HESAPLARI (GELİRLER) = `Income` (60, 61, 64, 67, 69); `6G` GELİR TABLOSU HESAPLARI (GİDERLER) = `Expense` (62, 63, 65, 66, 68). Alt hesap numaraları aynı kaldı |
+| Yaprak hesap yoktu | `101.01` Alınan Çekler TL (`Cash`), `102.01` TL Banka (`Bank`), `153.01` Ticari Mallar TL (`Stock`), `320.90` Faturası Gelmemiş Mal Alımları (`Stock Received But Not Billed`), `500.01` Sermaye TL, `600.01` Yurt İçi Satışlar TL (`Income Account`), `621.01` Satılan Ticari Mallar Maliyeti TL (`Cost of Goods Sold`), `689.01` Yuvarlama Farkları (`Round Off`) |
+| `320.01` türü yoktu | `Payable` |
+| Varsayılan kasa USD KASA, varsayılan stok `157.01` seçiliyordu (aynı türde birden çok yaprak) | Company `on_update` kancası `set_company_defaults`: yeni Türkiye şirketinde varsayılan kasa `100.01` TL KASA, stok `153.01` |
+| Çek, havale, nakit ödeme yöntemlerinde şirket hesabı yoktu | `setup()` şirket oluşurken `Cash`→`100.01`, `Cheque`→`101.01`, `Wire Transfer` ve `Bank Draft`→`102.01` bağlar |
 
-Doğrulandı: pilotta `Allow Negative Stock` kapalı (0); yetersiz stokla satış reddediliyor. Karar bekliyor: hesap planı düzeltmesi (6. sınıfı gelir ve gider köklerine bölmek, yaprak hesaplar, türler, şirket varsayılanları). Yalnızca yeni kurulan şirketleri etkiler; mevcut şirketlerin hesapları için ayrı bir yama gerekir.
+Doğrulama:
+
+- Ana akış testi artık hesap kurmadan, yalnızca yeni hesap planıyla 15/15 geçiyor; `test_company_is_ready_to_trade` varsayılanları, kök türlerini ve ödeme yöntemi hesaplarını denetler.
+- `TestTurkeyChartOfAccounts` (dosya düzeyinde, 4 test): kök türleri, hesap numarası tekilliği, ticaret yaprakları ve türleri, ERPNext'in kendisinin seçtiği türlerin tek yaprakla temsil edilmesi.
+- `test_turkey_regional` 16/16, `test_company` 25/25 (MariaDB, taze site).
+
+Sınırlar:
+
+- Düzeltme yalnızca yeni kurulan şirketleri etkiler. Pilot ve demo şirketleri eski planla duruyor: yeniden oluşturulmaları ya da bir geçiş yaması gerekir (mevcut hesapların kökünü değiştirmek raporları etkiler).
+- Kambiyo kâr/zarar, banka masrafı, şüpheli alacak ve yazılan fark hesapları için varsayılan tanımlanmadı; dövizli işlemler öncesinde yapılmalı.
+- EUR/USD banka hesapları kullanıcı tarafından eklenir; tek bir `Bank` yaprağı vardır (`102.01`).
 
 ## Sonraki adım
 
