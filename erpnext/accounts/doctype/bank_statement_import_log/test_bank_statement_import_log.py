@@ -11,6 +11,7 @@ from erpnext.accounts.doctype.bank_statement_import_log.bank_statement_import_lo
 	detect_column_mapping,
 	detect_header_row,
 	extract_pdf_tables,
+	fold_text,
 	get_amount_cr_dr_marker,
 	get_float_amount,
 	get_statement_details,
@@ -125,6 +126,98 @@ class TestBankStatementImportLog(ERPNextTestSuite, AccountsTestMixin):
 		# Random strings and characters should not throw a ValueError but return None
 		self.assertIsNone(get_float_amount("ABCD"))
 		self.assertIsNone(get_float_amount("****"))
+
+	# ------------------------------------------------------------------ #
+	# Turkish statements
+	# ------------------------------------------------------------------ #
+
+	def test_fold_text_handles_the_turkish_i(self):
+		self.assertEqual(fold_text("İŞLEM TARİHİ"), "islem tarihi")
+		self.assertEqual(fold_text("Açıklama"), "aciklama")
+		self.assertEqual(fold_text("BORÇ/ALACAK"), "borc/alacak")
+		self.assertEqual(fold_text("DESCRIPTION"), "description")
+		self.assertEqual(fold_text(None), "")
+
+	def test_amount_parser_reads_turkish_and_english_numbers(self):
+		cases = {
+			"1.250,75": 1250.75,
+			"-320,40": -320.40,
+			"12.500,00 TL": 12500.00,
+			"5,5": 5.5,
+			"1.250.000": 1250000.0,
+			"1,234": 1234.0,
+			"1,234,567.89": 1234567.89,
+			"100.27": 100.27,
+			"-1,000.34 INR": -1000.34,
+		}
+		for text, expected in cases.items():
+			self.assertEqual(get_float_amount(text), expected, text)
+		# A date is not a number.
+		self.assertIsNone(get_float_amount("24.11.2026"))
+
+	def test_turkish_header_row_and_column_mapping(self):
+		header = ["VALÖR TARİHİ", "İŞLEM TARİHİ", "AÇIKLAMA", "REFERANS", "BORÇ", "ALACAK", "BAKİYE"]
+		data = [["HESAP HAREKETLERİ", "", "", "", "", "", ""], header]
+		index, score = detect_header_row(data)
+		self.assertEqual(index, 1)
+		self.assertGreaterEqual(score, 6)
+
+		mapping = {column["index"]: column["maps_to"] for column in detect_column_mapping(header)}
+		self.assertEqual(
+			mapping,
+			{
+				0: "Do not import",  # value date: the transaction date column wins
+				1: "Date",
+				2: "Description",
+				3: "Reference",
+				4: "Withdrawal",
+				5: "Deposit",
+				6: "Balance",
+			},
+		)
+
+	def test_turkish_statement_with_separate_debit_and_credit_columns(self):
+		doc = self._create_bank_statement_import_log(
+			[
+				["HESAP HAREKETLERİ", "", "", "", "", ""],
+				["VALÖR TARİHİ", "İŞLEM TARİHİ", "AÇIKLAMA", "BORÇ", "ALACAK", "BAKİYE"],
+				["24.11.2026", "24.11.2026", "Havale - Proje avansı", "", "8.200,00", "8.200,00"],
+				["25.11.2026", "25.11.2026", "Kira ödemesi - Kasım", "2.500,50", "", "5.699,50"],
+			]
+		)
+		self.assertEqual(doc.detected_header_index, 1)
+		self.assertEqual(doc.detected_date_format, "%d.%m.%Y")
+		self.assertEqual(doc.detected_amount_format, "Separate columns for withdrawal and deposit")
+		self.assertEqual(doc.number_of_transactions, 2)
+		self.assertEqual(doc.total_debits, 2500.50)
+		self.assertEqual(doc.total_credits, 8200.00)
+
+	def test_turkish_statement_with_a_signed_amount_column(self):
+		doc = self._create_bank_statement_import_log(
+			[
+				["Tarih", "Açıklama", "Tutar", "Referans"],
+				["24.11.2026", "Müşteri tahsilatı", "5.000,00", "EFT-7001"],
+				["25.11.2026", "Ofis malzemeleri", "-320,40", "KRT-7002"],
+				["26.11.2026", "Personel maaş ödemesi", "-12.500,00", "HVL-7003"],
+			]
+		)
+		self.assertEqual(doc.detected_amount_format, "Amount column has positive/negative values")
+		self.assertEqual(doc.number_of_transactions, 3)
+		self.assertEqual(doc.total_credits, 5000.00)
+		self.assertEqual(doc.total_debits, 12820.40)
+
+	def test_turkish_statement_with_a_borc_alacak_type_column(self):
+		doc = self._create_bank_statement_import_log(
+			[
+				["Tarih", "Açıklama", "Tutar", "Borç/Alacak"],
+				["24.11.2026", "Müşteri tahsilatı", "5.000,00", "Alacak"],
+				["25.11.2026", "Ofis malzemeleri", "320,40", "Borç"],
+				["26.11.2026", "Tedarikçi ödemesi", "1.250,75", "BORÇ"],
+			]
+		)
+		self.assertEqual(doc.detected_amount_format, 'Transaction type column has "CR"/"DR" values')
+		self.assertEqual(doc.total_credits, 5000.00)
+		self.assertEqual(doc.total_debits, 1571.15)
 
 	# ------------------------------------------------------------------ #
 	# Amount format detection

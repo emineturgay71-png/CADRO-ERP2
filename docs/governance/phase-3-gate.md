@@ -86,7 +86,7 @@ Gezinti sırasında bulunan ve düzeltilen sorunlar:
 
 | Adım | Sonuç |
 | --- | --- |
-| Yükleme ve sütun eşleme | Sütun türü listesi Türkçe (Tarih, Açıklama, Tutar, Referans, Para Çekme, Mevduat…). Başlık satırı kullanıcı tarafından işaretlenir; Türkçe başlıklar otomatik tanınmaz |
+| Yükleme ve sütun eşleme | Sütun türü listesi Türkçe (Tarih, Açıklama, Tutar, Referans, Para Çekme, Mevduat…). Başlık satırı kullanıcı tarafından işaretlenir; Türkçe başlıklar bu turda otomatik tanınmadı (aşağıdaki düzeltmeyle tanınır) |
 | Biçim algısı | Tarih `DD.MM.YYYY`, tutar "pozitif/negatif değerler"; önizleme 3 işlem, borç `₺ 12.820,40`, alacak `₺ 5.000,00` |
 | İçe aktarma | 3 işlem oluştu, uzlaştırma ekranına geçildi, `Mutabık 0 / 3` |
 | Aynı dosyanın tekrarı | "Çakışan İşlemler" uyarısı gösterildi; yine de içe aktarılınca **0 yeni kayıt** oluştu (veritabanında 9 işlem: 6 örnek + 3), günlükte "3 yinelenen satır atlandı" notu |
@@ -95,11 +95,21 @@ Gezilen pencereler: Banka Girişi ve Transfer (tamamen Türkçe), Ödeme Kaydet 
 
 Bu turda bulunan: günlük notu `Imported {0} transactions (skipped {1} duplicate rows).` İngilizce kalıyordu; katalog girdisi eklendi.
 
+### Türkçe başlık ve sayı tanıma
+
+Ekstre içe aktarıcı yalnızca İngilizce başlıkları tanıyor ve `1.250,75` gibi sayıları `1.25075` okuyordu. Düzeltme (`bank_statement_import_log.py`):
+
+- `fold_text`: Türkçe `İ`/`ı` ve aksanları katlar (`İŞLEM TARİHİ` → `islem tarihi`).
+- Başlık sözlüğü: `Tarih`, `İşlem Tarihi`, `Açıklama`/`Detay`, `Tutar`/`Miktar`, `Borç`, `Alacak`, `Borç/Alacak`, `İşlem Türü`, `Referans`/`Dekont`/`İşlem No`, `Bakiye`/`Kalan`. `Valör Tarihi` işlem tarihi sütununun yerini almaz.
+- Sayılar: iki ayraç varsa sonuncusu ondalık; tek virgül `^\d{1,3}(,\d{3})+$` ise binlik, değilse ondalık (`320,40`); `1.250.000` binlik; `24.11.2026` gibi tarihler sayı sayılmaz.
+- `Borç`/`Alacak` tür sütunu değerleri tanınır.
+- 6 yeni birim test; ekstre içe aktarma günlüğü (29), içe aktarma (17) ve banka uzlaştırma (34) testleri MariaDB üzerinde geçti.
+
 ### Açık kalanlar
 
 - Eşleştirme kuralı oluşturma penceresi ve işlem geri alma akışı tarayıcıda gezilmedi (gömülü tarayıcıda ayar penceresi güvenilir açılmadı); metinleri kod incelemesinde `_()` ile sarılı görünüyor.
 - XLSX ve PDF ekstre içe aktarma denenmedi (PDF için Chromium düzeltmesi sonrası testler geçti).
-- Türkçe sütun başlıklarının (`Tarih`, `Tutar`, `Açıklama`) otomatik tanınması yapılmadı.
+- Türkçe başlık tanıma birim testlerle doğrulandı; gerçek bir Türk bankası ekstresiyle denenmedi.
 - Bazı erişilebilirlik etiketleri (`Close toast`, `Select all rows`) üçüncü taraf bileşenlerden İngilizce gelir.
 - Türkiye hesap planında `Bank` türünde yaprak hesap yok (bkz. yukarıdaki not).
 - Baskı formatları (29 adet) ve e-posta şablonlarında alıcı dili için ayrı kapsam (Faz 4) geçerlidir.

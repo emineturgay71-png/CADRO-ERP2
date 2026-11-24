@@ -4,6 +4,7 @@
 import io
 import json
 import re
+import unicodedata
 from datetime import datetime
 
 import frappe
@@ -600,6 +601,19 @@ class BankStatementImportLog(Document):
 		self.save()
 
 
+def fold_text(text) -> str:
+	"""Lowercase text with accents removed, aware of the Turkish dotted/dotless i.
+
+	Header and type cells are compared in this form, so "İŞLEM TARİHİ", "İşlem Tarihi" and
+	"islem tarihi" are the same text. A plain ``str.lower()`` turns "İ" into "i" plus a
+	combining dot, which no keyword would ever match.
+	"""
+	text = str(text or "").replace("İ", "I").replace("ı", "i")
+	decomposed = unicodedata.normalize("NFKD", text)
+	return "".join(char for char in decomposed if not unicodedata.combining(char)).lower().strip()
+
+
+# Keywords are written in folded form (no accents, "i" for both i and ı): "Açıklama" is "aciklama".
 HEADER_KEYWORDS = [
 	"date",
 	"amount",
@@ -612,10 +626,22 @@ HEADER_KEYWORDS = [
 	"deposit",
 	"withdrawal",
 	"balance",
+	# Turkish
+	"tarih",
+	"tutar",
+	"aciklama",
+	"referans",
+	"islem",
+	"borc",
+	"alacak",
+	"bakiye",
+	"cekilen",
+	"yatan",
+	"dekont",
 ]
 
 STANDARD_VARIABLES = {
-	"Date": ["date", "transaction date"],
+	"Date": ["date", "transaction date", "tarih", "islem tarihi"],
 	"Debit/Credit": [
 		"transaction type",
 		"cr/dr",
@@ -624,14 +650,24 @@ STANDARD_VARIABLES = {
 		"credit/debit",
 		"debit / credit",
 		"credit / debit",
+		# Turkish
+		"borc/alacak",
+		"alacak/borc",
+		"borc / alacak",
+		"alacak / borc",
+		"islem turu",
 	],
-	"Withdrawal": ["withdrawal", "debit"],
-	"Deposit": ["deposit", "credit"],
-	"Amount": ["amount"],
-	"Description": ["description", "particulars", "remarks", "narration", "detail", "reference"],
-	"Reference": ["reference", "ref", "tran id", "transaction id", "cheque", "check", "id", "chq"],
-	"Balance": ["balance"],
+	"Withdrawal": ["withdrawal", "debit", "borc", "cikis", "cekilen"],
+	"Deposit": ["deposit", "credit", "alacak", "giris", "yatan"],
+	"Amount": ["amount", "tutar", "miktar"],
+	"Description": ["description", "particulars", "remarks", "narration", "detail", "reference", "aciklama", "detay", "ayrinti"],
+	"Reference": ["reference", "ref", "tran id", "transaction id", "cheque", "check", "id", "chq", "referans", "dekont", "islem no", "fis no", "cek no", "sira no"],
+	"Balance": ["balance", "bakiye", "kalan"],
 }
+
+# A column whose header contains one of these never becomes the given variable. The Turkish
+# "Valör Tarihi" (value date) would otherwise take the Date mapping from the transaction date.
+EXCLUDED_HEADERS = {"Date": ["valor"]}
 
 # Map of standard column variable -> transaction row field
 FIELD_MAP = {
@@ -665,7 +701,7 @@ def detect_header_row(data: list[list]) -> tuple[int, int]:
 		for cell in row:
 			if not cell or not isinstance(cell, str):
 				continue
-			if any(keyword in cell.lower() for keyword in HEADER_KEYWORDS):
+			if any(keyword in fold_text(cell) for keyword in HEADER_KEYWORDS):
 				valid_columns += 1
 		if valid_columns > max_valid_columns:
 			max_valid_columns = valid_columns
@@ -693,8 +729,11 @@ def detect_column_mapping(header_row: list) -> list[dict]:
 			"maps_to": "Do not import",
 		}
 
+		folded = fold_text(cell).replace(".", "")
 		for standard_variable, names in STANDARD_VARIABLES.items():
-			if any(name in cell.lower().replace(".", "") for name in names):
+			if any(excluded in folded for excluded in EXCLUDED_HEADERS.get(standard_variable, ())):
+				continue
+			if any(name in folded for name in names):
 				if column_mapping.get(standard_variable, None) is None:
 					column["maps_to"] = standard_variable
 					column_mapping[standard_variable] = idx
@@ -892,13 +931,13 @@ def compute_final_transactions(transaction_rows: list, date_format: str, amount_
 			else:
 				return abs(amount), 0
 
-		transaction_type = str(transaction_row.get("debit_credit") or "").strip().lower()
+		transaction_type = fold_text(transaction_row.get("debit_credit"))
 		amount = abs(get_float_amount(transaction_row.get("amount", "0")) or 0)
 
 		if amount_format == 'Transaction type column has "CR"/"DR" values':
 			# "credit" contains "cr". "debit" does not contain "dr", so it correctly falls
-			# through to the withdrawal side.
-			return (0, amount) if "cr" in transaction_type else (amount, 0)
+			# through to the withdrawal side. The Turkish "Alacak" is a credit, "Borç" a debit.
+			return (0, amount) if "cr" in transaction_type or "alacak" in transaction_type else (amount, 0)
 
 		if amount_format == 'Transaction type column has "C"/"D" values':
 			return (0, amount) if transaction_type == "c" else (amount, 0)
@@ -1090,14 +1129,37 @@ def render_pdf_pages(
 	return images
 
 
+def _decimal_separator(text: str) -> str:
+	"""Which character is the decimal point in a cleaned number: ".", "," or "" (none).
+
+	Understands "1,234.56" and "1.234,56" (the last separator is the decimal one), a lone
+	"320,40" (decimal comma) and grouped thousands ("1,234" / "1.250.000"). A lone "1.250" is
+	read as a decimal, as before.
+	"""
+	if "." in text and "," in text:
+		return "." if text.rfind(".") > text.rfind(",") else ","
+	if "," in text:
+		return "" if re.fullmatch(r"-?\d{1,3}(,\d{3})+", text) else ","
+	if text.count(".") > 1 and re.fullmatch(r"-?\d{1,3}(\.\d{3})+", text):
+		return ""
+	return "."
+
+
 def get_float_amount(amount):
 	if not amount:
 		return None
 
 	if isinstance(amount, str):
-		amount = amount.lower().replace(",", "").replace(" ", "").replace("cr", "").replace("dr", "")
-		# Remove any other alphabets and currency symbols - do not remove the minus or decimal sign
-		amount = re.sub(r"[^\d.-]", "", amount)
+		amount = amount.lower().replace(" ", "").replace("cr", "").replace("dr", "")
+		# Remove any other alphabets and currency symbols - do not remove the minus or the separators
+		amount = re.sub(r"[^\d.,-]", "", amount)
+		decimal = _decimal_separator(amount)
+		if decimal == ",":
+			amount = amount.replace(".", "").replace(",", ".")
+		elif decimal == ".":
+			amount = amount.replace(",", "")
+		else:
+			amount = amount.replace(",", "").replace(".", "")
 		try:
 			amount = float(amount)
 		except ValueError:
@@ -1189,7 +1251,7 @@ def get_file_properties(transactions: list):
 		if not amount:
 			continue
 
-		debit_credit = str(transaction.get("debit_credit") or "").strip().lower()
+		debit_credit = fold_text(transaction.get("debit_credit"))
 
 		# One vote per row, most specific signal first. Order matters: "withdrawal" contains
 		# "dr", so it must be matched before the loose cr/dr check or a Deposit/Withdrawal
@@ -1202,7 +1264,7 @@ def get_file_properties(transactions: list):
 			amount_format_frequency['Transaction type column has "Deposit"/"Withdrawal" values'] += 1
 		elif debit_credit in ("c", "d"):
 			amount_format_frequency['Transaction type column has "C"/"D" values'] += 1
-		elif any(token in debit_credit for token in ("cr", "dr", "debit")):
+		elif any(token in debit_credit for token in ("cr", "dr", "debit", "borc", "alacak")):
 			amount_format_frequency['Transaction type column has "CR"/"DR" values'] += 1
 		else:
 			# Nothing said which direction this is, so assume the amount carries the sign.
