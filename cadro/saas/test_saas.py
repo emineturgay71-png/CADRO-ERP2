@@ -6,6 +6,7 @@ Run from the repository root:
 
 from __future__ import annotations
 
+import json
 import sys
 import tempfile
 import types
@@ -14,7 +15,7 @@ from datetime import timedelta
 from pathlib import Path
 from unittest.mock import patch
 
-from cadro.saas import db, manage_tenant, provision_site, subscription, tenant
+from cadro.saas import control_plane, db, manage_tenant, provision_site, subscription, tenant, webhook
 from cadro.saas.tenant import PlanTier, TenantStatus, utcnow, validate_site_name
 
 
@@ -204,6 +205,332 @@ class TestSubscription(ControlPlaneTestCase):
                 endpoint()
             db.set_tenant_status("a.example.com", TenantStatus.ACTIVE)
             self.assertEqual(endpoint(), "ok")
+
+
+class FakeActions:
+    """Records what the control plane would do to sites, without running bench."""
+
+    def __init__(self, fail_on=None):
+        self.calls = []
+        self.fail_on = fail_on
+
+    def suspend(self, site):
+        if self.fail_on == ("suspend", site):
+            raise RuntimeError("bench is down")
+        self.calls.append(("suspend", site))
+
+    def reactivate(self, site):
+        if self.fail_on == ("reactivate", site):
+            raise RuntimeError("bench is down")
+        self.calls.append(("reactivate", site))
+
+
+def make_payload(event, event_id, site="a.example.com", **kwargs):
+    fields = {"tenant_id": site.replace(".", "-"), "invoice_id": None, "amount": None, "currency": None}
+    if event == webhook.WebhookEvent.PAYMENT_SUCCEEDED:
+        fields.update(amount=250.0, currency="TRY")
+    fields.update(kwargs)
+    return webhook.WebhookPayload(event=event, event_id=event_id, site_name=site, **fields)
+
+
+class TestWebhookHandling(ControlPlaneTestCase):
+    E = webhook.WebhookEvent
+
+    def setUp(self):
+        super().setUp()
+        self.actions = FakeActions()
+        db.create_tenant("a.example.com")
+
+    def handle(self, event, event_id, **kwargs):
+        return webhook.handle_webhook(make_payload(event, event_id, **kwargs), self.actions)
+
+    def status(self, site="a.example.com"):
+        return db.get_tenant(site).status
+
+    def test_first_payment_turns_a_trial_into_an_active_tenant(self):
+        self.assertEqual(self.handle(self.E.PAYMENT_SUCCEEDED, "evt-1", invoice_id="INV-1"), "applied")
+        self.assertEqual(self.status(), TenantStatus.ACTIVE)
+        self.assertEqual(self.actions.calls, [])
+
+    def test_redelivered_event_changes_nothing(self):
+        self.handle(self.E.PAYMENT_SUCCEEDED, "evt-1", invoice_id="INV-1")
+        db.set_tenant_status("a.example.com", TenantStatus.SUSPENDED)
+        self.assertEqual(self.handle(self.E.PAYMENT_SUCCEEDED, "evt-1", invoice_id="INV-1"), "duplicate")
+        self.assertEqual(self.status(), TenantStatus.SUSPENDED)
+        self.assertEqual(self.actions.calls, [])
+
+    def test_same_invoice_under_another_event_id_is_ignored(self):
+        self.handle(self.E.PAYMENT_SUCCEEDED, "evt-1", invoice_id="INV-1")
+        db.set_tenant_status("a.example.com", TenantStatus.SUSPENDED)
+        self.assertEqual(self.handle(self.E.PAYMENT_SUCCEEDED, "evt-2", invoice_id="INV-1"), "ignored")
+        self.assertEqual(self.status(), TenantStatus.SUSPENDED)
+
+    def test_payment_reactivates_a_suspended_tenant_and_clears_the_failure(self):
+        self.handle(self.E.PAYMENT_FAILED, "evt-1")
+        db.set_tenant_status("a.example.com", TenantStatus.SUSPENDED)
+        self.assertEqual(self.handle(self.E.PAYMENT_SUCCEEDED, "evt-2", invoice_id="INV-2"), "applied")
+        self.assertEqual(self.actions.calls, [("reactivate", "a.example.com")])
+        record = db.get_tenant("a.example.com")
+        self.assertEqual(record.status, TenantStatus.ACTIVE)
+        self.assertIsNone(record.payment_failed_since)
+
+    def test_failed_payment_is_forgiven_during_grace_and_suspends_after_it(self):
+        self.assertEqual(self.handle(self.E.PAYMENT_FAILED, "evt-1"), "grace")
+        record = db.get_tenant("a.example.com")
+        self.assertIsNotNone(record.payment_failed_since)
+        self.assertEqual(self.actions.calls, [])
+
+        # A retry two days later keeps the original start of the failure.
+        self.assertEqual(self.handle(self.E.PAYMENT_FAILED, "evt-2"), "grace")
+        self.assertEqual(db.get_tenant("a.example.com").payment_failed_since, record.payment_failed_since)
+
+        db.set_payment_failed_since("a.example.com", utcnow() - timedelta(days=8))
+        self.assertEqual(self.handle(self.E.PAYMENT_FAILED, "evt-3"), "suspended")
+        self.assertEqual(self.actions.calls, [("suspend", "a.example.com")])
+        self.assertEqual(self.status(), TenantStatus.SUSPENDED)
+
+        # Further failures do not suspend the site a second time.
+        self.assertEqual(self.handle(self.E.PAYMENT_FAILED, "evt-4"), "suspended")
+        self.assertEqual(self.actions.calls, [("suspend", "a.example.com")])
+
+    def test_cancellation_suspends_and_a_late_payment_cannot_revive_the_tenant(self):
+        self.assertEqual(self.handle(self.E.SUBSCRIPTION_CANCELLED, "evt-1"), "applied")
+        self.assertEqual(self.actions.calls, [("suspend", "a.example.com")])
+        self.assertEqual(self.status(), TenantStatus.CANCELLED)
+        self.assertEqual(self.handle(self.E.PAYMENT_SUCCEEDED, "evt-2", invoice_id="INV-9"), "ignored")
+        self.assertEqual(self.status(), TenantStatus.CANCELLED)
+
+    def test_informational_events_are_only_recorded(self):
+        self.assertEqual(self.handle(self.E.TRIAL_ENDING, "evt-1"), "recorded")
+        self.assertEqual(self.handle(self.E.SUBSCRIPTION_CREATED, "evt-2"), "recorded")
+        self.assertEqual(self.status(), TenantStatus.TRIAL)
+
+    def test_event_must_belong_to_the_tenant_it_names(self):
+        db.create_tenant("b.example.com")
+        with self.assertRaises(ValueError):
+            webhook.handle_webhook(
+                make_payload(self.E.PAYMENT_SUCCEEDED, "evt-1", tenant_id="b-example-com"), self.actions
+            )
+        self.assertEqual(self.status(), TenantStatus.TRIAL)
+        # Nothing was claimed, so a corrected delivery of the same event still works.
+        self.assertEqual(self.handle(self.E.PAYMENT_SUCCEEDED, "evt-1"), "applied")
+
+    def test_unknown_site_and_bad_payloads(self):
+        with self.assertRaises(LookupError):
+            self.handle(self.E.PAYMENT_FAILED, "evt-1", site="nobody.example.com")
+        with self.assertRaises(ValueError):
+            self.handle(self.E.PAYMENT_FAILED, "")
+        with self.assertRaises(ValueError):
+            self.handle(self.E.PAYMENT_SUCCEEDED, "evt-2", amount=None)
+        for amount in (0, -5, float("nan"), float("inf")):
+            with self.assertRaises(ValueError, msg=str(amount)):
+                self.handle(self.E.PAYMENT_SUCCEEDED, "evt-3", amount=amount)
+        with self.assertRaises(ValueError):
+            self.handle(self.E.PAYMENT_FAILED, "evt-4", site="A b")
+
+    def test_failed_processing_releases_the_event_so_the_retry_is_handled(self):
+        db.set_tenant_status("a.example.com", TenantStatus.SUSPENDED)
+        self.actions.fail_on = ("reactivate", "a.example.com")
+        with self.assertRaises(RuntimeError):
+            self.handle(self.E.PAYMENT_SUCCEEDED, "evt-1", invoice_id="INV-1")
+        self.assertEqual(self.status(), TenantStatus.SUSPENDED)
+
+        self.actions.fail_on = None
+        self.assertEqual(self.handle(self.E.PAYMENT_SUCCEEDED, "evt-1", invoice_id="INV-1"), "applied")
+        self.assertEqual(self.status(), TenantStatus.ACTIVE)
+
+
+class TestSweepOverdue(ControlPlaneTestCase):
+    def age(self, site, trial_days=None):
+        with db._connect() as conn:
+            conn.execute(
+                "UPDATE tenants SET trial_ends_at = ? WHERE site_name = ?",
+                ((utcnow() - timedelta(days=trial_days)).isoformat(), site),
+            )
+
+    def test_suspends_only_tenants_that_are_overdue(self):
+        for site in ("expired.example.com", "late.example.com", "fine.example.com", "paid.example.com"):
+            db.create_tenant(site)
+        self.age("expired.example.com", trial_days=1)
+        db.set_tenant_status("late.example.com", TenantStatus.ACTIVE)
+        db.set_payment_failed_since("late.example.com", utcnow() - timedelta(days=10))
+        db.set_tenant_status("paid.example.com", TenantStatus.ACTIVE)
+        db.set_payment_failed_since("paid.example.com", utcnow() - timedelta(days=2))
+
+        actions = FakeActions()
+        suspended = webhook.sweep_overdue(actions)
+
+        self.assertEqual(sorted(suspended), ["expired.example.com", "late.example.com"])
+        self.assertEqual(sorted(site for _, site in actions.calls), sorted(suspended))
+        self.assertEqual(db.get_tenant("expired.example.com").status, TenantStatus.SUSPENDED)
+        self.assertEqual(db.get_tenant("fine.example.com").status, TenantStatus.TRIAL)
+        self.assertEqual(db.get_tenant("paid.example.com").status, TenantStatus.ACTIVE)
+        self.assertEqual(webhook.sweep_overdue(actions), [])  # nothing left to do
+
+    def test_one_failing_site_does_not_stop_the_others(self):
+        for site in ("a.example.com", "b.example.com"):
+            db.create_tenant(site)
+            self.age(site, trial_days=1)
+        actions = FakeActions(fail_on=("suspend", "a.example.com"))
+        with self.assertLogs("cadro.saas.webhook", level="ERROR"):
+            self.assertEqual(webhook.sweep_overdue(actions), ["b.example.com"])
+        self.assertEqual(db.get_tenant("a.example.com").status, TenantStatus.TRIAL)
+
+
+class TestRegistryMigration(ControlPlaneTestCase):
+    def test_a_registry_from_before_the_payment_columns_is_upgraded(self):
+        import sqlite3
+
+        conn = sqlite3.connect(str(db.DB_PATH))
+        conn.execute(
+            "CREATE TABLE tenants (tenant_id TEXT PRIMARY KEY, site_name TEXT UNIQUE NOT NULL, plan TEXT NOT NULL DEFAULT 'starter', "
+            "status TEXT NOT NULL DEFAULT 'trial', trial_ends_at TEXT, created_at TEXT NOT NULL, max_users INTEGER NOT NULL DEFAULT 5, "
+            "max_companies INTEGER NOT NULL DEFAULT 1, max_storage_gb INTEGER NOT NULL DEFAULT 5, max_api_calls_per_minute INTEGER NOT NULL DEFAULT 300)"
+        )
+        conn.execute("INSERT INTO tenants (tenant_id, site_name, created_at) VALUES ('old-example-com', 'old.example.com', '2026-11-01T00:00:00+00:00')")
+        conn.commit()
+        conn.close()
+
+        record = db.get_tenant("old.example.com")
+        self.assertIsNone(record.payment_failed_since)
+        db.set_payment_failed_since("old.example.com", utcnow())
+        self.assertIsNotNone(db.get_tenant("old.example.com").payment_failed_since)
+
+
+SECRET = b"unit-test-secret"
+
+
+def signed(body: dict | bytes, secret=SECRET, timestamp=None):
+    raw = body if isinstance(body, bytes) else json.dumps(body).encode()
+    ts = timestamp or str(int(utcnow().timestamp()))
+    return raw, webhook.sign(ts, raw, secret), ts
+
+
+def event_body(event="payment.succeeded", event_id="evt-1", **extra):
+    body = {
+        "event_id": event_id,
+        "event": event,
+        "tenant_id": "a-example-com",
+        "site_name": "a.example.com",
+        "amount": 250,
+        "currency": "TRY",
+        "invoice_id": "INV-1",
+    }
+    body.update(extra)
+    return body
+
+
+class TestSignatureAndNormalizer(unittest.TestCase):
+    def test_valid_request_is_accepted(self):
+        raw, signature, ts = signed(event_body())
+        payload = webhook.normalize_generic(raw, signature, ts, SECRET)
+        self.assertEqual(payload.event, webhook.WebhookEvent.PAYMENT_SUCCEEDED)
+        self.assertEqual((payload.event_id, payload.site_name, payload.amount, payload.currency), ("evt-1", "a.example.com", 250.0, "TRY"))
+
+    def test_forged_tampered_or_stale_requests_are_refused(self):
+        raw, signature, ts = signed(event_body())
+        for args in (
+            (raw, signature, ts, b"another-secret"),
+            (raw.replace(b"250", b"999"), signature, ts, SECRET),
+            (raw, "", ts, SECRET),
+            (raw, "é" * 64, ts, SECRET),
+            (raw, signature, "not-a-number", SECRET),
+            (raw, signature, ts, b""),
+        ):
+            with self.assertRaises(webhook.InvalidSignature, msg=repr(args[1:3])):
+                webhook.normalize_generic(*args)
+
+        old_raw, old_signature, old_ts = signed(event_body(), timestamp=str(int(utcnow().timestamp()) - 3600))
+        with self.assertRaises(webhook.InvalidSignature):
+            webhook.normalize_generic(old_raw, old_signature, old_ts, SECRET)
+
+    def test_signature_binds_the_timestamp(self):
+        raw, signature, ts = signed(event_body())
+        with self.assertRaises(webhook.InvalidSignature):
+            webhook.normalize_generic(raw, signature, str(int(ts) + 1), SECRET)
+
+    def test_malformed_bodies_are_value_errors(self):
+        for body in (b"not json", b"[1, 2]", b'"text"', event_body(event="refund.created"), event_body(amount=True),
+                     event_body(amount="250"), {k: v for k, v in event_body().items() if k != "event_id"},
+                     event_body(site_name=""), event_body(currency=5)):
+            raw, signature, ts = signed(body)
+            with self.assertRaises(ValueError, msg=repr(body)):
+                webhook.normalize_generic(raw, signature, ts, SECRET)
+
+
+class TestControlPlaneHTTP(ControlPlaneTestCase):
+    def setUp(self):
+        super().setUp()
+        import threading
+        from http.server import ThreadingHTTPServer
+
+        self.actions = FakeActions()
+        self.server = ThreadingHTTPServer(("127.0.0.1", 0), control_plane.make_handler(SECRET, self.actions))
+        self.port = self.server.server_address[1]
+        thread = threading.Thread(target=self.server.serve_forever, daemon=True)
+        thread.start()
+        self.addCleanup(thread.join, 5)
+        self.addCleanup(self.server.server_close)
+        self.addCleanup(self.server.shutdown)
+        db.create_tenant("a.example.com")
+
+    def request(self, method, path, raw=b"", signature="", timestamp="", content_length=None):
+        import http.client
+
+        conn = http.client.HTTPConnection("127.0.0.1", self.port, timeout=5)
+        try:
+            headers = {"X-Cadro-Signature": signature, "X-Cadro-Timestamp": timestamp}
+            if content_length is not None:
+                headers["Content-Length"] = content_length
+            conn.request(method, path, body=raw if method == "POST" else None, headers=headers)
+            response = conn.getresponse()
+            return response.status, json.loads(response.read() or b"{}")
+        finally:
+            conn.close()
+
+    def post(self, body, **kwargs):
+        raw, signature, ts = signed(body, **kwargs)
+        return self.request("POST", "/webhooks/generic", raw, signature, ts)
+
+    def test_health_and_unknown_paths(self):
+        self.assertEqual(self.request("GET", "/healthz"), (200, {"status": "ok"}))
+        self.assertEqual(self.request("GET", "/nope")[0], 404)
+        self.assertEqual(self.request("POST", "/webhooks/stripe")[0], 404)
+
+    def test_signed_payment_activates_the_tenant_and_a_redelivery_is_a_duplicate(self):
+        self.assertEqual(self.post(event_body()), (200, {"outcome": "applied"}))
+        self.assertEqual(db.get_tenant("a.example.com").status, TenantStatus.ACTIVE)
+        self.assertEqual(self.post(event_body()), (200, {"outcome": "duplicate"}))
+
+    def test_bad_signature_changes_nothing(self):
+        status, body = self.post(event_body(), secret=b"wrong")
+        self.assertEqual(status, 401)
+        self.assertNotIn("secret", json.dumps(body))
+        self.assertEqual(db.get_tenant("a.example.com").status, TenantStatus.TRIAL)
+
+    def test_error_statuses(self):
+        self.assertEqual(self.post(event_body(site_name="nobody.example.com", tenant_id="nobody-example-com"))[0], 404)
+        self.assertEqual(self.post(event_body(tenant_id="other-tenant"))[0], 400)
+        self.assertEqual(self.post(b"not json")[0], 400)
+        self.assertEqual(self.request("POST", "/webhooks/generic", b"{}", "x", "1", content_length="abc")[0], 400)
+
+    def test_failed_site_action_answers_500_and_the_retry_succeeds(self):
+        db.set_tenant_status("a.example.com", TenantStatus.SUSPENDED)
+        self.actions.fail_on = ("reactivate", "a.example.com")
+        with self.assertLogs("cadro.saas.control_plane", level="ERROR"):
+            self.assertEqual(self.post(event_body()), (500, {"error": "processing failed"}))
+        self.actions.fail_on = None
+        self.assertEqual(self.post(event_body()), (200, {"outcome": "applied"}))
+        self.assertEqual(db.get_tenant("a.example.com").status, TenantStatus.ACTIVE)
+
+    def test_secret_comes_from_a_file(self):
+        secret_file = Path(self._tmp.name) / "secret"
+        secret_file.write_text(SECRET.decode() + "\n", encoding="utf-8")
+        with patch.dict(control_plane.os.environ, {"CADRO_WEBHOOK_SECRET_FILE": str(secret_file)}):
+            self.assertEqual(control_plane.load_secret(), SECRET)
+        with patch.dict(control_plane.os.environ, {}, clear=True):
+            with self.assertRaises(RuntimeError):
+                control_plane.load_secret()
 
 
 if __name__ == "__main__":

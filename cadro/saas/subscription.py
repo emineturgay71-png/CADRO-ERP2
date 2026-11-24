@@ -77,18 +77,3 @@ def require_active_subscription(fn):
         return fn(*args, **kwargs)
 
     return wrapper
-
-
-def webhook_payment_succeeded(site_name: str, amount: float, currency: str, invoice_id: str) -> None:
-    """Handle a successful payment webhook.
-
-    THIS IS A STUB — the real implementation goes into the CADRO control-plane
-    service that owns the tenant database.  The stub exists so that Phase 5
-    documents the contract without wiring a specific payment provider.
-    """
-    raise NotImplementedError("Control-plane payment handling is not implemented yet")
-
-
-def webhook_payment_failed(site_name: str, reason: str) -> None:
-    """Handle a failed payment — triggers dunning after grace period."""
-    raise NotImplementedError("Control-plane payment handling is not implemented yet")

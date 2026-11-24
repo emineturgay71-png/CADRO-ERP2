@@ -87,6 +87,8 @@ class TenantRecord:
     trial_ends_at: datetime | None = None
     created_at: datetime = field(default_factory=utcnow)
     quota: TenantQuota = field(default_factory=TenantQuota)
+    # Set by the first failed payment, cleared by the next successful one; drives the grace period.
+    payment_failed_since: datetime | None = None
 
     def is_active(self) -> bool:
         return self.status == TenantStatus.ACTIVE

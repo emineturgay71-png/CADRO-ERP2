@@ -19,7 +19,8 @@ Durum: **SaaS modeli tanımlandı; altyapı araçları oluşturuldu. Kontrol dü
 | `cadro/saas/subscription.py` | `SubscriptionState`, `require_active_subscription` dekoratörü, grace period mantığı |
 | `cadro/saas/provision_site.py` | `bench new-site` + `cadro.baseline.json` pin'leriyle otomatik provisioning |
 | `cadro/saas/manage_tenant.py` | `suspend`, `reactivate`, `offboard` — tenant yaşam döngüsü |
-| `cadro/saas/webhook.py` | `WebhookPayload`, `WebhookEvent` — sağlayıcı-bağımsız ödeme kontratı |
+| `cadro/saas/webhook.py` | `WebhookPayload`, `WebhookEvent`; imza doğrulama, genel (CADRO imzalı JSON) adaptör, `handle_webhook` (idempotent abonelik durumu geçişleri), `sweep_overdue` |
+| `cadro/saas/control_plane.py` | Bileşen servis: `serve` (HTTP webhook alıcı) ve `sweep` (süresi dolan deneme/gecikmiş ödemeleri askiya al) |
 
 ## Tenant yaşam döngüsü
 
@@ -92,11 +93,11 @@ def my_endpoint():
 | Python syntax | ✅ compileall temiz |
 | Faz 0 manifesto | ✅ geçerli |
 | Faz 0 testleri | ✅ 8/8 |
-| Kontrol düzlemi testleri | ✅ 19/19 (`python -m unittest cadro.saas.test_saas`, CI'da çalışır) |
+| Kontrol düzlemi testleri | ✅ 42/42 (`python -m unittest cadro.saas.test_saas`, CI'da çalışır) |
 | Tenant modeli ve SQLite kayıt defteri | ✅ yaşam döngüsü, kota, deneme süresi |
 | Provisioning | ✅ pin doğrulaması, kayıt defterine yazma (gerçek bir bench'te çalıştırılmadı) |
 | Suspend/reactivate/offboard | ✅ yalnızca tenant sitesi değişir, kayıt defteri güncellenir (komutlar testte taklit edildi) |
-| Ödeme webhook | ⚠️ kontrat tanımlı; `webhook_payment_*` işlevleri hâlâ `NotImplementedError` |
+| Ödeme webhook | ✅ `handle_webhook` ve HTTP alıcı uygulanıp test edildi (23 yeni test, gerçek yerel HTTP sunucusu dahil); somut bir ödeme sağlayıcısı bağlanmadı (bkz. “Ödeme webhook'u”) |
 
 ### 23-24 Kasım 2026 incelemesinde bulunan ve düzeltilenler
 
@@ -113,13 +114,41 @@ Bu modüller önceki turda hiç çalıştırılmamıştı. Testler yazılırken 
 | `offboard` için `--confirm YES` herkes için aynı onaydı | Onay olarak site adının tekrarı |
 | Askıya alma/yeniden etkinleştirme kayıt defterini güncellemiyordu | Güncelliyor |
 
+## Ödeme webhook'u (24 Kasım 2026)
+
+`NotImplementedError` veren `webhook_payment_succeeded` / `webhook_payment_failed` kısa yolları kaldırıldı; yerine olay tabanlı işleyici geldi.
+
+| Olay | Sonuç |
+| --- | --- |
+| `payment.succeeded`, `subscription.renewed` | Tenant `active`; ödeme hatası temizlenir; askidaysa site yeniden etkinleştirilir |
+| `payment.failed` | İlk hatada `payment_failed_since` kaydedilir, 7 gün tolerans (`grace`); süre dolunca site askiya alınır |
+| `subscription.cancelled` | Site askiya alınır, tenant `cancelled` (geçersiz kalan olaylar tenant'ı geri getirmez) |
+| `subscription.created`, `trial.ending` | Yalnızca olay günlüğüne yazılır |
+
+Garanti edilenler:
+
+- **Idempotency:** sağlayıcının `event_id` değeri `webhook_events` tablosunda birincil anahtardır; aynı teslimat `duplicate` döner ve hiçbir şey değişmez. Aynı fatura başka olay kimliğiyle gelirse `ignored`.
+- **Yeniden deneme:** site işlemi (bench) başarısız olursa olay kimliği serbest bırakılır ve HTTP 500 döner; sağlayıcının tekrar denemesi yeniden işlenir.
+- **İmza:** HMAC-SHA256 üzerinde `<zaman damgası>.<gövde>`, sabit zamanlı karşılaştırma, ±5 dakika zaman damgası toleransi (tekrar saldırısını sınırlar). Sır yalnızca dosyadan okunur (`CADRO_WEBHOOK_SECRET_FILE`).
+- **Tenant tutarlılığı:** `tenant_id`, `site_name` ile eşleşmiyorsa istek reddedilir (400); bilinmeyen site 404; gövde 64 KB ile sınırlı.
+
+```bash
+CADRO_WEBHOOK_SECRET_FILE=/run/secrets/webhook_secret \
+    python -m cadro.saas.control_plane serve --host 127.0.0.1 --port 8090   # POST /webhooks/generic, GET /healthz
+python -m cadro.saas.control_plane sweep                                       # saatlik zamanlanmış görev
+```
+
+Servis düz HTTP konuşur; önüne TLS sonlandıran bir ters vekil konmalıdır. Askiya alma/yeniden etkinleştirme `bench` çalıştırdığından servis bench ile aynı makinede/konteynerde çalışır. Kayıt defteri eski sürümden gelirse `payment_failed_since` sütunu otomatik eklenir.
+
+**Henüz yapılmayanlar:** somut sağlayıcı adaptörü (Stripe/İyzico/PayTR — seçim ve sözleşme gerekir; her biri kendi imza biçimiyle `normalize_*` yazacak), tutarın fiyat listesiyle mutabakatı (fatura sistemi gerekir), servisin compose'a eklenmesi (imajında `cadro/` ve bench erişimi gerekir), `require_active_subscription` için sorgu API'si.
+
 ## Kontrol düzlemi için sonraki adımlar (bu fazda kapatılmaz)
 
-1. Ayrı bir kontrol düzlemi servisi kur (FastAPI/Flask)
-2. Tenant veritabanı (PostgreSQL) oluştur
-3. Ödeme sağlayıcı adaptörü ekle (Stripe/Iyzico/PayTR)
-4. Webhook idempotency + imza doğrulama
-5. Gerçek `tenant_from_site()` implementasyonu
+1. Kontrol düzlemi servisini üretim için sertleştir (PostgreSQL, compose servisi, TLS, süreç yönetimi)
+2. Tenant veritabanını PostgreSQL'e taşı (bugün SQLite)
+3. Ödeme sağlayıcı adaptörü ekle (Stripe/Iyzico/PayTR) — imza doğrulama ve idempotency çerçevesi hazır
+4. ~~Webhook idempotency + imza doğrulama~~ (tamam, yukarıya bakın)
+5. ~~Gerçek `tenant_from_site()` implementasyonu~~ (tamam)
 6. KVKK/GDPR veri işleme sözleşmeleri
 7. Self-service kayıt ve trial başlatma
 8. Müşteri veri export ve hesap kapatma akışı
@@ -131,7 +160,9 @@ cadro/saas/tenant.py           - yeni: tenant modeli
 cadro/saas/subscription.py     - yeni: abonelik ve entitlement
 cadro/saas/provision_site.py   - yeni: otomatik provisioning
 cadro/saas/manage_tenant.py    - yeni: tenant yaşam döngüsü
-cadro/saas/webhook.py          - yeni: ödeme webhook kontratı
+cadro/saas/webhook.py          - ödeme webhook işleyicisi, imza doğrulama, gecikmiş ödeme taraması
+cadro/saas/control_plane.py    - yeni: HTTP webhook alıcı + sweep komutu
+cadro/saas/db.py               - webhook olay tablosu, payment_failed_since
 docs/governance/phase-5-gate.md - bu dosya
 ```
 

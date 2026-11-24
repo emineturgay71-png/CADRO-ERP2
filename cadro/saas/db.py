@@ -49,7 +49,27 @@ def init_db() -> None:
                 max_users   INTEGER NOT NULL DEFAULT 5,
                 max_companies INTEGER NOT NULL DEFAULT 1,
                 max_storage_gb INTEGER NOT NULL DEFAULT 5,
-                max_api_calls_per_minute INTEGER NOT NULL DEFAULT 300
+                max_api_calls_per_minute INTEGER NOT NULL DEFAULT 300,
+                payment_failed_since TEXT
+            )
+        """
+        )
+        # Registries created before the payment columns existed.
+        columns = {row["name"] for row in conn.execute("PRAGMA table_info(tenants)")}
+        if "payment_failed_since" not in columns:
+            conn.execute("ALTER TABLE tenants ADD COLUMN payment_failed_since TEXT")
+        # One row per payment-provider event; the primary key is what makes webhooks idempotent.
+        conn.execute(
+            """
+            CREATE TABLE IF NOT EXISTS webhook_events (
+                event_id    TEXT PRIMARY KEY,
+                event       TEXT NOT NULL,
+                site_name   TEXT NOT NULL,
+                invoice_id  TEXT,
+                amount      REAL,
+                currency    TEXT,
+                received_at TEXT NOT NULL,
+                outcome     TEXT NOT NULL DEFAULT 'processing'
             )
         """
         )
@@ -105,6 +125,66 @@ def set_tenant_status(site_name: str, status: TenantStatus) -> None:
         raise LookupError(f"Tenant with site_name '{site_name}' is not registered")
 
 
+def set_payment_failed_since(site_name: str, since: datetime | None) -> None:
+    """Record (or clear, with None) when the tenant's payments started failing."""
+    init_db()
+    with _connect() as conn:
+        cursor = conn.execute(
+            "UPDATE tenants SET payment_failed_since = ? WHERE site_name = ?",
+            (since.isoformat() if since else None, site_name),
+        )
+    if cursor.rowcount == 0:
+        raise LookupError(f"Tenant with site_name '{site_name}' is not registered")
+
+
+def claim_webhook_event(
+    event_id: str,
+    event: str,
+    site_name: str,
+    invoice_id: str | None = None,
+    amount: float | None = None,
+    currency: str | None = None,
+) -> bool:
+    """Reserve a provider event id. False means it was already seen (duplicate delivery)."""
+    init_db()
+    received = datetime.now(timezone.utc).replace(microsecond=0).isoformat()
+    with _connect() as conn:
+        try:
+            conn.execute(
+                "INSERT INTO webhook_events (event_id, event, site_name, invoice_id, amount, currency, received_at) "
+                "VALUES (?, ?, ?, ?, ?, ?, ?)",
+                (event_id, event, site_name, invoice_id, amount, currency, received),
+            )
+        except sqlite3.IntegrityError:
+            return False
+    return True
+
+
+def finish_webhook_event(event_id: str, outcome: str) -> None:
+    init_db()
+    with _connect() as conn:
+        conn.execute("UPDATE webhook_events SET outcome = ? WHERE event_id = ?", (outcome, event_id))
+
+
+def release_webhook_event(event_id: str) -> None:
+    """Forget a claimed event whose processing failed, so the provider's retry is handled again."""
+    init_db()
+    with _connect() as conn:
+        conn.execute("DELETE FROM webhook_events WHERE event_id = ?", (event_id,))
+
+
+def invoice_was_paid(invoice_id: str) -> bool:
+    """True if a payment for this invoice was already applied under another event id."""
+    init_db()
+    with _connect() as conn:
+        row = conn.execute(
+            "SELECT 1 FROM webhook_events WHERE invoice_id = ? AND event IN ('payment.succeeded', 'subscription.renewed') "
+            "AND outcome = 'applied'",
+            (invoice_id,),
+        ).fetchone()
+    return row is not None
+
+
 def list_tenants(status: TenantStatus | None = None) -> list[TenantRecord]:
     """List all tenants, optionally filtered by status."""
     init_db()
@@ -129,5 +209,8 @@ def _row_to_record(row: sqlite3.Row) -> TenantRecord:
             max_companies=row["max_companies"],
             max_storage_gb=row["max_storage_gb"],
             max_api_calls_per_minute=row["max_api_calls_per_minute"],
+        ),
+        payment_failed_since=(
+            datetime.fromisoformat(row["payment_failed_since"]) if row["payment_failed_since"] else None
         ),
     )
