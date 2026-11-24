@@ -44,6 +44,26 @@ class DocumentStatus(str, enum.Enum):
     FAILED = "failed"           # unrecoverable technical error
 
 
+# Allowed status changes. Everything else is rejected, so an auditor can rely on the log.
+VALID_TRANSITIONS: dict[DocumentStatus, set[DocumentStatus]] = {
+    DocumentStatus.DRAFT: {DocumentStatus.QUEUED},
+    DocumentStatus.QUEUED: {DocumentStatus.PROCESSING, DocumentStatus.FAILED},
+    DocumentStatus.PROCESSING: {DocumentStatus.ACCEPTED, DocumentStatus.REJECTED, DocumentStatus.FAILED},
+    DocumentStatus.ACCEPTED: {DocumentStatus.CANCELLED},
+    DocumentStatus.REJECTED: {DocumentStatus.QUEUED},
+    DocumentStatus.CANCELLED: set(),
+    DocumentStatus.FAILED: {DocumentStatus.QUEUED},
+}
+
+
+def can_transition(current: str, new: str) -> bool:
+    """True if a log may move from status ``current`` to ``new`` (plain strings or enum values)."""
+    try:
+        return DocumentStatus(new) in VALID_TRANSITIONS[DocumentStatus(current)]
+    except (ValueError, KeyError):
+        return False
+
+
 class EInvoice(abc.ABC):
     """Abstract e-fatura / e-arsiv invoice adapter."""
 

@@ -42,7 +42,14 @@ Her sağlayıcı implementasyonu şu metodları sunar:
 
 ### Log DocType
 
-`CADRO EDocument Log` — Her e-belge işlemi için denetlenebilir kayıt:
+`CADRO EDocument Log` (`erpnext/regional/doctype/cadro_edocument_log/`) — gerçek, sürüm kontrollü DocType. Önceden çalışma anında `custom` DocType olarak oluşturuluyordu ve System Manager silebiliyordu; artık:
+
+- Formdan kimseye yazma/oluşturma/silme yetkisi yok (System Manager ve Accounts Manager yalnızca okur/dışa aktarır); kayıtları `e_document_queue` kodu yazar.
+- Denetleyici durum makinesini zorlar (`VALID_TRANSITIONS` / `can_transition`, `e_document_contract.py`); yeni kayıt yalnızca `draft` başlar; geçersiz geçiş "Geçersiz Durum Geçişi" hatası verir.
+- Kayıt silinemez (`on_trash` engeller). Belge türü, yön ve ERP referansı oluşturulduktan sonra değişmez (`set_only_once`). Değişiklikler sürüm geçmişinde izlenir.
+- Mevcut bir sitede eski çalışma anı sürümü varsa `patches.txt` (pre_model_sync) `custom` bayrağını kaldırır, tablo ve veriler korunur.
+
+Kayıt alanları:
 - Belge türü (e-fatura, e-arsiv, e-irsaliye, e-defter)
 - Yön (outbound/inbound)
 - Durum (draft→…→cancelled)
@@ -64,8 +71,11 @@ Her sağlayıcı implementasyonu şu metodları sunar:
 
 ```
 erpnext/regional/turkey/setup.py                  - KDV şablonları + custom field hook'u
-erpnext/regional/turkey/e_document_contract.py    - yeni: ABC sözleşmesi
-erpnext/regional/turkey/e_document_queue.py       - yeni: durum makinesi + log
+erpnext/regional/turkey/e_document_contract.py    - yeni: ABC sözleşmesi + VALID_TRANSITIONS
+erpnext/regional/turkey/e_document_queue.py       - yeni: durum makinesi + log (artık gerçek DocType kullanır)
+erpnext/regional/doctype/cadro_edocument_log/     - yeni: gerçek DocType (JSON + denetleyici)
+erpnext/regional/turkey/test_turkey_regional.py   - ülke paketi + e-belge günlüğü testleri
+erpnext/patches.txt                                - eski çalışma anı DocType'ının custom bayrağını kaldırır
 docs/governance/phase-4-gate.md                    - bu dosya
 ```
 
@@ -80,6 +90,7 @@ docs/governance/phase-4-gate.md                    - bu dosya
 | KDV şablonları | ✅ şirket oluşturulurken `country_wise_tax.json` (`Türkiye`) ile oluşuyor; pilot sitede doğrulandı |
 | E-belge contract | ✅ soyut, sağlayıcı-bağımsız |
 | E-belge queue | ✅ durum makinesi + idempotency |
+| E-belge günlüğü DocType | ✅ gerçek DocType, silinemez, yazma yetkisi yok; `test_turkey_regional.py` 12/12 (MariaDB, taze site: ülke paketi 2 + günlük 10 test) |
 | Mali müşavir onayı | ❌ Gerekli, bu faz kapsamında değil |
 | Sağlayıcı seçimi | ❌ Gerekli, bu faz kapsamında değil |
 

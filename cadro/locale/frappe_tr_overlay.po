@@ -12685,3 +12685,83 @@ msgstr "{0} işlem içe aktarıldı ({1} yinelenen satır atlandı)."
 #. banking
 msgid "Page {0} of {1}"
 msgstr "Sayfa {0} / {1}"
+
+#. erpnext
+msgid "CADRO EDocument Log"
+msgstr "CADRO E-Belge Günlüğü"
+
+#. erpnext
+msgid "Correlation ID"
+msgstr "Korelasyon Kimliği"
+
+#. erpnext
+msgid "Provider-assigned identifier"
+msgstr "Sağlayıcının atadığı tanımlayıcı"
+
+#. erpnext
+msgid "ERP Reference Doctype"
+msgstr "ERP Referans Belge Türü"
+
+#. erpnext
+msgid "ERP Reference Name"
+msgstr "ERP Referans Belge Adı"
+
+#. erpnext
+msgid "Last Polled"
+msgstr "Son Sorgulama"
+
+#. erpnext
+msgid "Provider Response"
+msgstr "Sağlayıcı Yanıtı"
+
+#. erpnext
+msgid "Provider Error"
+msgstr "Sağlayıcı Hatası"
+
+#. erpnext
+msgid "outbound"
+msgstr "giden"
+
+#. erpnext
+msgid "inbound"
+msgstr "gelen"
+
+#. erpnext
+msgid "draft"
+msgstr "taslak"
+
+#. erpnext
+msgid "processing"
+msgstr "işleniyor"
+
+#. erpnext
+msgid "accepted"
+msgstr "kabul edildi"
+
+#. erpnext
+msgid "rejected"
+msgstr "reddedildi"
+
+#. erpnext
+msgid "cancelled"
+msgstr "iptal edildi"
+
+#. erpnext
+msgid "A new e-document log must start in status 'draft'"
+msgstr "Yeni bir e-belge günlüğü 'taslak' durumunda başlamalıdır"
+
+#. erpnext
+msgid "E-document logs cannot be deleted"
+msgstr "E-belge günlükleri silinemez"
+
+#. erpnext
+msgid "Cannot transition from '{0}' to '{1}'"
+msgstr "'{0}' durumundan '{1}' durumuna geçilemez"
+
+#. erpnext
+msgid "Invalid Status Transition"
+msgstr "Geçersiz Durum Geçişi"
+
+#. erpnext
+msgid "Status changed: {0} → {1}"
+msgstr "Durum değişti: {0} → {1}"
