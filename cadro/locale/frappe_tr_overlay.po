@@ -12677,3 +12677,7 @@ msgstr "İşlem türü sütununda \"C\"/\"D\" değerleri var"
 #. banking
 msgid "{0} (e.g. {1})"
 msgstr "{0} (örn. {1})"
+
+#. erpnext
+msgid "Imported {0} transactions (skipped {1} duplicate rows)."
+msgstr "{0} işlem içe aktarıldı ({1} yinelenen satır atlandı)."

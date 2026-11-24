@@ -80,13 +80,29 @@ Gezinti sırasında bulunan ve düzeltilen sorunlar:
 | `Close` ekran okuyucu etiketi | Çevrildi |
 | Bankacılık sayfasında gerçek zamanlı bağlantı `:9000` portuna gidiyordu (SDK, standart dışı portta geliştirme düzeni varsayıyor) | Bağlantı sayfanın portunu kullanır; nginx arkasında çalışır |
 
+### Ekstre içe aktarma (24 Kasım 2026)
+
+Üç satırlık bir CSV (`Tarih,Açıklama,Tutar,Referans`; `24.11.2026`, `5000.00`, `-320.40`) demo sitede içe aktarıldı:
+
+| Adım | Sonuç |
+| --- | --- |
+| Yükleme ve sütun eşleme | Sütun türü listesi Türkçe (Tarih, Açıklama, Tutar, Referans, Para Çekme, Mevduat…). Başlık satırı kullanıcı tarafından işaretlenir; Türkçe başlıklar otomatik tanınmaz |
+| Biçim algısı | Tarih `DD.MM.YYYY`, tutar "pozitif/negatif değerler"; önizleme 3 işlem, borç `₺ 12.820,40`, alacak `₺ 5.000,00` |
+| İçe aktarma | 3 işlem oluştu, uzlaştırma ekranına geçildi, `Mutabık 0 / 3` |
+| Aynı dosyanın tekrarı | "Çakışan İşlemler" uyarısı gösterildi; yine de içe aktarılınca **0 yeni kayıt** oluştu (veritabanında 9 işlem: 6 örnek + 3), günlükte "3 yinelenen satır atlandı" notu |
+
+Gezilen pencereler: Banka Girişi ve Transfer (tamamen Türkçe), Ödeme Kaydet (önceki turda uçtan uca).
+
+Bu turda bulunan: günlük notu `Imported {0} transactions (skipped {1} duplicate rows).` İngilizce kalıyordu; katalog girdisi eklendi.
+
 ### Açık kalanlar
 
-- Ekstre içe aktarmada sütun eşleme adımı (başlık satırı ve tür seçimi) ve gerçek bir CSV'nin içe aktarılması uçtan uca denenmedi; sayfa ve ilk adım Türkçe doğrulandı. Türkçe sütun başlıkları (`Tarih`, `Tutar`) otomatik tanınmıyor, başlık satırı kullanıcı tarafından belirtilir.
-- İşlem/Banka Girişi ve Transfer pencereleri, kural oluşturma ve geri alma akışları ayrıca gezilmedi.
+- Eşleştirme kuralı oluşturma penceresi ve işlem geri alma akışı tarayıcıda gezilmedi (gömülü tarayıcıda ayar penceresi güvenilir açılmadı); metinleri kod incelemesinde `_()` ile sarılı görünüyor.
+- XLSX ve PDF ekstre içe aktarma denenmedi (PDF için Chromium düzeltmesi sonrası testler geçti).
+- Türkçe sütun başlıklarının (`Tarih`, `Tutar`, `Açıklama`) otomatik tanınması yapılmadı.
 - Bazı erişilebilirlik etiketleri (`Close toast`, `Select all rows`) üçüncü taraf bileşenlerden İngilizce gelir.
-- Türkiye hesap planında `Bank` türünde varsayılan bir genel muhasebe hesabı yoktur; banka hesabı eklemeden önce `102 BANKALAR` altında hesap oluşturulmalıdır. Kurulum sihirbazına varsayılan banka hesabı eklenmesi ayrı bir iştir.
-- Baskı formatları (29 adet) ve e-posta şablonlarında alıcı dili için ayrı kapsam (Faz 4) geçerlidir; `default_print_language` değiştirilmedi.
+- Türkiye hesap planında `Bank` türünde yaprak hesap yok (bkz. yukarıdaki not).
+- Baskı formatları (29 adet) ve e-posta şablonlarında alıcı dili için ayrı kapsam (Faz 4) geçerlidir.
 - Bankacılık dışı ERPNext ekranlarının tamamı tarayıcıda tek tek gezilmedi; kapsam otomatik taramalarla (525 rota) ölçülmüştür.
 
 ## Değişen dosyalar
