@@ -7,23 +7,31 @@ MariaDB instance so that a suspended tenant cannot modify its own status.
 
 from __future__ import annotations
 
+import os
 import sqlite3
-from dataclasses import asdict
+from collections.abc import Iterator
+from contextlib import contextmanager
 from datetime import datetime, timedelta, timezone
 from pathlib import Path
-from typing import Any
 
-from cadro.saas.tenant import PlanTier, TenantQuota, TenantRecord, TenantStatus
+from cadro.saas.tenant import PLAN_QUOTAS, PlanTier, TenantQuota, TenantRecord, TenantStatus
 
-DB_PATH = Path(__file__).resolve().parents[2] / "cadro" / "control_plane.db"
+# CADRO_CONTROL_PLANE_DB overrides the default location (tests, other deployments).
+DB_PATH = Path(os.environ.get("CADRO_CONTROL_PLANE_DB") or Path(__file__).resolve().parents[2] / "cadro" / "control_plane.db")
 
 
-def _connect() -> sqlite3.Connection:
+@contextmanager
+def _connect() -> Iterator[sqlite3.Connection]:
+    """Open the control-plane database; commits on success and always closes."""
     conn = sqlite3.connect(str(DB_PATH))
     conn.row_factory = sqlite3.Row
-    conn.execute("PRAGMA journal_mode=WAL")
-    conn.execute("PRAGMA foreign_keys=ON")
-    return conn
+    try:
+        conn.execute("PRAGMA journal_mode=WAL")
+        conn.execute("PRAGMA foreign_keys=ON")
+        with conn:
+            yield conn
+    finally:
+        conn.close()
 
 
 def init_db() -> None:
@@ -89,10 +97,12 @@ def get_tenant(site_name: str) -> TenantRecord | None:
 
 
 def set_tenant_status(site_name: str, status: TenantStatus) -> None:
-    """Update a tenant's lifecycle status."""
+    """Update a tenant's lifecycle status. Raises LookupError for an unknown site."""
     init_db()
     with _connect() as conn:
-        conn.execute("UPDATE tenants SET status = ? WHERE site_name = ?", (status.value, site_name))
+        cursor = conn.execute("UPDATE tenants SET status = ? WHERE site_name = ?", (status.value, site_name))
+    if cursor.rowcount == 0:
+        raise LookupError(f"Tenant with site_name '{site_name}' is not registered")
 
 
 def list_tenants(status: TenantStatus | None = None) -> list[TenantRecord]:
@@ -104,22 +114,6 @@ def list_tenants(status: TenantStatus | None = None) -> list[TenantRecord]:
         else:
             rows = conn.execute("SELECT * FROM tenants ORDER BY created_at").fetchall()
     return [_row_to_record(r) for r in rows]
-
-
-def tenant_from_site(site_name: str) -> TenantRecord | None:
-    """Resolve a tenant from its site name."""
-    return get_tenant(site_name)
-
-
-def enforce_tenant_active(site_name: str) -> None:
-    """Raise if the tenant is suspended or its trial expired."""
-    tenant = get_tenant(site_name)
-    if tenant is None:
-        return  # unknown site — let the framework 404
-    if not tenant.can_access():
-        from frappe import _
-
-        raise PermissionError(_("This account is suspended. Please contact support."))
 
 
 def _row_to_record(row: sqlite3.Row) -> TenantRecord:
@@ -137,6 +131,3 @@ def _row_to_record(row: sqlite3.Row) -> TenantRecord:
             max_api_calls_per_minute=row["max_api_calls_per_minute"],
         ),
     )
-
-
-from cadro.saas.tenant import PLAN_QUOTAS  # noqa: E402

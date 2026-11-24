@@ -35,6 +35,9 @@ jobs:
       - name: Baseline validator tests
         run: python -m unittest discover -s scripts -p 'test_*.py' -v
 
+      - name: Control-plane tests
+        run: python -m unittest cadro.saas.test_saas -v
+
       - name: Pins resolve from the manifest
         run: |
           for component in frappe erpnext payments; do

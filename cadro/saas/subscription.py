@@ -12,7 +12,7 @@ from dataclasses import dataclass
 from datetime import datetime, timezone
 from typing import Any
 
-from erpnext.cadro.saas.tenant import TenantStatus, enforce_tenant_active
+from cadro.saas.tenant import TenantStatus, enforce_tenant_active
 
 
 class QuotaExceededError(Exception):

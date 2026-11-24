@@ -58,18 +58,20 @@ trial ──► active ──► suspended ──► active   (ödeme yapıldı)
 
 ### Provisioning
 ```bash
-python cadro/saas/provision_site.py \
+# depo kökünden; bench PATH'te, uygulamalar baseline commit'lerinde olmalı
+python -m cadro.saas.provision_site \
     --site cadro-tenant-001.localhost \
-    --admin-password <pw> \
-    --db-password <root-pw> \
+    --admin-password-file /run/secrets/admin_password \
+    --db-password-file /run/secrets/db_password \
     --plan professional
 ```
 
 ### Tenant yönetimi
 ```bash
-python cadro/saas/manage_tenant.py --site cadro-tenant-001.localhost --action suspend
-python cadro/saas/manage_tenant.py --site cadro-tenant-001.localhost --action reactivate
-python cadro/saas/manage_tenant.py --site cadro-tenant-001.localhost --action offboard --confirm YES
+python -m cadro.saas.manage_tenant --site cadro-tenant-001.localhost --action suspend
+python -m cadro.saas.manage_tenant --site cadro-tenant-001.localhost --action reactivate
+python -m cadro.saas.manage_tenant --site cadro-tenant-001.localhost --action offboard \
+    --confirm cadro-tenant-001.localhost
 ```
 
 ### API koruması
@@ -81,6 +83,8 @@ def my_endpoint():
     ...
 ```
 
+**Sınır:** Bu dekoratör kontrol düzlemi veritabanını (`cadro.saas.db`) okur. `cadro/` paketi bench imajında bulunmadığı için dekoratör bugünkü imajda çalıştırılamaz; kontrol düzlemi ayrı servis olarak kurulduğunda bir API üzerinden sorgulamalıdır. Bugün askıya alma `maintenance_mode` ile siteye uygulanır.
+
 ## Doğrulama
 
 | Kapı | Sonuç |
@@ -88,12 +92,26 @@ def my_endpoint():
 | Python syntax | ✅ compileall temiz |
 | Faz 0 manifesto | ✅ geçerli |
 | Faz 0 testleri | ✅ 8/8 |
-| Tenant modeli | ✅ dataclass + enum |
-| Plan/kota | ✅ 3 plan, default kotalar |
-| Provisioning | ✅ bench tabanlı, pin'li |
-| Suspend/reactivate | ✅ maintenance_mode |
-| Offboarding | ✅ drop-site, onaylı |
-| Ödeme webhook | ✅ kontrat tanımlı, uygulama stub |
+| Kontrol düzlemi testleri | ✅ 19/19 (`python -m unittest cadro.saas.test_saas`, CI'da çalışır) |
+| Tenant modeli ve SQLite kayıt defteri | ✅ yaşam döngüsü, kota, deneme süresi |
+| Provisioning | ✅ pin doğrulaması, kayıt defterine yazma (gerçek bir bench'te çalıştırılmadı) |
+| Suspend/reactivate/offboard | ✅ yalnızca tenant sitesi değişir, kayıt defteri güncellenir (komutlar testte taklit edildi) |
+| Ödeme webhook | ⚠️ kontrat tanımlı; `webhook_payment_*` işlevleri hâlâ `NotImplementedError` |
+
+### 23-24 Kasım 2026 incelemesinde bulunan ve düzeltilenler
+
+Bu modüller önceki turda hiç çalıştırılmamıştı. Testler yazılırken şu hatalar çıktı:
+
+| Sorun | Düzeltme |
+| --- | --- |
+| `can_access()` UTC'siz `utcnow()` ile UTC'li kayıt tarihini karşılaştırıp `TypeError` veriyordu (her yeni tenant için) | Tüm zaman damgaları UTC farkındalıklı |
+| `subscription.py` olmayan `erpnext.cadro.saas` yolundan içe aktarıyordu | `cadro.saas` olarak düzeltildi |
+| `tenant_from_site` / `enforce_tenant_active` biri `NotImplementedError`, biri başka dosyada olmak üzere iki kopyaydı | Tek uygulama (`tenant.py`), kayıt defterine bakar |
+| `suspend` genel (`-g`) `disable_website` ayarını yapıyordu: bir tenant'ın askıya alınması bench'teki **tüm** tenant'ların web sitesini kapatırdı | Yalnızca tenant sitesinin ayarı değişir |
+| `provision_site` genel `developer_mode` ayarını değiştiriyordu, `get-app --branch <commit>` (SHA ile çalışmaz) kullanıyordu, planı uygulamıyordu, parolaları komut satırından alıyordu | Pin doğrulaması, parola dosyaları, kayıt defterine yazma; genel ayar yok |
+| Site adı doğrulanmıyordu (bench argümanına gidiyor) | `validate_site_name` |
+| `offboard` için `--confirm YES` herkes için aynı onaydı | Onay olarak site adının tekrarı |
+| Askıya alma/yeniden etkinleştirme kayıt defterini güncellemiyordu | Güncelliyor |
 
 ## Kontrol düzlemi için sonraki adımlar (bu fazda kapatılmaz)
 

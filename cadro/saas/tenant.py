@@ -11,9 +11,29 @@ in the CADRO control plane (outside this ERPNext app repo).
 from __future__ import annotations
 
 import enum
+import re
 from dataclasses import dataclass, field
-from datetime import datetime
+from datetime import datetime, timezone
 from typing import Any
+
+
+def utcnow() -> datetime:
+    """Timezone-aware current UTC time. All tenant timestamps are timezone-aware UTC."""
+    return datetime.now(timezone.utc)
+
+
+_SITE_NAME = re.compile(r"^[a-z0-9]([a-z0-9.-]{0,251}[a-z0-9])?$")
+
+
+def validate_site_name(site_name: str) -> str:
+    """Return the site name when it is a plain lowercase host name, else raise ValueError.
+
+    Site names reach bench as command arguments and become directory and database names, so
+    anything but letters, digits, dots and hyphens (and a leading dash) is refused.
+    """
+    if not isinstance(site_name, str) or not _SITE_NAME.fullmatch(site_name):
+        raise ValueError(f"Invalid site name: {site_name!r}")
+    return site_name
 
 
 class TenantStatus(str, enum.Enum):
@@ -65,7 +85,7 @@ class TenantRecord:
     plan: PlanTier
     status: TenantStatus = TenantStatus.TRIAL
     trial_ends_at: datetime | None = None
-    created_at: datetime = field(default_factory=datetime.utcnow)
+    created_at: datetime = field(default_factory=utcnow)
     quota: TenantQuota = field(default_factory=TenantQuota)
 
     def is_active(self) -> bool:
@@ -76,21 +96,24 @@ class TenantRecord:
         if self.status == TenantStatus.ACTIVE:
             return True
         if self.status == TenantStatus.TRIAL and self.trial_ends_at:
-            return datetime.utcnow() < self.trial_ends_at
+            return utcnow() < self.trial_ends_at
         return False
 
 
 def tenant_from_site(site_name: str) -> TenantRecord | None:
-    """Resolve a tenant from its site name (stub — real lookup goes to control plane DB)."""
-    raise NotImplementedError("Tenant resolution requires the control-plane database")
+    """Resolve a tenant from its site name through the control-plane database."""
+    from cadro.saas import db
+
+    return db.get_tenant(site_name)
 
 
 def enforce_tenant_active(site_name: str) -> None:
-    """Raise if the tenant is suspended or its trial expired."""
+    """Raise if the tenant is suspended or its trial expired.
+
+    An unknown site is not an error here: the framework answers it with a 404.
+    """
     tenant = tenant_from_site(site_name)
     if tenant is None:
-        return  # unknown site — let the framework 404
+        return
     if not tenant.can_access():
-        from frappe import _
-
-        raise PermissionError(_("This account is suspended. Please contact support."))
+        raise PermissionError("This account is suspended. Please contact support.")
