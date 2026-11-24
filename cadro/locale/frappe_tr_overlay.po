@@ -12681,3 +12681,7 @@ msgstr "{0} (örn. {1})"
 #. erpnext
 msgid "Imported {0} transactions (skipped {1} duplicate rows)."
 msgstr "{0} işlem içe aktarıldı ({1} yinelenen satır atlandı)."
+
+#. banking
+msgid "Page {0} of {1}"
+msgstr "Sayfa {0} / {1}"

@@ -105,10 +105,22 @@ Ekstre içe aktarıcı yalnızca İngilizce başlıkları tanıyor ve `1.250,75`
 - `Borç`/`Alacak` tür sütunu değerleri tanınır.
 - 6 yeni birim test; ekstre içe aktarma günlüğü (29), içe aktarma (17) ve banka uzlaştırma (34) testleri MariaDB üzerinde geçti.
 
+### XLSX ve PDF içe aktarma (demo site, yeni imaj)
+
+| Dosya | Sonuç |
+| --- | --- |
+| XLSX: üstte `HESAP HAREKETLERİ` başlığı, boş satır, büyük harfli `VALÖR TARİHİ / İŞLEM TARİHİ / AÇIKLAMA / REFERANS / BORÇ / ALACAK / BAKİYE`, tutarlar metin (`8.200,00`) | Başlık satırı 3. satır olarak, sütunlar otomatik eşlendi (valör sütunu hariç); `DD.MM.YYYY`, ayrı borç/alacak; 3 işlem, borç ₺ 3.751,25, alacak ₺ 8.200,00, kapanış ₺ 4.448,75; içe aktarma tamam, uzlaştırma ekranında 3 işlem |
+| PDF (Türkçe tablo: `Tarih, Açıklama, Borç, Alacak, Bakiye`) | Tablo algılandı, 3 işlem doğru okundu (`Müşteri tahsilatı - Beta A.Ş.`, `Güneş Ltd.` dahil Türkçe harfler); borç ₺ 1.730,75, alacak ₺ 6.400,00, kapanış ₺ 4.669,25 |
+
+Bu turda bulunan: Frappe çekirdeğindeki `Page {0} of {1}` çevirisi `{1} {0} Sayfası` olduğundan PDF ekranında `1 1 Sayfası` görünüyordu; overlay'e `Sayfa {0} / {1}` eklendi (sonraki imaj derlemesiyle devreye girer). Ayrıca içe aktarma hemen sonrasında uzlaştırma sayacı bir an `3 / 3`, liste boş görünüyor; sayfa yenilenince `0 / 3` ve 3 işlem geliyor (önbellek yenileme gecikmesi, veri doğru).
+
+### Eşleştirme kuralı ve geri alma metinleri
+
+Ayarlar → Eşleştirme Kuralları sekmesi klavyeyle açıldı (başlık, açıklama, `Kural Ekle`, boş durum Türkçe). `Kural Ekle` formu ve geri alma pencereleri gömülü tarayıcıda açılmadı (Radix düğme tıklamaları iletilmiyor). Bunun yerine `Settings`, `Rules`, `ActionLog` ve `BankTransactionUnreconcileModal` bileşenlerindeki tüm `_()` metinleri çalışan sitenin çeviri tablosuyla karşılaştırıldı: 26 eksik görünen metnin 24'ü Türkçe (`Kaydet`, `Sil`, `Geri Al`, `Kaldır`, `Değer`, `Vade Tarihi`…), kalan ikisi metin değil (`0.00`, `{} :`).
+
 ### Açık kalanlar
 
-- Eşleştirme kuralı oluşturma penceresi ve işlem geri alma akışı tarayıcıda gezilmedi (gömülü tarayıcıda ayar penceresi güvenilir açılmadı); metinleri kod incelemesinde `_()` ile sarılı görünüyor.
-- XLSX ve PDF ekstre içe aktarma denenmedi (PDF için Chromium düzeltmesi sonrası testler geçti).
+- `Kural Ekle` formu ve işlem geri alma penceresi tarayıcıda çalıştırılamadı; yalnızca metin kapsamı doğrulandı, işlevi arka uç testleri kapsıyor.
 - Türkçe başlık tanıma birim testlerle doğrulandı; gerçek bir Türk bankası ekstresiyle denenmedi.
 - Bazı erişilebilirlik etiketleri (`Close toast`, `Select all rows`) üçüncü taraf bileşenlerden İngilizce gelir.
 - Türkiye hesap planında `Bank` türünde yaprak hesap yok (bkz. yukarıdaki not).
