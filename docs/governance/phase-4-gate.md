@@ -94,6 +94,44 @@ docs/governance/phase-4-gate.md                    - bu dosya
 | Mali müşavir onayı | ❌ Gerekli, bu faz kapsamında değil |
 | Sağlayıcı seçimi | ❌ Gerekli, bu faz kapsamında değil |
 
+## Uçtan uca ana akış testi (24 Kasım 2026)
+
+`erpnext/regional/turkey/test_main_flow.py` Türkiye şirketi üzerinde alım → depolama → satış → tahsilat → banka mutabakatı zincirini çalıştırır. Her adım kendi belge/stok/GL beklentisini hemen doğrular; alt senaryolar önkoşullarını kendileri çalıştırır, `test_main_flow` bütün zinciri koşup defterleri denetler.
+
+```bash
+bench --site <site> run-tests --module erpnext.regional.turkey.test_main_flow
+```
+
+| Alt senaryo | Beklenen (örnek: 100 adet × 50 TL alım, 40 adet × 80 TL satış, %20 KDV) |
+| --- | --- |
+| 1 Alım | İrsaliye: `153` 5.000 B / faturasız mallar 5.000 A; fatura: KDV `191` 1.000 B, `320` 6.000 A; stok +100 |
+| 2 Tedarikçiye ödeme | `320` B / `102` A; fatura kapanır (kısmi ödeme varyasyonu ayrı) |
+| 3 Depolama | Depolar arası transfer: Bin'ler doğru, stok hesabı bakiyesi değişmez |
+| 4 Satış | İrsaliye: maliyet 2.000 B / `153` A; fatura: `120` 3.840 B, satış 3.200 A, `391` 640 A |
+| 5 Tahsilat | Nakit 1.000 (`100`), çek 1.500 (`101`, vadeli), havale 1.340 (`102`); fatura "Paid" |
+| 6 Çek yatırma | `102` B / `101` A; çek hesabı sıfırlanır |
+| 7 Banka mutabakatı | 4 ekstre hareketi belgelerle eşlenir, hepsi "Reconciled"; ekstre toplamı = defter bakiyesi |
+| Ana akış | Mizan dengeli, stok değeri = `153`, alıcılar/satıcılar = açık faturalar, tüm hesap bakiyeleri beklenen, kâr = 3.200 − 2.000 |
+| Varyasyonlar | Kısmi ödeme, stok sayım farkı (`940`), yetersiz stokla satışın reddi, satış iadesi (stok + maliyet + KDV), karşılıksız çek, satışın iptali |
+
+Sonuç: taze MariaDB sitesinde 15/15 geçti (iki ardışık koşu). PostgreSQL'de koşulmadı.
+
+### Bulunan eksikler: Türkiye hesap planı ticarete hazır gelmiyor
+
+Taze bir Türkiye şirketinde akışın çalışması için testin kendisinin kurması gereken şeyler (`CADRO-GAP` çıktısı):
+
+| Eksik | Etki |
+| --- | --- |
+| **6. sınıf tek `Income` kökü altında**: `621 Satılan Ticari Mallar Maliyeti`, `62`, `63 Faaliyet Giderleri`, `65`, `66`, `68` gelir kökünde | ERPNext varsayılan maliyet/gider hesabı olarak kabul etmez ("invalid root_type"); gider raporları ve Kâr-Zarar sınıflaması yanlış. Pilot sitede de `621` ve `632` `Income` kökünde. **Yapısal hata.** |
+| `153 Ticari Mallar`, `101 Alınan Çekler`, `102 Bankalar`, `600 Yurt İçi Satışlar`, `500 Sermaye` altında **yaprak hesap yok** | Ürün, çek tahsilatı, banka hesabı bağlama, satış ve sermaye hareketi yapılamaz |
+| `320.01 Satıcılar` türü `Payable` değil | Tedarikçi borcu için varsayılan hesap olamaz |
+| `Stock Received But Not Billed` türünde hesap yok | Sürekli envanterde alış irsaliyesi kaydedilemez |
+| Şirket varsayılanları boş: ödenecek, gelir, gider, stok girişi, banka; kasa varsayılanı `USD KASA` | Belgeler hesap bulamaz; nakit tahsilat yanlış kasaya gider |
+| `Cash`/`Bank`/`Receivable` türü olmayan hesap ödeme yöntemine bağlanamaz | `101 Alınan Çekler` yaprağı bir tür taşımalı (testte `Cash`) |
+| `Cheque` ve `Wire Transfer` ödeme yöntemlerinde şirket hesabı yok | Çek/havale tahsilatı hesabı bulamaz |
+
+Doğrulandı: pilotta `Allow Negative Stock` kapalı (0); yetersiz stokla satış reddediliyor. Karar bekliyor: hesap planı düzeltmesi (6. sınıfı gelir ve gider köklerine bölmek, yaprak hesaplar, türler, şirket varsayılanları). Yalnızca yeni kurulan şirketleri etkiler; mevcut şirketlerin hesapları için ayrı bir yama gerekir.
+
 ## Sonraki adım
 
 Faz 5 — SaaS ticarileştirme ve ölçek.  
