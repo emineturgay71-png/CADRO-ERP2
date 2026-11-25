@@ -10,10 +10,12 @@ usage:
         --password-file cadro/secrets/admin_password [--seconds 15] [--levels 1,5,20,50]
 
 Scenarios (--scenario): `read` (default; list and count endpoints), `reports` (General Ledger,
-Accounts Receivable, Trial Balance through the report API) and `write` (each request inserts and
-submits a Sales Invoice, i.e. writes GL entries). `reports` and `write` need --company; `write`
-needs the customers and items of scripts/seed_load_data.py and, because it creates data that cannot
-be removed again, refuses a site whose name does not contain "load" (override with --force).
+Accounts Receivable, Trial Balance through the report API), `write` (each request inserts and
+submits a Sales Invoice, i.e. writes GL entries) and `write-stock` (the same with update_stock, so
+every request also writes stock ledger entries and updates shared Bin rows). `reports` and the
+write scenarios need --company; the write scenarios need the customers and items of
+scripts/seed_load_data.py and, because they create data that cannot be removed again, refuse a
+site whose name does not contain "load" (override with --force).
 """
 
 from __future__ import annotations
@@ -159,31 +161,47 @@ def report_endpoints(opener, base, host, company):
     }
 
 
-def write_endpoint(opener, base, host, company):
-    """Insert and submit a Sales Invoice per request, using the seeded customers and items."""
-    customers = [row["name"] for row in api_get(
-        opener, base, host,
-        "/api/resource/Customer?limit_page_length=200&filters=%5B%5B%22customer_name%22%2C%22like%22%2C%22LOAD%25%22%5D%5D",
-    )["data"]]
-    items = [row["name"] for row in api_get(
-        opener, base, host,
-        "/api/resource/Item?limit_page_length=200&filters=%5B%5B%22item_code%22%2C%22like%22%2C%22LOAD%25%22%5D%5D",
-    )["data"]]
+def write_endpoint(opener, base, host, company, stock=False):
+    """Insert and submit a Sales Invoice per request, using the seeded customers and items.
+
+    With `stock` the invoice delivers stock-item units from a warehouse (update_stock), which
+    also writes stock ledger entries and updates the Bin rows that concurrent requests share.
+    """
+    def names(doctype: str, field: str, prefix: str) -> list[str]:
+        filters = urllib.parse.quote(json.dumps([[field, "like", prefix + "%"]]))
+        return [row["name"] for row in api_get(
+            opener, base, host, f"/api/resource/{doctype}?limit_page_length=200&filters={filters}"
+        )["data"]]
+
+    customers = names("Customer", "customer_name", "LOAD ")
+    items = names("Item", "item_code", "LOAD Stok" if stock else "LOAD Hizmet")
     if not customers or not items:
         raise SystemExit("seed the site first (scripts/seed_load_data.py)")
+    warehouse = None
+    if stock:
+        filters = urllib.parse.quote(json.dumps([["company", "=", company], ["is_group", "=", 0]]))
+        rows = api_get(opener, base, host, f"/api/resource/Warehouse?limit_page_length=1&filters={filters}")["data"]
+        if not rows:
+            raise SystemExit("the company has no warehouse")
+        warehouse = rows[0]["name"]
     today = date.today().isoformat()
 
     def make_body() -> bytes:
+        lines = []
+        for _ in range(random.randint(1, 3)):
+            line = {"item_code": random.choice(items), "qty": random.randint(1, 5), "rate": random.randint(10, 500)}
+            if warehouse:
+                line["warehouse"] = warehouse
+            lines.append(line)
         doc = {
             "doctype": "Sales Invoice", "company": company, "customer": random.choice(customers),
-            "posting_date": today, "set_posting_time": 1, "due_date": today, "update_stock": 0,
-            "remarks": "LOAD write test",
-            "items": [{"item_code": random.choice(items), "qty": random.randint(1, 5), "rate": random.randint(10, 500)}
-                      for _ in range(random.randint(1, 3))],
+            "posting_date": today, "set_posting_time": 1, "due_date": today, "update_stock": 1 if stock else 0,
+            "remarks": "LOAD write test", "items": lines,
         }
         return json.dumps({"doc": json.dumps(doc)}).encode()
 
-    return {"write Sales Invoice submit": ("POST", "/api/method/frappe.client.submit", True, make_body)}
+    name = "write Sales Invoice (stock)" if stock else "write Sales Invoice submit"
+    return {name: ("POST", "/api/method/frappe.client.submit", True, make_body)}
 
 
 def main() -> int:
@@ -193,14 +211,15 @@ def main() -> int:
     parser.add_argument("--password-file", required=True)
     parser.add_argument("--seconds", type=int, default=15)
     parser.add_argument("--levels", default="1,5,20,50")
-    parser.add_argument("--scenario", choices=["read", "reports", "write"], default="read")
+    parser.add_argument("--scenario", choices=["read", "reports", "write", "write-stock"], default="read")
     parser.add_argument("--company", help="company name (reports and write scenarios)")
-    parser.add_argument("--force", action="store_true", help='allow --scenario write on a site not named "*load*"')
+    parser.add_argument("--force", action="store_true", help='allow write scenarios on a site not named "*load*"')
     args = parser.parse_args()
-    if args.scenario in ("reports", "write") and not args.company:
+    writes = args.scenario in ("write", "write-stock")
+    if (writes or args.scenario == "reports") and not args.company:
         parser.error(f"--scenario {args.scenario} needs --company")
-    if args.scenario == "write" and "load" not in args.site.lower() and not args.force:
-        parser.error('--scenario write creates data that cannot be removed; the site name must contain "load"')
+    if writes and "load" not in args.site.lower() and not args.force:
+        parser.error(f'--scenario {args.scenario} creates data that cannot be removed; the site name must contain "load"')
 
     with open(args.password_file, encoding="utf-8") as handle:
         password = handle.read().strip()
@@ -210,8 +229,8 @@ def main() -> int:
     headers = None
     if args.scenario == "reports":
         endpoints = report_endpoints(opener, args.base, host, args.company)
-    elif args.scenario == "write":
-        endpoints = write_endpoint(opener, args.base, host, args.company)
+    elif writes:
+        endpoints = write_endpoint(opener, args.base, host, args.company, stock=args.scenario == "write-stock")
         headers = {"X-Frappe-CSRF-Token": csrf_token(opener, args.base, host)}
     else:
         endpoints = {name: (*spec, None) for name, spec in ENDPOINTS.items()}

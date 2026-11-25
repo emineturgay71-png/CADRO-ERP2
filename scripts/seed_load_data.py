@@ -1,9 +1,9 @@
 #!/usr/bin/env python3
 """Seed a throw-away CADRO site with volume data for load testing.
 
-Creates customers, suppliers, service items and submitted Sales Invoices (names prefixed
-"LOAD ") on the site's default company, so that list views, reports and the ledger have a
-realistic number of rows when scripts/load_smoke.py runs. It is idempotent: it only adds what
+Creates customers, suppliers, service items, stock items (with an opening stock receipt) and
+submitted Sales Invoices (names prefixed "LOAD ") on the site's default company, so that list
+views, reports and the ledger have a realistic number of rows when scripts/load_smoke.py runs. It is idempotent: it only adds what
 is missing to reach the requested counts. It never touches records it did not create.
 
 SAFETY: the data cannot be removed again (submitted invoices). The site name must contain
@@ -13,7 +13,7 @@ Run it inside the bench container with the bench's Python, from the sites direct
 
     cd "$FRAPPE_BENCH_PATH/sites"
     ../env/bin/python /home/frappe/scripts/seed_load_data.py --site cadro-load.localhost \
-        [--customers 300] [--suppliers 50] [--items 300] [--invoices 1500] [--seed 1]
+        [--customers 300] [--suppliers 50] [--items 300] [--stock-items 50] [--invoices 1500] [--seed 1]
 """
 
 from __future__ import annotations
@@ -33,20 +33,21 @@ def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
     parser.add_argument("--customers", type=int, default=300)
     parser.add_argument("--suppliers", type=int, default=50)
     parser.add_argument("--items", type=int, default=300)
+    parser.add_argument("--stock-items", type=int, default=50, help="stock items with 1,000,000 units on hand")
     parser.add_argument("--invoices", type=int, default=1500)
     parser.add_argument("--seed", type=int, default=1, help="random seed, for repeatable data")
     parser.add_argument("--force", action="store_true", help='allow a site whose name does not contain "load"')
     args = parser.parse_args(argv)
     if "load" not in args.site.lower() and not args.force:
         parser.error('refusing to seed a site whose name does not contain "load" (use --force)')
-    for name in ("customers", "suppliers", "items", "invoices"):
+    for name in ("customers", "suppliers", "items", "stock_items", "invoices"):
         if getattr(args, name) < 0:
-            parser.error(f"--{name} must not be negative")
+            parser.error(f"--{name.replace('_', '-')} must not be negative")
     return args
 
 
-def _existing(frappe, doctype: str, field: str) -> int:
-    return frappe.db.count(doctype, {field: ["like", f"{PREFIX}%"]})
+def _existing(frappe, doctype: str, field: str, prefix: str = PREFIX) -> int:
+    return frappe.db.count(doctype, {field: ["like", f"{prefix}%"]})
 
 
 def _first_leaf(frappe, doctype: str) -> str:
@@ -91,7 +92,7 @@ def _seed_parties(frappe, args: argparse.Namespace) -> None:
 def _seed_items(frappe, args: argparse.Namespace) -> None:
     group = _first_leaf(frappe, "Item Group")
     uom = frappe.db.get_value("UOM", "Nos") or frappe.db.get_value("UOM", {}, "name")
-    have = _existing(frappe, "Item", "item_code")
+    have = _existing(frappe, "Item", "item_code", f"{PREFIX}Hizmet")
     for i in range(have + 1, args.items + 1):
         frappe.get_doc(
             {
@@ -108,10 +109,56 @@ def _seed_items(frappe, args: argparse.Namespace) -> None:
     frappe.db.commit()
 
 
+def _seed_stock_items(frappe, args: argparse.Namespace, company: str, today: date) -> None:
+    """Stock items plus one Material Receipt that puts 1,000,000 units of each into a warehouse."""
+    group = _first_leaf(frappe, "Item Group")
+    uom = frappe.db.get_value("UOM", "Nos") or frappe.db.get_value("UOM", {}, "name")
+    have = _existing(frappe, "Item", "item_code", f"{PREFIX}Stok")
+    created = []
+    for i in range(have + 1, args.stock_items + 1):
+        code = f"{PREFIX}Stok {i:05d}"
+        frappe.get_doc(
+            {
+                "doctype": "Item",
+                "item_code": code,
+                "item_name": code,
+                "item_group": group,
+                "stock_uom": uom,
+                "is_stock_item": 1,
+                "valuation_rate": 10,
+            }
+        ).insert()
+        created.append(code)
+    frappe.db.commit()
+    if not created:
+        return
+    warehouse = frappe.db.get_value("Warehouse", {"company": company, "is_group": 0, "disabled": 0}, "name")
+    if not warehouse:
+        raise SystemExit(f"Company {company} has no warehouse")
+    receipt = frappe.get_doc(
+        {
+            "doctype": "Stock Entry",
+            "stock_entry_type": "Material Receipt",
+            "company": company,
+            "posting_date": today.isoformat(),
+            "set_posting_time": 1,
+            "to_warehouse": warehouse,
+            "remarks": f"{PREFIX}opening stock",
+            "items": [
+                {"item_code": code, "qty": 1_000_000, "basic_rate": 10, "t_warehouse": warehouse}
+                for code in created
+            ],
+        }
+    )
+    receipt.insert()
+    receipt.submit()
+    frappe.db.commit()
+
+
 def _seed_invoices(frappe, args: argparse.Namespace, company: str, today: date) -> None:
     rng = random.Random(args.seed)
     customers = frappe.get_all("Customer", filters={"customer_name": ["like", f"{PREFIX}%"]}, pluck="name")
-    items = frappe.get_all("Item", filters={"item_code": ["like", f"{PREFIX}%"]}, pluck="name")
+    items = frappe.get_all("Item", filters={"item_code": ["like", f"{PREFIX}Hizmet%"]}, pluck="name")
     if not customers or not items:
         if args.invoices:
             raise SystemExit("Invoices need at least one seeded customer and item")
@@ -163,12 +210,14 @@ def main(argv: list[str] | None = None) -> int:
         print(f"Seeding {args.site} (company: {company}) ...", flush=True)
         _seed_parties(frappe, args)
         _seed_items(frappe, args)
+        _seed_stock_items(frappe, args, company, date.today())
         _seed_invoices(frappe, args, company, date.today())
         print(
             "Done: "
             f"{_existing(frappe, 'Customer', 'customer_name')} customers, "
             f"{_existing(frappe, 'Supplier', 'supplier_name')} suppliers, "
-            f"{_existing(frappe, 'Item', 'item_code')} items, "
+            f"{_existing(frappe, 'Item', 'item_code', PREFIX + 'Hizmet')} items, "
+            f"{_existing(frappe, 'Item', 'item_code', PREFIX + 'Stok')} stock items, "
             f"{frappe.db.count('Sales Invoice', {'remarks': ['like', PREFIX + '%']})} invoices"
         )
     finally:

@@ -81,7 +81,7 @@ FRAPPE_COMMIT=$(python scripts/ci_pin_resolver.py --component frappe)
 | CI entegrasyonu | ✅ `.github/workflows/cadro-image.yml` (baseline doğrulama, compose/entrypoint denetimi, imaj build, SBOM) — GitHub'da henüz çalıştırılmadı |
 | Canlı Bench testleri | ✅ MariaDB + PostgreSQL (bkz. Faz 1) |
 | CADRO imaj etiketi | ✅ Etiket `CADRO_IMAGE_TAG` ile verilir (varsayılan `eval`); `python scripts/cadro_version.py` commit'ten etiket üretir (`-dirty` ekli imaj sürüm olarak kullanılamaz; `--require-clean` bunu reddeder, `--report` JSON sürüm kaydı verir). Kayıt defterine gönderme ve sürüm numaralandırma kararı bekliyor |
-| Yük ve kapasite testi | ⚠️ Duman, hacimli okuma, rapor ve eşzamanlı yazma taban değerleri çıkarıldı (aşağıda); eşzamanlı yazmada MariaDB `innodb_snapshot_isolation` hatası bulunup düzeltildi. Stoklu/import/çok kiracılı yük ölçülmedi |
+| Yük ve kapasite testi | ⚠️ Duman, hacimli okuma, rapor ve eşzamanlı yazma taban değerleri çıkarıldı (aşağıda); eşzamanlı yazmada MariaDB `innodb_snapshot_isolation` hatası bulunup düzeltildi; stoklu yazma 0 hatayla ve tutarlı defterle ölçüldü. Import/çok kiracılı yük ölçülmedi |
 | Yedekleme/geri yükleme tatbikatı | ✅ 23 Kasım 2026, ayrıntılar aşağıda |
 | Zamanlanmış yedek ve site dışı kopya | ✅ `backup` servisi: günde bir, son 14 yedek, ana makine dizinine (`cadro/backups`, bench volume'u dışında). Her yedek önce doğrulanır (`verify_backup.sh`); yalnızca doğrulanan yedek `<dizin>/.last_verified_backup` işaretini günceller, budamaya ve yüklemeye girer. `CADRO_BACKUP_UPLOAD_COMMAND` (örn. rclone/aws/rsync çağrısı; `CADRO_BACKUP_PATH` ile doğrulanmış dizini alır) site dışı kopya için kancadır; başarısız yükleme raporlanır, hiçbir şey silmez. Kanca canlı denendi (25 Kasım 2026: yedek alındı, doğrulandı, kopyalandı; bozuk kopya ve eksik manifesto reddedildi). Gerçek uzak depolama (sağlayıcı/kimlik bilgisi) henüz yok |
 | TLS | ✅ Kod hazır: `docker-compose.tls.yml` (443 + 80 yönlendirme, TLS 1.2/1.3, HSTS); kendinden imzalı sertifikayla canlı doğrulandı (HTTPS 200, 301 yönlendirme, HSTS başlığı). CA sertifikası, yenileme, WAF/CDN yok. Yönlendirme `$host` kullandığından standart portlar varsayılır |
@@ -163,13 +163,21 @@ Bulunan ve düzeltilen: nginx başlangıçta `bench` adresini bir kez çözüyor
 
 **Bulunan ve düzeltilen hata:** düzeltmeden önce 5 eşzamanlı istemcide yazma isteklerinin ~%80'i, 20'de ~%90'ı HTTP `508` (`QueryDeadlockError`) ile düşüyordu: `(1020, "Record has changed since last read in table 'tabSeries'")`. Neden: MariaDB ≥ 11.6.2 varsayılan olarak `innodb_snapshot_isolation=ON` çalıştırır; REPEATABLE READ işlem, anlık görüntüden sonra başka işlemce değişen satıra yazarken beklemek yerine hata verir. Frappe'nin numara serisi (`tabSeries`) ve defter güncellemeleri her eşzamanlı onayda buna çarpar. `cadro/mariadb/conf.d/cadro.cnf` artık `innodb_snapshot_isolation = OFF` ayarlar (Frappe'nin yazıldığı davranış). Sonuç: 5 ve 20 eşzamanlıda 0 hata, 2145 onaylı faturanın hepsinde GL kaydı var, toplam borç − alacak = 0, yinelenen belge adı yok. Bu bulgu pilot dahil tüm kullanıcılar için geçerliydi; ayar `db` konteyneri yeniden başlatılarak uygulandı.
 
-Sınırlar: yazma verimi ~9 fatura/sn'de doyar (numara serisi satırı işlemleri sıraya dizer; eşzamanlılık arttıkça gecikme artar, hata değil). İstemci ve sunucu aynı makinede; üretim donanımı, çok kiracılı eşzamanlı yük, stoklu kalemler (Bin/SLE kilitleri) ve import yükleri ölçülmedi.
+Sınırlar: yazma verimi ~9 fatura/sn'de doyar (numara serisi satırı işlemleri sıraya dizer; eşzamanlılık arttıkça gecikme artar, hata değil). İstemci ve sunucu aynı makinede; üretim donanımı, çok kiracılı eşzamanlı yük ve import yükleri ölçülmedi.
+
+**Stoklu yazma** (`--scenario write-stock`: `update_stock` ile Satış Faturası; 50 stoklu kalem, her biri 1.000.000 birim açılış stoğu, 1–3 satır, rastgele kalem; tohum `seed_load_data.py --stock-items`):
+
+| 1 eşzamanlı | 5 eşzamanlı | 20 eşzamanlı |
+| --- | --- | --- |
+| 4,8 fatura/sn, p95 328 ms | 6,3 fatura/sn, p95 890 ms | 6,3 fatura/sn, p95 4,9 sn |
+
+0 hata (kilit çatışması/`508` yok). Sonrasında doğrulandı: 164 stoklu fatura, 983 birim satıldı; her `Bin` için `actual_qty` = stok defteri toplamı (0 uyuşmazlık); açılış − satış = eldeki miktar; stok defteri değeri = Stok hesaplarının GL bakiyesi (499.990.170); toplam borç − alacak = 0. Stoklu yazma ~6 fatura/sn'de doyar (stok defteri ve değerleme kilitleri nedeniyle hizmet faturasından ~%30 yavaş). Tek bir sıcak kalemde (tüm istekler aynı kalem) kilit çatışması ölçülmedi.
 
 | Madde | Açıklama |
 | --- | --- |
 | Vault / secret manager | Docker secret dosyaları yerine merkezi sır yönetimi |
 | Sürüm numaralandırma ve kayıt defteri | Etiket değişkeni hazır; hangi sürüm şemasının ve deponun kullanılacağı kararı |
-| Gerçek veriyle yük ve kapasite testi | Hacimli okuma, rapor ve eşzamanlı yazma ölçüldü (yukarıda); stoklu kalemler, import, çok kiracılı yük ve üretim donanımı kaldı |
+| Gerçek veriyle yük ve kapasite testi | Hacimli okuma, rapor, eşzamanlı yazma ve stoklu yazma ölçüldü (yukarıda); import, çok kiracılı yük ve üretim donanımı kaldı |
 | TLS, WAF/CDN, izleme | Dış ters vekil, sertifikalar, alarm |
 | Yedeklerin makine dışına kopyalanması | Nesne depolama veya ikinci disk; geri yükleme tatbikatının periyodik tekrarı |
 | Kalan zafiyetlerin risk kabulü | Düzeltmesi olmayan OS paketleri |
