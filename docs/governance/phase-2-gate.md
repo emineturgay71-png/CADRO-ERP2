@@ -171,7 +171,9 @@ Sınırlar: yazma verimi ~9 fatura/sn'de doyar (numara serisi satırı işlemler
 | --- | --- | --- |
 | 4,8 fatura/sn, p95 328 ms | 6,3 fatura/sn, p95 890 ms | 6,3 fatura/sn, p95 4,9 sn |
 
-0 hata (kilit çatışması/`508` yok). Sonrasında doğrulandı: 164 stoklu fatura, 983 birim satıldı; her `Bin` için `actual_qty` = stok defteri toplamı (0 uyuşmazlık); açılış − satış = eldeki miktar; stok defteri değeri = Stok hesaplarının GL bakiyesi (499.990.170); toplam borç − alacak = 0. Stoklu yazma ~6 fatura/sn'de doyar (stok defteri ve değerleme kilitleri nedeniyle hizmet faturasından ~%30 yavaş). Tek bir sıcak kalemde (tüm istekler aynı kalem) kilit çatışması ölçülmedi.
+0 hata (kilit çatışması/`508` yok). Sonrasında doğrulandı: 164 stoklu fatura, 983 birim satıldı; her `Bin` için `actual_qty` = stok defteri toplamı (0 uyuşmazlık); açılış − satış = eldeki miktar; stok defteri değeri = Stok hesaplarının GL bakiyesi (499.990.170); toplam borç − alacak = 0. Stoklu yazma ~6 fatura/sn'de doyar (stok defteri ve değerleme kilitleri nedeniyle hizmet faturasından ~%30 yavaş).
+
+**Sıcak kalem** (`--hot-items 1`: tüm istekler aynı stoklu kalemi satar, yani aynı `Bin` ve stok defteri satırlarında çatışır): 1 eşzamanlı 4,6, 5 eşzamanlı 6,1, 20 eşzamanlı 6,0 fatura/sn (p95 5,0 sn); yine 0 hata ve kalem dağıtımı dikkate alınmaksızın aynı verim, yani darboğaz kalem kilidi değil numara serisi/defter yazımıdır. Sonrasında 158 fatura/949 birim: Bin = defter, açılış − satış = eldeki, stok değeri = GL (499.990.510), borç − alacak = 0.
 
 | Madde | Açıklama |
 | --- | --- |

@@ -161,11 +161,13 @@ def report_endpoints(opener, base, host, company):
     }
 
 
-def write_endpoint(opener, base, host, company, stock=False):
+def write_endpoint(opener, base, host, company, stock=False, hot_items=0):
     """Insert and submit a Sales Invoice per request, using the seeded customers and items.
 
     With `stock` the invoice delivers stock-item units from a warehouse (update_stock), which
     also writes stock ledger entries and updates the Bin rows that concurrent requests share.
+    `hot_items` > 0 restricts the stock items to that many, so concurrent requests collide on the
+    same Bin and stock ledger rows (the worst case: everybody sells the same product).
     """
     def names(doctype: str, field: str, prefix: str) -> list[str]:
         filters = urllib.parse.quote(json.dumps([[field, "like", prefix + "%"]]))
@@ -175,6 +177,8 @@ def write_endpoint(opener, base, host, company, stock=False):
 
     customers = names("Customer", "customer_name", "LOAD ")
     items = names("Item", "item_code", "LOAD Stok" if stock else "LOAD Hizmet")
+    if hot_items:
+        items = sorted(items)[:hot_items]
     if not customers or not items:
         raise SystemExit("seed the site first (scripts/seed_load_data.py)")
     warehouse = None
@@ -213,6 +217,7 @@ def main() -> int:
     parser.add_argument("--levels", default="1,5,20,50")
     parser.add_argument("--scenario", choices=["read", "reports", "write", "write-stock"], default="read")
     parser.add_argument("--company", help="company name (reports and write scenarios)")
+    parser.add_argument("--hot-items", type=int, default=0, help="write-stock: sell only this many distinct items")
     parser.add_argument("--force", action="store_true", help='allow write scenarios on a site not named "*load*"')
     args = parser.parse_args()
     writes = args.scenario in ("write", "write-stock")
@@ -230,7 +235,7 @@ def main() -> int:
     if args.scenario == "reports":
         endpoints = report_endpoints(opener, args.base, host, args.company)
     elif writes:
-        endpoints = write_endpoint(opener, args.base, host, args.company, stock=args.scenario == "write-stock")
+        endpoints = write_endpoint(opener, args.base, host, args.company, stock=args.scenario == "write-stock", hot_items=args.hot_items)
         headers = {"X-Frappe-CSRF-Token": csrf_token(opener, args.base, host)}
     else:
         endpoints = {name: (*spec, None) for name, spec in ENDPOINTS.items()}
