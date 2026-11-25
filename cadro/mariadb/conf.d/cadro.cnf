@@ -13,6 +13,13 @@ innodb_log_file_size    = 256M
 innodb_flush_method     = O_DIRECT
 innodb_file_per_table   = 1
 
+# MariaDB >= 11.6.2 turns snapshot isolation on: a REPEATABLE READ transaction that touches a row
+# changed by another transaction after its snapshot fails with error 1020 ("Record has changed
+# since last read") instead of waiting for the lock. Frappe's naming series (tabSeries) and
+# ledger updates hit that on every concurrent submit (measured: ~80% of concurrent Sales Invoice
+# submits failed with HTTP 508 at 5 clients). Frappe is written for the pre-11.6 behaviour.
+innodb_snapshot_isolation = OFF
+
 # Connection limits
 max_connections         = 200
 thread_cache_size       = 16
