@@ -150,6 +150,10 @@ Bulunan ve düzeltilen: nginx başlangıçta `bench` adresini bir kez çözüyor
 
 1500 fatura, hacimli listelerde belirgin bir yavaşlama yaratmadı; 20 eşzamanlıda DocType listesinde 1 hata görüldü (nedeni incelenmedi, tekrarlanmadı). Hâlâ tek makine, tek kullanıcı oturumu ve okuma ağırlıklı yük; çok kullanıcılı yazma iş akışları, raporlar ve import yükleri ölçülmedi.
 
+### Boş birimlerden ilk kurulum doğrulaması (25 Kasım 2026)
+
+Pilot konteynerleri kaldırıldı (birimler ve veri korundu; pilotun ek yedeği `D:\dev\cadro-backups\20261125-pre-fresh`), ayrı bir Compose projesinde (`-p cadrofresh`, `SITE_NAME=cadro-fresh.localhost`) boş birimlerle `up -d --build` çalıştırıldı. Sonuç: 11 konteynerin tamamı sağlıklı (kontrol düzlemi profili dahil), `ready` işaretçisi yazıldı; `frappe`/`erpnext`/`payments` HEAD'leri `cadro.baseline.json` pin'leriyle birebir; site uygulamaları frappe + erpnext + payments; site veritabanı kullanıcısı `%` ana makinesine sahip; `innodb_snapshot_isolation=0` (cnf uygulanıyor); `tr.po` imajdan bindirilmiş, sistem dili `tr`, ülke `Türkiye`; yönetici girişi ve API okuması 200; `worker`, `scheduler`, `socketio` günlüklerinde hata yok; ilk zamanlanmış yedek alındı ve `verify_backup.sh` ile doğrulandı. Test projesi birimleriyle silindi, pilot yeniden başlatıldı (şirketler ve giriş doğrulandı). Not: bu doğrulama imaj önbelleğiyle yapıldı (Dockerfile katmanları yeniden derlenmedi); sıfırdan `--no-cache` derlemesi ve gerçek GitHub CI çalıştırması ayrıca yapılmadı.
+
 ### Rapor ve yazma yükü (25 Kasım 2026)
 
 `load_smoke.py --scenario reports|write`, aynı hacimli sitede (1500 → ~2100 fatura), nginx üzerinden, her düzeyde 8–10 sn:
