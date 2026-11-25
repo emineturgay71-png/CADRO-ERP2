@@ -50,14 +50,27 @@ def init_db() -> None:
                 max_companies INTEGER NOT NULL DEFAULT 1,
                 max_storage_gb INTEGER NOT NULL DEFAULT 5,
                 max_api_calls_per_minute INTEGER NOT NULL DEFAULT 300,
-                payment_failed_since TEXT
+                payment_failed_since TEXT,
+                exported_at TEXT
             )
         """
         )
-        # Registries created before the payment columns existed.
+        # Registries created before these columns existed.
         columns = {row["name"] for row in conn.execute("PRAGMA table_info(tenants)")}
-        if "payment_failed_since" not in columns:
-            conn.execute("ALTER TABLE tenants ADD COLUMN payment_failed_since TEXT")
+        for column in ("payment_failed_since", "exported_at"):
+            if column not in columns:
+                conn.execute(f"ALTER TABLE tenants ADD COLUMN {column} TEXT")
+        # Expected price of one billing period per plan and currency; used to flag payments of the wrong amount.
+        conn.execute(
+            """
+            CREATE TABLE IF NOT EXISTS plan_prices (
+                plan     TEXT NOT NULL,
+                currency TEXT NOT NULL,
+                amount   REAL NOT NULL,
+                PRIMARY KEY (plan, currency)
+            )
+        """
+        )
         # One row per payment-provider event; the primary key is what makes webhooks idempotent.
         conn.execute(
             """
@@ -137,6 +150,53 @@ def set_payment_failed_since(site_name: str, since: datetime | None) -> None:
         raise LookupError(f"Tenant with site_name '{site_name}' is not registered")
 
 
+def set_plan_price(plan: PlanTier, currency: str, amount: float) -> None:
+    """Set the expected price of one billing period for a plan in a currency."""
+    if not (isinstance(amount, (int, float)) and 0 < amount < float("inf")):
+        raise ValueError("amount must be a positive number")
+    if not isinstance(currency, str) or not (2 <= len(currency) <= 5) or not currency.isalpha():
+        raise ValueError("currency must be an ISO code such as TRY")
+    init_db()
+    with _connect() as conn:
+        conn.execute(
+            "INSERT INTO plan_prices (plan, currency, amount) VALUES (?, ?, ?) "
+            "ON CONFLICT(plan, currency) DO UPDATE SET amount = excluded.amount",
+            (plan.value, currency.upper(), float(amount)),
+        )
+
+
+def get_plan_prices(plan: PlanTier) -> dict[str, float]:
+    """Expected prices of a plan by currency (empty when none is configured)."""
+    init_db()
+    with _connect() as conn:
+        rows = conn.execute("SELECT currency, amount FROM plan_prices WHERE plan = ?", (plan.value,)).fetchall()
+    return {row["currency"]: row["amount"] for row in rows}
+
+
+def mark_exported(site_name: str, when: datetime | None = None) -> None:
+    """Record that the tenant's data was exported (backup with files) at `when` (default now)."""
+    init_db()
+    stamp = (when or datetime.now(timezone.utc)).replace(microsecond=0).isoformat()
+    with _connect() as conn:
+        cursor = conn.execute("UPDATE tenants SET exported_at = ? WHERE site_name = ?", (stamp, site_name))
+    if cursor.rowcount == 0:
+        raise LookupError(f"Tenant with site_name '{site_name}' is not registered")
+
+
+def count_tenants_by_status() -> dict[str, int]:
+    init_db()
+    with _connect() as conn:
+        rows = conn.execute("SELECT status, COUNT(*) AS n FROM tenants GROUP BY status").fetchall()
+    return {row["status"]: row["n"] for row in rows}
+
+
+def count_webhook_outcomes() -> dict[str, int]:
+    init_db()
+    with _connect() as conn:
+        rows = conn.execute("SELECT outcome, COUNT(*) AS n FROM webhook_events GROUP BY outcome").fetchall()
+    return {row["outcome"]: row["n"] for row in rows}
+
+
 def claim_webhook_event(
     event_id: str,
     event: str,
@@ -213,4 +273,5 @@ def _row_to_record(row: sqlite3.Row) -> TenantRecord:
         payment_failed_since=(
             datetime.fromisoformat(row["payment_failed_since"]) if row["payment_failed_since"] else None
         ),
+        exported_at=datetime.fromisoformat(row["exported_at"]) if row["exported_at"] else None,
     )

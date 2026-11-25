@@ -110,6 +110,7 @@ class TestManageTenant(ControlPlaneTestCase):
         self.run_manage("suspend")
         self.run_manage("reactivate")
         self.assertEqual(db.get_tenant("a.example.com").status, TenantStatus.ACTIVE)
+        db.mark_exported("a.example.com")
         calls = self.run_manage("offboard")
         self.assertIn("drop-site", calls[0])
         self.assertEqual(db.get_tenant("a.example.com").status, TenantStatus.CANCELLED)
@@ -397,6 +398,136 @@ class TestRegistryMigration(ControlPlaneTestCase):
         self.assertIsNotNone(db.get_tenant("old.example.com").payment_failed_since)
 
 
+class TestExportBeforeOffboard(ControlPlaneTestCase):
+    def fake_bench(self):
+        calls = []
+
+        def fake_run(command, **kwargs):
+            calls.append(command)
+            return types.SimpleNamespace(returncode=0, stdout="", stderr="")
+
+        return calls, patch.object(manage_tenant.subprocess, "run", fake_run)
+
+    def test_offboard_is_refused_without_a_recent_export(self):
+        db.create_tenant("a.example.com")
+        calls, patcher = self.fake_bench()
+        with patcher:
+            with self.assertRaises(RuntimeError) as caught:
+                manage_tenant.offboard("a.example.com")
+        self.assertIn("export", str(caught.exception))
+        self.assertEqual(calls, [])  # nothing was dropped
+        self.assertNotEqual(db.get_tenant("a.example.com").status, TenantStatus.CANCELLED)
+
+    def test_an_old_export_does_not_count(self):
+        db.create_tenant("a.example.com")
+        db.mark_exported("a.example.com", utcnow() - timedelta(days=manage_tenant.EXPORT_MAX_AGE_DAYS + 1))
+        calls, patcher = self.fake_bench()
+        with patcher:
+            with self.assertRaises(RuntimeError):
+                manage_tenant.offboard("a.example.com")
+        self.assertEqual(calls, [])
+
+    def test_export_backs_up_with_files_and_unlocks_offboarding(self):
+        db.create_tenant("a.example.com")
+        calls, patcher = self.fake_bench()
+        with patcher:
+            path = manage_tenant.export_tenant("a.example.com", self._tmp.name)
+            self.assertTrue(Path(path).is_dir())
+            self.assertIn("--with-files", calls[0])
+            self.assertIn(path, calls[0])
+            manage_tenant.offboard("a.example.com")
+        self.assertIn("drop-site", calls[1])
+        self.assertEqual(db.get_tenant("a.example.com").status, TenantStatus.CANCELLED)
+
+    def test_skip_flag_and_unregistered_sites(self):
+        calls, patcher = self.fake_bench()
+        with patcher:
+            with self.assertRaises(RuntimeError):
+                manage_tenant.offboard("manual.example.com")  # unregistered: no export on record
+            manage_tenant.offboard("manual.example.com", skip_export_check=True)
+        self.assertEqual(len(calls), 1)
+
+    def test_offboard_passes_the_db_root_password_from_the_secret_file(self):
+        secret = Path(self._tmp.name) / "db_password"
+        secret.write_text("s3cret\n", encoding="utf-8")
+        db.create_tenant("a.example.com")
+        db.mark_exported("a.example.com")
+        calls, patcher = self.fake_bench()
+        with patcher, patch.dict(manage_tenant.os.environ, {"DB_PASSWORD_FILE": str(secret)}):
+            manage_tenant.offboard("a.example.com")
+        self.assertEqual(calls[0][calls[0].index("--db-root-password") + 1], "s3cret")
+
+    def test_failed_backup_records_no_export(self):
+        db.create_tenant("a.example.com")
+
+        def failing_run(command, **kwargs):
+            return types.SimpleNamespace(returncode=1, stdout="", stderr="disk full")
+
+        with patch.object(manage_tenant.subprocess, "run", failing_run):
+            with self.assertRaises(RuntimeError):
+                manage_tenant.export_tenant("a.example.com", self._tmp.name)
+        self.assertIsNone(db.get_tenant("a.example.com").exported_at)
+
+
+class TestPriceReconciliation(ControlPlaneTestCase):
+    E = webhook.WebhookEvent
+
+    def setUp(self):
+        super().setUp()
+        self.actions = FakeActions()
+        db.create_tenant("a.example.com", PlanTier.PROFESSIONAL)
+        db.set_plan_price(PlanTier.PROFESSIONAL, "try", 1500)
+
+    def pay(self, event_id, amount, currency="TRY"):
+        payload = make_payload(
+            self.E.PAYMENT_SUCCEEDED, event_id, amount=amount, currency=currency, invoice_id=f"INV-{event_id}"
+        )
+        return webhook.handle_webhook(payload, self.actions)
+
+    def test_the_exact_price_activates_the_tenant(self):
+        self.assertEqual(self.pay("e1", 1500), "applied")
+        self.assertEqual(db.get_tenant("a.example.com").status, TenantStatus.ACTIVE)
+
+    def test_an_underpayment_is_flagged_and_does_not_activate(self):
+        db.set_tenant_status("a.example.com", TenantStatus.SUSPENDED)
+        with self.assertLogs("cadro.saas.webhook", level="WARNING"):
+            self.assertEqual(self.pay("e1", 1000), "mismatch")
+        self.assertEqual(db.get_tenant("a.example.com").status, TenantStatus.SUSPENDED)
+        self.assertEqual(self.actions.calls, [])  # not reactivated
+        self.assertEqual(db.count_webhook_outcomes(), {"mismatch": 1})
+
+    def test_a_currency_without_a_price_is_flagged(self):
+        with self.assertLogs("cadro.saas.webhook", level="WARNING"):
+            self.assertEqual(self.pay("e1", 1500, currency="EUR"), "mismatch")
+        self.assertEqual(db.get_tenant("a.example.com").status, TenantStatus.TRIAL)
+
+    def test_a_flagged_invoice_can_still_be_paid_correctly_later(self):
+        with self.assertLogs("cadro.saas.webhook", level="WARNING"):
+            self.pay("e1", 1000)
+        payload = make_payload(
+            self.E.PAYMENT_SUCCEEDED, "e2", amount=1500, currency="TRY", invoice_id="INV-e1"
+        )
+        self.assertEqual(webhook.handle_webhook(payload, self.actions), "applied")
+
+    def test_no_configured_price_means_no_check(self):
+        db.create_tenant("b.example.com", PlanTier.STARTER)
+        payload = make_payload(
+            self.E.PAYMENT_SUCCEEDED, "e1", site="b.example.com", amount=1, currency="TRY", invoice_id="X"
+        )
+        self.assertEqual(webhook.handle_webhook(payload, self.actions), "applied")
+
+    def test_price_validation(self):
+        for amount in (0, -5, float("nan"), float("inf"), "10"):
+            with self.assertRaises(ValueError, msg=repr(amount)):
+                db.set_plan_price(PlanTier.STARTER, "TRY", amount)
+        for currency in ("", "T", "TRY1", "12", None):
+            with self.assertRaises(ValueError, msg=repr(currency)):
+                db.set_plan_price(PlanTier.STARTER, currency, 10)
+        db.set_plan_price(PlanTier.STARTER, "eur", 10)
+        db.set_plan_price(PlanTier.STARTER, "EUR", 12)  # replaces
+        self.assertEqual(db.get_plan_prices(PlanTier.STARTER), {"EUR": 12.0})
+
+
 SECRET = b"unit-test-secret"
 
 
@@ -522,6 +653,43 @@ class TestControlPlaneHTTP(ControlPlaneTestCase):
         self.actions.fail_on = None
         self.assertEqual(self.post(event_body()), (200, {"outcome": "applied"}))
         self.assertEqual(db.get_tenant("a.example.com").status, TenantStatus.ACTIVE)
+
+    def signed_get(self, path, secret=SECRET, timestamp=None):
+        ts = timestamp or str(int(utcnow().timestamp()))
+        signature = webhook.sign(ts, f"GET {path}".encode(), secret)
+        return self.request("GET", path, b"", signature, ts)
+
+    def test_metrics_expose_tenant_and_webhook_counters(self):
+        import http.client
+
+        self.post(event_body())  # trial -> active, one applied event
+        conn = http.client.HTTPConnection("127.0.0.1", self.port, timeout=5)
+        conn.request("GET", "/metrics")
+        response = conn.getresponse()
+        text = response.read().decode()
+        conn.close()
+        self.assertEqual(response.status, 200)
+        self.assertIn('cadro_tenants{status="active"} 1', text)
+        self.assertIn('cadro_tenants{status="trial"} 0', text)
+        self.assertIn('cadro_webhook_events_total{outcome="applied"} 1', text)
+
+    def test_signed_access_lookup(self):
+        status, body = self.signed_get("/v1/access/a.example.com")
+        self.assertEqual(status, 200)
+        self.assertEqual((body["site"], body["status"], body["can_access"]), ("a.example.com", "trial", True))
+        db.set_tenant_status("a.example.com", TenantStatus.SUSPENDED)
+        self.assertFalse(self.signed_get("/v1/access/a.example.com")[1]["can_access"])
+
+    def test_access_lookup_refuses_unsigned_forged_and_invalid_requests(self):
+        self.assertEqual(self.request("GET", "/v1/access/a.example.com")[0], 401)
+        self.assertEqual(self.signed_get("/v1/access/a.example.com", secret=b"wrong")[0], 401)
+        self.assertEqual(self.signed_get("/v1/access/nobody.example.com")[0], 404)
+        self.assertEqual(self.signed_get("/v1/access/A_b")[0], 400)
+        # A signature for one site is useless for another.
+        ts = str(int(utcnow().timestamp()))
+        signature = webhook.sign(ts, b"GET /v1/access/a.example.com", SECRET)
+        db.create_tenant("b.example.com")
+        self.assertEqual(self.request("GET", "/v1/access/b.example.com", b"", signature, ts)[0], 401)
 
     def test_secret_comes_from_a_file(self):
         secret_file = Path(self._tmp.name) / "secret"

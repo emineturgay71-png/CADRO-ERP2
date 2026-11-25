@@ -56,12 +56,12 @@ CADRO_BANKING_SRC="${CADRO_BANKING_SRC:-/home/frappe/cadro-erpnext/banking/src}"
 CADRO_STATE_DIR="${FRAPPE_BENCH_PATH}/.cadro-state"
 
 # Process role. `cadro-web` provisions/updates the bench and then serves it with gunicorn.
-# `cadro-socketio`, `cadro-worker`, `cadro-scheduler` and `cadro-backup` run the same image against the
+# `cadro-socketio`, `cadro-worker`, `cadro-scheduler`, `cadro-backup` and `cadro-control-plane` run the same image against the
 # shared bench volume and wait until the web role reports the bench ready. Any other
 # command (the image default `bench start`) is the single-container development mode.
 ROLE=""
 case "${1:-}" in
-    cadro-web|cadro-socketio|cadro-worker|cadro-scheduler|cadro-backup)
+    cadro-web|cadro-socketio|cadro-worker|cadro-scheduler|cadro-backup|cadro-control-plane)
         ROLE="${1#cadro-}"
         shift
         ;;
@@ -89,6 +89,21 @@ launch() {
         socketio) exec bench socketio ;;
         worker) exec bench worker ;;
         scheduler) exec bench schedule ;;
+        control-plane)
+            # Payment webhook receiver plus an hourly sweep that suspends overdue tenants. It runs
+            # `bench` against the shared bench volume (cwd is the bench); the tenant registry lives
+            # in its own volume so a tenant cannot change its own status.
+            export PYTHONPATH="/home/frappe/control-plane"
+            export CADRO_CONTROL_PLANE_DB="${CADRO_CONTROL_PLANE_DB:-/control-plane-data/control_plane.db}"
+            mkdir -p "$(dirname "${CADRO_CONTROL_PLANE_DB}")" || exit 1
+            (
+                while true; do
+                    sleep 3600
+                    python -m cadro.saas.control_plane sweep || echo "ERROR: overdue sweep failed" >&2
+                done
+            ) &
+            exec python -m cadro.saas.control_plane serve --host 0.0.0.0 --port "${CADRO_CONTROL_PLANE_PORT:-8090}"
+            ;;
         backup)
             # Scheduled backups into CADRO_BACKUP_DIR (a host bind mount, outside the bench
             # volume), pruned to the newest CADRO_BACKUP_KEEP backups.

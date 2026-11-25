@@ -75,6 +75,26 @@ python -m cadro.saas.manage_tenant --site cadro-tenant-001.localhost --action of
     --confirm cadro-tenant-001.localhost
 ```
 
+### Kontrol düzlemi servisi (Docker Compose)
+
+```bash
+# paylaşımlı sır (git'te yok sayılır) — ödeme adaptörü ile aynı değer
+cadro/secrets/webhook_secret
+
+docker compose -p cadro --project-directory . --env-file cadro/.env -f cadro/docker-compose.yml \
+    --profile control-plane up -d --build
+
+# kiracı kaydı ve plan fiyatı (kayıt defteri `control-plane-data` biriminde)
+docker exec -e PYTHONPATH=/home/frappe/control-plane -e CADRO_CONTROL_PLANE_DB=/control-plane-data/control_plane.db \
+    cadro-control-plane python -m cadro.saas.control_plane register --site <site> --plan starter
+```
+
+- nginx yalnızca `/cadro/webhooks/` yolunu yayımlar (`POST /cadro/webhooks/generic`, hız sınırlı, 64 KB); `/healthz`, `/metrics` ve `/v1/access/<site>` yalnızca `cadro-net` içindedir.
+- Profil verilmezse servis başlamaz ve `webhook_secret` dosyası gerekmez; webhook yolu 502 döner.
+- `payment.succeeded` tutarı plan fiyatından farklıysa sonuç `mismatch` olur (abonelik değişmez, olay kaydedilir); fiyat `set-price` ile tanımlanır.
+- `offboard` öncesi `--action export` zorunludur (en fazla 7 gün eski dışa aktarım); aksi halde reddedilir.
+- 25 Kasım 2026 canlı doğrulama (Compose, nginx üzerinden): imzasız/bayat zaman damgası 401, bilinmeyen kiracı 404, uyuşmayan `tenant_id` 400, `payment.failed` → `grace`, tekrar → `duplicate`, `payment.succeeded` → `applied` (kiracı `trial` → `active`), `/metrics` nginx üzerinden 404. İlk denemede iki hata bulundu ve düzeltildi: `/control-plane-data` birimi root sahipliydi (Dockerfile'da frappe sahipliğinde oluşturuldu) ve nginx'te `rewrite … break` sonrası `set` çalışmıyordu (`set` öne alındı).
+
 ### API koruması
 ```python
 @frappe.whitelist()
@@ -93,7 +113,7 @@ def my_endpoint():
 | Python syntax | ✅ compileall temiz |
 | Faz 0 manifesto | ✅ geçerli |
 | Faz 0 testleri | ✅ 8/8 |
-| Kontrol düzlemi testleri | ✅ 42/42 (`python -m unittest cadro.saas.test_saas`, CI'da çalışır) |
+| Kontrol düzlemi testleri | ✅ 57/57 (`python -m unittest cadro.saas.test_saas`, CI'da çalışır) |
 | Tenant modeli ve SQLite kayıt defteri | ✅ yaşam döngüsü, kota, deneme süresi |
 | Provisioning | ✅ pin doğrulaması, kayıt defterine yazma (gerçek bir bench'te çalıştırılmadı) |
 | Suspend/reactivate/offboard | ✅ yalnızca tenant sitesi değişir, kayıt defteri güncellenir (komutlar testte taklit edildi) |

@@ -180,7 +180,8 @@ def _validate(payload: WebhookPayload) -> None:
 
 def handle_webhook(payload: WebhookPayload, actions: SiteActions | None = None) -> str:
     """Apply a verified, normalized event. Returns "applied", "grace", "suspended", "recorded",
-    "ignored" or "duplicate". Raises ValueError for a bad payload and LookupError for an unknown site."""
+    "ignored", "mismatch" (amount differs from the plan price) or "duplicate". Raises ValueError for a
+    bad payload and LookupError for an unknown site."""
     _validate(payload)
     site = validate_site_name(payload.site_name)
     record = db.get_tenant(site)
@@ -205,6 +206,25 @@ def handle_webhook(payload: WebhookPayload, actions: SiteActions | None = None) 
     return outcome
 
 
+def _price_mismatch(record: TenantRecord, payload: WebhookPayload) -> str | None:
+    """Why a payment does not match the plan price, or None when it matches (or no price is configured).
+
+    The configured price is the expected amount of one billing period in a currency. A payment in
+    another amount (or in a currency without a configured price) is flagged instead of activating
+    the tenant, so an underpayment cannot unlock a plan.
+    """
+    prices = db.get_plan_prices(record.plan)
+    if not prices or payload.amount is None:
+        return None
+    currency = (payload.currency or "").upper()
+    expected = prices.get(currency)
+    if expected is None:
+        return f"no {record.plan.value} price configured in {currency or 'an unknown currency'}"
+    if abs(payload.amount - expected) > 0.01:
+        return f"paid {payload.amount:.2f} {currency}, the {record.plan.value} plan costs {expected:.2f} {currency}"
+    return None
+
+
 def _suspend(site: str, actions: SiteActions) -> None:
     actions.suspend(site)
     db.set_tenant_status(site, TenantStatus.SUSPENDED)
@@ -220,6 +240,10 @@ def _apply(record: TenantRecord, payload: WebhookPayload, actions: SiteActions) 
     if event in (WebhookEvent.PAYMENT_SUCCEEDED, WebhookEvent.SUBSCRIPTION_RENEWED):
         if payload.invoice_id and db.invoice_was_paid(payload.invoice_id):
             return "ignored"
+        mismatch = _price_mismatch(record, payload)
+        if mismatch:
+            log.warning("payment %s for %s flagged: %s", payload.event_id, site, mismatch)
+            return "mismatch"
         db.set_payment_failed_since(site, None)
         if record.status == TenantStatus.SUSPENDED:
             actions.reactivate(site)

@@ -89,6 +89,8 @@ class TenantRecord:
     quota: TenantQuota = field(default_factory=TenantQuota)
     # Set by the first failed payment, cleared by the next successful one; drives the grace period.
     payment_failed_since: datetime | None = None
+    # When the tenant's data was last exported; offboarding requires a recent export.
+    exported_at: datetime | None = None
 
     def is_active(self) -> bool:
         return self.status == TenantStatus.ACTIVE

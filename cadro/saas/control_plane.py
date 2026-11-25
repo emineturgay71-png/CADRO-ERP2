@@ -7,9 +7,16 @@ Run next to the bench (suspending or reactivating a site calls `bench`):
         python -m cadro.saas.control_plane serve --host 127.0.0.1 --port 8090
 
     python -m cadro.saas.control_plane sweep        # hourly, e.g. from cron
+    python -m cadro.saas.control_plane register --site <site> --plan starter
+    python -m cadro.saas.control_plane set-price --plan starter --amount 10 --currency USD
+    python -m cadro.saas.control_plane list
 
 Endpoints:
     GET  /healthz            -> 200 {"status": "ok"}
+    GET  /metrics            -> Prometheus text: tenants by status, webhook events by outcome
+                                (internal network only; nginx does not publish it)
+    GET  /v1/access/<site>   -> signed lookup {site, plan, status, can_access}; the signature covers
+                                "GET <path>" (see cadro.saas.webhook.sign)
     POST /webhooks/generic   -> CADRO signed JSON; headers X-Cadro-Timestamp and X-Cadro-Signature
                                 (see cadro.saas.webhook.sign)
 
@@ -32,11 +39,30 @@ import sys
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from pathlib import Path
 
-from cadro.saas import webhook
+from cadro.saas import db, webhook
+from cadro.saas.tenant import PlanTier, TenantStatus, validate_site_name
 
 log = logging.getLogger("cadro.saas.control_plane")
 
 MAX_BODY_BYTES = 64 * 1024
+
+
+def render_metrics() -> str:
+    """Prometheus text exposition of tenant and webhook counters (internal network only)."""
+    lines = [
+        "# HELP cadro_tenants Registered tenants by lifecycle status.",
+        "# TYPE cadro_tenants gauge",
+    ]
+    by_status = db.count_tenants_by_status()
+    for status in TenantStatus:
+        lines.append(f'cadro_tenants{{status="{status.value}"}} {by_status.get(status.value, 0)}')
+    lines += [
+        "# HELP cadro_webhook_events_total Payment webhook events by outcome.",
+        "# TYPE cadro_webhook_events_total counter",
+    ]
+    for outcome, count in sorted(db.count_webhook_outcomes().items()):
+        lines.append(f'cadro_webhook_events_total{{outcome="{outcome}"}} {count}')
+    return "\n".join(lines) + "\n"
 
 
 def load_secret() -> bytes:
@@ -68,8 +94,50 @@ def make_handler(secret: bytes, actions: webhook.SiteActions | None = None):
         def do_GET(self):
             if self.path == "/healthz":
                 self._reply(200, {"status": "ok"})
+            elif self.path == "/metrics":
+                self._reply_text(200, render_metrics())
+            elif self.path.startswith("/v1/access/"):
+                self._access(self.path[len("/v1/access/") :])
             else:
                 self._reply(404, {"error": "not found"})
+
+        def _reply_text(self, status: int, text: str) -> None:
+            data = text.encode()
+            self.send_response(status)
+            self.send_header("Content-Type", "text/plain; version=0.0.4; charset=utf-8")
+            self.send_header("Content-Length", str(len(data)))
+            self.end_headers()
+            self.wfile.write(data)
+
+        def _access(self, site: str) -> None:
+            """Signed lookup of a tenant's access state, for components outside the control plane."""
+            try:
+                webhook.verify_signature(
+                    f"GET {self.path}".encode(),
+                    self.headers.get("X-Cadro-Signature", ""),
+                    self.headers.get("X-Cadro-Timestamp", ""),
+                    secret,
+                )
+            except webhook.InvalidSignature:
+                self._reply(401, {"error": "invalid signature"})
+                return
+            try:
+                record = db.get_tenant(validate_site_name(site))
+            except ValueError:
+                self._reply(400, {"error": "invalid site name"})
+                return
+            if record is None:
+                self._reply(404, {"error": "unknown tenant"})
+                return
+            self._reply(
+                200,
+                {
+                    "site": record.site_name,
+                    "plan": record.plan.value,
+                    "status": record.status.value,
+                    "can_access": record.can_access(),
+                },
+            )
 
         def do_POST(self):
             if self.path != "/webhooks/generic":
@@ -125,16 +193,33 @@ def main() -> None:
     serve_parser.add_argument("--host", default="127.0.0.1")
     serve_parser.add_argument("--port", type=int, default=8090)
     sub.add_parser("sweep", help="suspend tenants whose trial or payment grace period ended")
+    register = sub.add_parser("register", help="register a tenant site (starts a 14-day trial)")
+    register.add_argument("--site", required=True)
+    register.add_argument("--plan", default="starter", choices=[p.value for p in PlanTier])
+    price = sub.add_parser("set-price", help="set the expected price of one billing period of a plan")
+    price.add_argument("--plan", required=True, choices=[p.value for p in PlanTier])
+    price.add_argument("--currency", required=True)
+    price.add_argument("--amount", required=True, type=float)
+    sub.add_parser("list", help="list registered tenants")
     args = parser.parse_args()
 
     logging.basicConfig(level=logging.INFO, format="%(asctime)s %(levelname)s %(name)s %(message)s")
     try:
         if args.command == "serve":
             serve(args.host, args.port)
+        elif args.command == "register":
+            record = db.create_tenant(validate_site_name(args.site), PlanTier(args.plan))
+            print(f"Registered {record.site_name} ({record.plan.value}), trial until {record.trial_ends_at:%Y-%m-%d}")
+        elif args.command == "set-price":
+            db.set_plan_price(PlanTier(args.plan), args.currency, args.amount)
+            print(f"{args.plan}: {args.amount:.2f} {args.currency.upper()} per billing period")
+        elif args.command == "list":
+            for record in db.list_tenants():
+                print(f"{record.site_name}\t{record.plan.value}\t{record.status.value}")
         else:
             suspended = webhook.sweep_overdue()
             print(f"Suspended {len(suspended)} tenant(s): {', '.join(suspended) or '-'}")
-    except (RuntimeError, OSError) as error:
+    except (RuntimeError, OSError, ValueError) as error:
         print(f"ERROR: {error}", file=sys.stderr)
         sys.exit(1)
 

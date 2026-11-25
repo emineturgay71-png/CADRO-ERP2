@@ -50,6 +50,10 @@ WORKDIR /home/${FRAPPE_USER}
 # Mount point of the persistent bench volume; created here so the volume is owned by frappe.
 # (bench init refuses an existing directory, so the bench is a sub-directory of the mount.)
 RUN mkdir -p /home/${FRAPPE_USER}/cadro-data
+# Mount point of the control-plane registry volume (same reason).
+USER root
+RUN mkdir -p /control-plane-data && chown ${FRAPPE_USER}:${FRAPPE_USER} /control-plane-data
+USER ${FRAPPE_USER}
 
 # Install bench CLI and ensure it's on PATH
 RUN pip install --user frappe-bench
@@ -71,6 +75,9 @@ COPY --chown=${FRAPPE_USER}:${FRAPPE_USER} cadro.baseline.json /home/${FRAPPE_US
 COPY --chown=${FRAPPE_USER}:${FRAPPE_USER} scripts/healthcheck.py /home/${FRAPPE_USER}/scripts/healthcheck.py
 # Backup and restore tooling: docker exec cadro-bench bash scripts/backup_site.sh <site>
 COPY --chown=${FRAPPE_USER}:${FRAPPE_USER} scripts/backup_site.sh scripts/restore_site.sh /home/${FRAPPE_USER}/scripts/
+# Control plane (tenant registry, payment webhooks, overdue sweep). The `cadro-control-plane`
+# role runs it next to the bench, with its registry in a volume of its own.
+COPY --chown=${FRAPPE_USER}:${FRAPPE_USER} cadro/saas/ /home/${FRAPPE_USER}/control-plane/cadro/saas/
 # CADRO's erpnext package (the repo is a fork of the pinned upstream commit). The entrypoint
 # overlays it onto the upstream app after checking out the pinned commit, so the running
 # code is exactly this repository, including erpnext/locale/tr.po.

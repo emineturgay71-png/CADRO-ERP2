@@ -206,6 +206,44 @@ services:
     networks:
       - cadro-net
 
+  # Control plane: payment webhooks, tenant registry, overdue sweep. Optional; start it with
+  #   docker compose ... --profile control-plane up -d
+  # Needs cadro/secrets/webhook_secret (shared secret with the payment adapter; git-ignored).
+  # nginx publishes only /cadro/webhooks/; /healthz, /metrics and /v1 are internal to cadro-net.
+  control-plane:
+    profiles: ["control-plane"]
+    image: cadro-bench:${CADRO_IMAGE_TAG:-eval}
+    container_name: cadro-control-plane
+    restart: unless-stopped
+    command: ["cadro-control-plane"]
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      <<: *bench-env
+      CADRO_WEBHOOK_SECRET_FILE: /run/secrets/webhook_secret
+    secrets:
+      - db_password
+      - admin_password
+      - webhook_secret
+    expose:
+      - "8090"
+    volumes:
+      - bench-data:/home/frappe/cadro-data
+      - control-plane-data:/control-plane-data
+    mem_limit: 256m
+    healthcheck:
+      test:
+        - CMD
+        - python
+        - -c
+        - "import urllib.request,sys; sys.exit(0 if urllib.request.urlopen('http://127.0.0.1:8090/healthz', timeout=5).status == 200 else 1)"
+      interval: 30s
+      retries: 5
+      start_period: 600s
+    networks:
+      - cadro-net
+
   # Public entry point: static assets and files, application and realtime proxy.
   nginx:
     image: nginx:1.27-alpine@sha256:65645c7bb6a0661892a8b03b89d0743208a18dd2f3f17a54ef4b76fb8e2f2a10
@@ -236,10 +274,13 @@ secrets:
     file: ./cadro/secrets/db_password
   admin_password:
     file: ./cadro/secrets/admin_password
+  webhook_secret:
+    file: ./cadro/secrets/webhook_secret
 
 volumes:
   db-data:
   bench-data:
+  control-plane-data:
 
 networks:
   cadro-net:
