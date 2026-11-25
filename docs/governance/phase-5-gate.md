@@ -104,7 +104,19 @@ def my_endpoint():
     ...
 ```
 
-**Sınır:** Bu dekoratör kontrol düzlemi veritabanını (`cadro.saas.db`) okur. `cadro/` paketi bench imajında bulunmadığı için dekoratör bugünkü imajda çalıştırılamaz; kontrol düzlemi ayrı servis olarak kurulduğunda bir API üzerinden sorgulamalıdır. Bugün askıya alma `maintenance_mode` ile siteye uygulanır.
+**Sınır:** Bu dekoratör kontrol düzlemi veritabanını (`cadro.saas.db`) okur. `cadro/` paketi bench imajında bulunmadığı için dekoratör bugünkü imajda çalıştırılamaz; kontrol düzlemi ayrı servis olarak kurulduğunda bir API üzerinden sorgulamalıdır. Bugün askıya alma site yapılandırmasıyla (`maintenance_mode` + `allow_reads_during_maintenance=0`) uygulanır.
+
+### Canlı kiracı yaşam döngüsü doğrulamas (25 Kasım 2026, atılabilir `cadro-sus.localhost`)
+
+Süreç: site kurulur, kontrol düzlemine kaydedilir, deneme süresi geçmişe çekilip `sweep` çalıştırılır, askıya alınan site ve pilot HTTP ile denenir, yeniden etkinleştirilir, dışa aktarılır ve offboard edilir. Doğrulanan: `sweep` süresi dolan denemeyi askıya alır; pilot site askıdan etkilenmez; dışa aktarma olmadan offboard reddedilir; dışa aktarma + offboard çalışır ve kayıt defteri `cancelled` olur. Bulunan ve düzeltilen üç hata:
+
+| Hata | Düzeltme |
+| --- | --- |
+| `maintenance_mode` tek başına yetmiyor: bu Frappe sürümü bakım sırasında okumaya izin verir (`allow_reads_during_maintenance` varsayılan açık). Askıdaki kiracıda `/login`, `/api/method/ping` 200 dönüyor, askıdan önce açılmış oturumlar veriyi okumaya devam edebilirdi (yeni giriş yazma gerektirdiğinden 503 alıyordu) | `suspend` artık `allow_reads_during_maintenance=0` da yazar; tüm istekler 503 (`SessionStopped`), `reactivate` geri alır |
+| Bench `new-site`, site veritabanı kullanıcısını yalnızca süreci çalıştıran konteynerın IP'sine yetkilendirir (örn. `_35ad…@172.18.0.12`). `worker`, `scheduler`, `backup` ve `control-plane` konteynerleri farklı IP'dedir: `Access denied` ile arka plan işleri, yedek ve `export` başarısız olurdu; konteyner yeniden oluşursa web süreci de erişimi kaybederdi | `provision_site.py` ve `entrypoint.sh` `new-site`'a `--mariadb-user-host-login-scope '%'` geçirir (veritabanı yalnızca `cadro-net` içinden erişilebilir; kullanıcı parolası rastgele). Pilot sitenin kullanıcısı zaten `%` ana makinesine sahiptir, etkilenmez; **bu sürümden önce `new-site` ile kurulmuş siteler** için kullanıcı ana makinesi elle `%`'e genişletilmelidir |
+| `bench` hatası stderr boşken nedeni göstermiyordu (`backup failed:` ve boş); başarısız dışa aktarma yarım dizin bırakıyordu | Hata iletisi stdout'a düşer; başarısız dışa aktarma dizini siler |
+
+**Yayılma gecikmesi:** Frappe site yapılandırmasını her gunicorn işçisinde 60 sn önbellekler (`site_cache(ttl=60)`). Askıya alma ve yeniden etkinleştirme bu yüzden en fazla ~60 sn içinde tüm işçilerde etkili olur (62 sn sonra 12/12 istek tutarlı ölçüldü; aradaki sürede istekler işçiye göre 200/503 karışık döner). Bu bilinen ve kabul edilen bir sınırdır; anında kesme gerekirse nginx'te kiracı bazlı engel gerekir.
 
 ## Doğrulama
 
@@ -116,7 +128,7 @@ def my_endpoint():
 | Kontrol düzlemi testleri | ✅ 57/57 (`python -m unittest cadro.saas.test_saas`, CI'da çalışır) |
 | Tenant modeli ve SQLite kayıt defteri | ✅ yaşam döngüsü, kota, deneme süresi |
 | Provisioning | ✅ pin doğrulaması, kayıt defterine yazma (gerçek bir bench'te çalıştırılmadı) |
-| Suspend/reactivate/offboard | ✅ yalnızca tenant sitesi değişir, kayıt defteri güncellenir (komutlar testte taklit edildi) |
+| Suspend/reactivate/offboard | ✅ yalnızca tenant sitesi değişir, kayıt defteri güncellenir; canlı doğrulandı (aşağıda) |
 | Ödeme webhook | ✅ `handle_webhook` ve HTTP alıcı uygulanıp test edildi (23 yeni test, gerçek yerel HTTP sunucusu dahil); somut bir ödeme sağlayıcısı bağlanmadı (bkz. “Ödeme webhook'u”) |
 
 ### 23-24 Kasım 2026 incelemesinde bulunan ve düzeltilenler

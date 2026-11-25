@@ -272,7 +272,10 @@ bench build || {
     echo "WARNING: bench build had issues, trying to continue..."
 }
 
-# Create site (skip if exists)
+# Create site (skip if exists). The site's database user is granted for any host ('%'): bench
+# otherwise grants it only to the IP of this container, and the worker, scheduler, backup and
+# control-plane containers (and this one after it is recreated) would be denied. The database is
+# reachable only inside the private compose network.
 if [ ! -f "${FRAPPE_BENCH_PATH}/sites/${SITE_NAME}/site_config.json" ]; then
     bench new-site "${SITE_NAME}" \
         --db-type mariadb \
@@ -281,6 +284,7 @@ if [ ! -f "${FRAPPE_BENCH_PATH}/sites/${SITE_NAME}/site_config.json" ]; then
         --db-root-password "${DB_PASSWORD}" \
         --admin-password "${ADMIN_PASSWORD}" \
         --mariadb-root-username root \
+        --mariadb-user-host-login-scope '%' \
         --no-mariadb-socket
 else
     echo "Site ${SITE_NAME} already exists, skipping creation."

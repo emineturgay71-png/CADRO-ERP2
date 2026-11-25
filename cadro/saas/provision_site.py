@@ -89,6 +89,10 @@ def provision(site: str, admin_password: str, db_password: str, plan: PlanTier) 
         "--db-root-password", db_password,
         "--admin-password", admin_password,
         "--mariadb-root-username", "root",
+        # bench otherwise grants the site's database user only to this container's IP; the worker,
+        # scheduler, backup and control-plane containers would be denied. The database is reachable
+        # only inside the private compose network.
+        "--mariadb-user-host-login-scope", "%",
     )
     bench("--site", site, "install-app", "erpnext")
 

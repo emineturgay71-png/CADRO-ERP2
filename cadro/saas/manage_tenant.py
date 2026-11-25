@@ -16,6 +16,7 @@ from __future__ import annotations
 
 import argparse
 import os
+import shutil
 import subprocess
 import sys
 from datetime import timedelta
@@ -31,7 +32,8 @@ EXPORT_MAX_AGE_DAYS = 7
 def bench(*args: str, check: bool = True) -> subprocess.CompletedProcess:
     result = subprocess.run(["bench", *args], capture_output=True, text=True, check=False)
     if check and result.returncode != 0:
-        raise RuntimeError(f"bench {' '.join(args[:3])} failed: {result.stderr.strip()[-400:]}")
+        detail = (result.stderr.strip() or result.stdout.strip())[-400:]
+        raise RuntimeError(f"bench {' '.join(args[:3])} failed: {detail}")
     return result
 
 
@@ -44,7 +46,11 @@ def _record_status(site: str, status: TenantStatus) -> None:
 
 
 def suspend(site: str) -> None:
-    """Suspend a tenant: the site answers with the maintenance page until it is reactivated.
+    """Suspend a tenant: every request to the site answers 503 until it is reactivated.
+
+    `maintenance_mode` alone is not enough: this Frappe keeps serving reads during maintenance
+    (`allow_reads_during_maintenance` defaults to true), so a session opened before the
+    suspension could still read the tenant's data. Reads are therefore switched off too.
 
     Only the tenant's own site configuration is changed. Global settings (-g) would affect
     every other tenant on the bench.
@@ -52,6 +58,7 @@ def suspend(site: str) -> None:
     validate_site_name(site)
     print(f"Suspending site '{site}' ...")
     bench("--site", site, "set-config", "maintenance_mode", "1")
+    bench("--site", site, "set-config", "allow_reads_during_maintenance", "0")
     bench("--site", site, "set-config", "disable_website", "1")
     _record_status(site, TenantStatus.SUSPENDED)
     print(f"Site '{site}' suspended.")
@@ -62,6 +69,7 @@ def reactivate(site: str) -> None:
     validate_site_name(site)
     print(f"Reactivating site '{site}' ...")
     bench("--site", site, "set-config", "maintenance_mode", "0")
+    bench("--site", site, "set-config", "allow_reads_during_maintenance", "1")
     bench("--site", site, "set-config", "disable_website", "0")
     _record_status(site, TenantStatus.ACTIVE)
     print(f"Site '{site}' reactivated.")
@@ -78,7 +86,11 @@ def export_tenant(site: str, dest: str) -> str:
     path = Path(dest) / f"{site}-{stamp}"
     path.mkdir(parents=True, exist_ok=False)
     print(f"Exporting '{site}' to {path} ...")
-    bench("--site", site, "backup", "--with-files", "--backup-path", str(path))
+    try:
+        bench("--site", site, "backup", "--with-files", "--backup-path", str(path))
+    except RuntimeError:
+        shutil.rmtree(path, ignore_errors=True)  # no half-made export is left behind
+        raise
     try:
         db.mark_exported(site)
     except LookupError:

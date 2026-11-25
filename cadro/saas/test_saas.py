@@ -105,6 +105,15 @@ class TestManageTenant(ControlPlaneTestCase):
         self.assertFalse(any(" -g " in f" {call} " for call in flat), flat)
         self.assertEqual(db.get_tenant("a.example.com").status, TenantStatus.SUSPENDED)
 
+    def test_suspend_blocks_reads_and_reactivate_restores_them(self):
+        db.create_tenant("a.example.com")
+        suspended = [" ".join(call) for call in self.run_manage("suspend")]
+        self.assertIn("bench --site a.example.com set-config maintenance_mode 1", suspended)
+        self.assertIn("bench --site a.example.com set-config allow_reads_during_maintenance 0", suspended)
+        reactivated = [" ".join(call) for call in self.run_manage("reactivate")]
+        self.assertIn("bench --site a.example.com set-config maintenance_mode 0", reactivated)
+        self.assertIn("bench --site a.example.com set-config allow_reads_during_maintenance 1", reactivated)
+
     def test_reactivate_and_offboard_update_the_registry(self):
         db.create_tenant("a.example.com")
         self.run_manage("suspend")
@@ -162,6 +171,8 @@ class TestProvisionSite(ControlPlaneTestCase):
                 patch.object(provision_site, "bench", fake_bench):
             provision_site.provision("a.example.com", "pw", "dbpw", PlanTier.ENTERPRISE)
         self.assertEqual(commands[0][0], "new-site")
+        scope = commands[0].index("--mariadb-user-host-login-scope")
+        self.assertEqual(commands[0][scope + 1], "%")
         self.assertNotIn("-g", [part for command in commands for part in command])
         self.assertEqual(db.get_tenant("a.example.com").quota.max_companies, 10)
 
@@ -464,9 +475,20 @@ class TestExportBeforeOffboard(ControlPlaneTestCase):
             return types.SimpleNamespace(returncode=1, stdout="", stderr="disk full")
 
         with patch.object(manage_tenant.subprocess, "run", failing_run):
-            with self.assertRaises(RuntimeError):
+            with self.assertRaises(RuntimeError) as caught:
                 manage_tenant.export_tenant("a.example.com", self._tmp.name)
+        self.assertIn("disk full", str(caught.exception))
+        self.assertEqual(list(Path(self._tmp.name).glob("a.example.com-*")), [])  # no half-made export left
         self.assertIsNone(db.get_tenant("a.example.com").exported_at)
+
+    def test_bench_error_falls_back_to_stdout_when_stderr_is_empty(self):
+        def failing_run(command, **kwargs):
+            return types.SimpleNamespace(returncode=1, stdout="mariadb-dump: Access denied", stderr="")
+
+        with patch.object(manage_tenant.subprocess, "run", failing_run):
+            with self.assertRaises(RuntimeError) as caught:
+                manage_tenant.bench("--site", "a.example.com", "backup")
+        self.assertIn("Access denied", str(caught.exception))
 
 
 class TestPriceReconciliation(ControlPlaneTestCase):
