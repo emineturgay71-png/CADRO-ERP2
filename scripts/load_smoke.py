@@ -26,6 +26,14 @@ ENDPOINTS = {
     "login page (public)": ("GET", "/login", False),
     "list Account (auth)": ("GET", "/api/resource/Account?limit_page_length=50&fields=%5B%22name%22%2C%22root_type%22%5D", True),
     "list DocType (auth)": ("GET", "/api/resource/DocType?limit_page_length=100", True),
+    # Volume endpoints: meaningful once the site holds many rows (scripts/seed_load_data.py).
+    "list Sales Invoice (auth)": (
+        "GET",
+        "/api/resource/Sales%20Invoice?limit_page_length=50&order_by=posting_date%20desc"
+        "&fields=%5B%22name%22%2C%22customer%22%2C%22grand_total%22%2C%22posting_date%22%5D",
+        True,
+    ),
+    "count GL Entry (auth)": ("GET", "/api/method/frappe.client.get_count?doctype=GL%20Entry", True),
 }
 
 

@@ -81,9 +81,9 @@ FRAPPE_COMMIT=$(python scripts/ci_pin_resolver.py --component frappe)
 | CI entegrasyonu | ✅ `.github/workflows/cadro-image.yml` (baseline doğrulama, compose/entrypoint denetimi, imaj build, SBOM) — GitHub'da henüz çalıştırılmadı |
 | Canlı Bench testleri | ✅ MariaDB + PostgreSQL (bkz. Faz 1) |
 | CADRO imaj etiketi | ✅ Etiket `CADRO_IMAGE_TAG` ile verilir (varsayılan `eval`); `python scripts/cadro_version.py` commit'ten etiket üretir (`-dirty` ekli imaj sürüm olarak kullanılamaz; `--require-clean` bunu reddeder, `--report` JSON sürüm kaydı verir). Kayıt defterine gönderme ve sürüm numaralandırma kararı bekliyor |
-| Yük ve kapasite testi | ⚠️ Duman düzeyinde taban değerler çıkarıldı (aşağıda); gerçek veriyle yük testi yapılmadı |
+| Yük ve kapasite testi | ⚠️ Duman düzeyinde ve hacimli (1500 fatura) okuma taban değerleri çıkarıldı (aşağıda); çok kullanıcılı yazma/rapor yükü ölçülmedi |
 | Yedekleme/geri yükleme tatbikatı | ✅ 23 Kasım 2026, ayrıntılar aşağıda |
-| Zamanlanmış yedek ve site dışı kopya | ✅ `backup` servisi: günde bir, son 14 yedek, ana makine dizinine (`cadro/backups`, bench volume'u dışında). Her yedek önce doğrulanır (`verify_backup.sh`); yalnızca doğrulanan yedek `<dizin>/.last_verified_backup` işaretini günceller, budamaya ve yüklemeye girer. `CADRO_BACKUP_UPLOAD_COMMAND` (örn. rclone/aws/rsync çağrısı; `CADRO_BACKUP_PATH` ile doğrulanmış dizini alır) site dışı kopya için kancadır; başarısız yükleme raporlanır, hiçbir şey silmez. Kanca canlı denendi (25 Kasım 2026: yedek alındı, doğralandı, kopyalandı; bozuk kopya ve eksik manifesto reddedildi). Gerçek uzak depolama (sağlayıcı/kimlik bilgisi) henüz yok |
+| Zamanlanmış yedek ve site dışı kopya | ✅ `backup` servisi: günde bir, son 14 yedek, ana makine dizinine (`cadro/backups`, bench volume'u dışında). Her yedek önce doğrulanır (`verify_backup.sh`); yalnızca doğrulanan yedek `<dizin>/.last_verified_backup` işaretini günceller, budamaya ve yüklemeye girer. `CADRO_BACKUP_UPLOAD_COMMAND` (örn. rclone/aws/rsync çağrısı; `CADRO_BACKUP_PATH` ile doğrulanmış dizini alır) site dışı kopya için kancadır; başarısız yükleme raporlanır, hiçbir şey silmez. Kanca canlı denendi (25 Kasım 2026: yedek alındı, doğrulandı, kopyalandı; bozuk kopya ve eksik manifesto reddedildi). Gerçek uzak depolama (sağlayıcı/kimlik bilgisi) henüz yok |
 | TLS | ✅ Kod hazır: `docker-compose.tls.yml` (443 + 80 yönlendirme, TLS 1.2/1.3, HSTS); kendinden imzalı sertifikayla canlı doğrulandı (HTTPS 200, 301 yönlendirme, HSTS başlığı). CA sertifikası, yenileme, WAF/CDN yok. Yönlendirme `$host` kullandığından standart portlar varsayılır |
 | İzleme/alarm | ⏳ Yapılmadı (kontrol düzlemi `/metrics` ve `.last_verified_backup` izleme yığını için hazır kaynaktır) |
 
@@ -135,11 +135,26 @@ Gunicorn 3 işçi × 4 iş parçacığı ile çalışır; sayfa oluşturma (`/lo
 
 Bulunan ve düzeltilen: nginx başlangıçta `bench` adresini bir kez çözüyordu; `bench` konteyneri yeniden oluşturulunca eski IP'ye bağlı kalıp `502` veriyordu. Artık adresler istek anında Docker DNS ile çözülür (`resolver 127.0.0.11`); `bench` yeniden oluşturulduktan sonra `ping` `200` döndü.
 
+### Hacimli veriyle yük taban değerleri (25 Kasım 2026)
+
+`scripts/seed_load_data.py` pilot yedeğinden geri yüklenen atılabilir bir siteyi (`cadro-load.localhost`; adı `load` içermeyen siteyi `--force` olmadan reddeder) 300 müşteri, 50 tedarikçi, 300 hizmet kalemi ve 1500 onaylı satış faturasıyla doldurur (tekrar çalıştırmak eksik olanı tamamlar). Kurulum: yedeği `docker cp` ile konteynere alıp `restore`, ardından `cd $FRAPPE_BENCH_PATH/sites && ../env/bin/python /home/frappe/scripts/seed_load_data.py --site cadro-load.localhost`.
+
+`load_smoke.py`, nginx üzerinden, tek Windows makinede, her düzeyde 10 sn:
+
+| Uç nokta | 5 eşzamanlı | 20 eşzamanlı |
+| --- | --- | --- |
+| Satış Faturası listesi (50 satır, sıralı) | ~280 istek/sn, p95 32 ms | ~440 istek/sn, p95 78 ms |
+| `GL Entry` sayısı | ~340 istek/sn, p95 31 ms | ~490 istek/sn, p95 78 ms |
+| Hesap / DocType listesi | ~320–340 istek/sn | ~450–480 istek/sn |
+| `/login` sayfası | ~75 istek/sn, p95 109 ms | ~78 istek/sn, p95 532 ms |
+
+1500 fatura, hacimli listelerde belirgin bir yavaşlama yaratmadı; 20 eşzamanlıda DocType listesinde 1 hata görüldü (nedeni incelenmedi, tekrarlanmadı). Hâlâ tek makine, tek kullanıcı oturumu ve okuma ağırlıklı yük; çok kullanıcılı yazma iş akışları, raporlar ve import yükleri ölçülmedi.
+
 | Madde | Açıklama |
 | --- | --- |
 | Vault / secret manager | Docker secret dosyaları yerine merkezi sır yönetimi |
 | Sürüm numaralandırma ve kayıt defteri | Etiket değişkeni hazır; hangi sürüm şemasının ve deponun kullanılacağı kararı |
-| Gerçek veriyle yük ve kapasite testi | Gerçek import/mutabakat yükleri ve çok kullanıcılı senaryolar |
+| Gerçek veriyle yük ve kapasite testi | Hacimli okuma yükü ölçüldü (yukarıda); çok kullanıcılı yazma, rapor ve import senaryoları ile üretim donanımı kaldı |
 | TLS, WAF/CDN, izleme | Dış ters vekil, sertifikalar, alarm |
 | Yedeklerin makine dışına kopyalanması | Nesne depolama veya ikinci disk; geri yükleme tatbikatının periyodik tekrarı |
 | Kalan zafiyetlerin risk kabulü | Düzeltmesi olmayan OS paketleri |
