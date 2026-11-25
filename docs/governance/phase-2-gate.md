@@ -15,6 +15,11 @@ Durum: **Altyapı kuruldu ve pilot üzerinde çalışıyor. Üretim sertleştirm
 | `cadro/entrypoint.sh` | İlk çalıştırmada Bench provisioning; `cadro.baseline.json` pin'lerini kullanır |
 | `cadro/mariadb/conf.d/cadro.cnf` | UTF8mb4, 512M buffer pool, staging uygunluk ayarları |
 | `scripts/backup_site.sh` | Site bazlı veritabanı + dosya yedeği; metadata dosyası üretir |
+| `scripts/verify_backup.sh` | Yedeği siteye dokunmadan doğrular: SHA256SUMS, gzip bütünlüğü, gerekli dosyalar, metadata JSON |
+| `cadro/nginx/cadro-server.inc` | HTTP ve TLS sunucularının ortak gövdesi (konumlar, başlıklar, vekil) |
+| `cadro/nginx/cadro-tls.conf`, `cadro/docker-compose.tls.yml` | İsteğe bağlı TLS sonlandırma (443) ve 80 → HTTPS yönlendirmesi |
+| `scripts/make_self_signed_cert.sh` | Staging için kendinden imzalı sertifika (`cadro/certs/`, git dışı) |
+| `scripts/cadro_version.py` | Git durumundan imaj etiketi (`<commit>` / `<commit>-dirty`) ve JSON sürüm kaydı |
 | `scripts/restore_site.sh` | Onaylı geri yükleme; site verisini tamamen değiştirir |
 | `scripts/healthcheck.py` | Docker HEALTHCHECK için Redis/DB/scheduler denetimi |
 | `scripts/ci_pin_resolver.py` | `cadro.baseline.json`'dan CI ortam değişkeni için commit SHA çözücü |
@@ -75,11 +80,12 @@ FRAPPE_COMMIT=$(python scripts/ci_pin_resolver.py --component frappe)
 | CVE taraması | ✅ Aşağıya bakın |
 | CI entegrasyonu | ✅ `.github/workflows/cadro-image.yml` (baseline doğrulama, compose/entrypoint denetimi, imaj build, SBOM) — GitHub'da henüz çalıştırılmadı |
 | Canlı Bench testleri | ✅ MariaDB + PostgreSQL (bkz. Faz 1) |
-| CADRO imaj etiketi | ✅ Etiket `CADRO_IMAGE_TAG` ile verilir (varsayılan `eval`); örnek: `CADRO_IMAGE_TAG=$(git rev-parse --short HEAD)`. Kayıt defterine gönderme ve sürüm numaralandırma kararı bekliyor |
+| CADRO imaj etiketi | ✅ Etiket `CADRO_IMAGE_TAG` ile verilir (varsayılan `eval`); `python scripts/cadro_version.py` commit'ten etiket üretir (`-dirty` ekli imaj sürüm olarak kullanılamaz; `--require-clean` bunu reddeder, `--report` JSON sürüm kaydı verir). Kayıt defterine gönderme ve sürüm numaralandırma kararı bekliyor |
 | Yük ve kapasite testi | ⚠️ Duman düzeyinde taban değerler çıkarıldı (aşağıda); gerçek veriyle yük testi yapılmadı |
 | Yedekleme/geri yükleme tatbikatı | ✅ 23 Kasım 2026, ayrıntılar aşağıda |
-| Zamanlanmış yedek ve site dışı kopya | ✅ `backup` servisi: günde bir, son 14 yedek, ana makine dizinine (`cadro/backups`, bench volume'u dışında). Makine dışına kopyalama (nesne depolama, başka disk) hâlâ yok |
-| TLS / harici ters vekil, izleme/alarm | ⏳ Yapılmadı |
+| Zamanlanmış yedek ve site dışı kopya | ✅ `backup` servisi: günde bir, son 14 yedek, ana makine dizinine (`cadro/backups`, bench volume'u dışında). Her yedek önce doğrulanır (`verify_backup.sh`); yalnızca doğrulanan yedek `<dizin>/.last_verified_backup` işaretini günceller, budamaya ve yüklemeye girer. `CADRO_BACKUP_UPLOAD_COMMAND` (örn. rclone/aws/rsync çağrısı; `CADRO_BACKUP_PATH` ile doğrulanmış dizini alır) site dışı kopya için kancadır; başarısız yükleme raporlanır, hiçbir şey silmez. Kanca canlı denendi (25 Kasım 2026: yedek alındı, doğralandı, kopyalandı; bozuk kopya ve eksik manifesto reddedildi). Gerçek uzak depolama (sağlayıcı/kimlik bilgisi) henüz yok |
+| TLS | ✅ Kod hazır: `docker-compose.tls.yml` (443 + 80 yönlendirme, TLS 1.2/1.3, HSTS); kendinden imzalı sertifikayla canlı doğrulandı (HTTPS 200, 301 yönlendirme, HSTS başlığı). CA sertifikası, yenileme, WAF/CDN yok. Yönlendirme `$host` kullandığından standart portlar varsayılır |
+| İzleme/alarm | ⏳ Yapılmadı (kontrol düzlemi `/metrics` ve `.last_verified_backup` izleme yığını için hazır kaynaktır) |
 
 ### Zafiyet taraması (Trivy, `cadro-bench:eval`)
 

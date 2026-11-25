@@ -181,7 +181,8 @@ services:
 
   # Scheduled site backups into a host directory (outside the bench volume), with retention.
   # CADRO_BACKUP_DIR (host path, default ./cadro/backups), CADRO_BACKUP_KEEP (default 14),
-  # CADRO_BACKUP_INTERVAL_HOURS (default 24). On Linux hosts the directory must be writable
+  # CADRO_BACKUP_INTERVAL_HOURS (default 24), CADRO_BACKUP_UPLOAD_COMMAND (optional off-host copy,
+  # run after a backup verified, with CADRO_BACKUP_PATH set to it). On Linux hosts the directory must be writable
   # by uid 1000. Copy it off the machine as well (object storage, another disk).
   backup:
     image: cadro-bench:${CADRO_IMAGE_TAG:-eval}
@@ -196,6 +197,7 @@ services:
       CADRO_BACKUP_DIR: /backups
       CADRO_BACKUP_KEEP: ${CADRO_BACKUP_KEEP:-14}
       CADRO_BACKUP_INTERVAL_HOURS: ${CADRO_BACKUP_INTERVAL_HOURS:-24}
+      CADRO_BACKUP_UPLOAD_COMMAND: ${CADRO_BACKUP_UPLOAD_COMMAND:-}
     secrets:
       - db_password
       - admin_password
@@ -257,6 +259,7 @@ services:
     volumes:
       - bench-data:/home/frappe/cadro-data:ro
       - ./cadro/nginx/cadro.conf:/etc/nginx/conf.d/default.conf:ro
+      - ./cadro/nginx/cadro-server.inc:/etc/nginx/cadro/cadro-server.inc:ro
     healthcheck:
       test: ["CMD", "wget", "-qO-", "--header=Host: ${SITE_NAME:?required}", "http://127.0.0.1:8001/api/method/ping"]
       interval: 30s

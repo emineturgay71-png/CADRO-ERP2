@@ -56,11 +56,17 @@ jobs:
           mkdir -p cadro/secrets
           echo "ci-only" > cadro/secrets/db_password
           echo "ci-only" > cadro/secrets/admin_password
+          echo "ci-only" > cadro/secrets/webhook_secret
           SITE_NAME=ci.localhost docker compose -p cadro --project-directory . \
             -f cadro/docker-compose.yml config --quiet
+          SITE_NAME=ci.localhost docker compose -p cadro --project-directory . \
+            -f cadro/docker-compose.yml -f cadro/docker-compose.tls.yml config --quiet
 
-      - name: Entrypoint is valid shell
-        run: bash -n cadro/entrypoint.sh
+      - name: Entrypoint and scripts are valid shell
+        run: |
+          for f in cadro/entrypoint.sh scripts/verify_backup.sh scripts/make_self_signed_cert.sh scripts/backup_site.sh scripts/restore_site.sh; do
+            bash -n "$f"
+          done
 
       - name: Build the bench image
         run: docker build -f cadro/Dockerfile -t cadro-bench:ci .

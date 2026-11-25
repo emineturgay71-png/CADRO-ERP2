@@ -74,7 +74,7 @@ COPY --chown=${FRAPPE_USER}:${FRAPPE_USER} cadro.baseline.json /home/${FRAPPE_US
 # Container healthcheck (cadro/docker-compose.yml runs `python scripts/healthcheck.py`).
 COPY --chown=${FRAPPE_USER}:${FRAPPE_USER} scripts/healthcheck.py /home/${FRAPPE_USER}/scripts/healthcheck.py
 # Backup and restore tooling: docker exec cadro-bench bash scripts/backup_site.sh <site>
-COPY --chown=${FRAPPE_USER}:${FRAPPE_USER} scripts/backup_site.sh scripts/restore_site.sh /home/${FRAPPE_USER}/scripts/
+COPY --chown=${FRAPPE_USER}:${FRAPPE_USER} scripts/backup_site.sh scripts/restore_site.sh scripts/verify_backup.sh /home/${FRAPPE_USER}/scripts/
 # Control plane (tenant registry, payment webhooks, overdue sweep). The `cadro-control-plane`
 # role runs it next to the bench, with its registry in a volume of its own.
 COPY --chown=${FRAPPE_USER}:${FRAPPE_USER} cadro/saas/ /home/${FRAPPE_USER}/control-plane/cadro/saas/

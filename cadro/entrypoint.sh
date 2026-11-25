@@ -106,15 +106,28 @@ launch() {
             ;;
         backup)
             # Scheduled backups into CADRO_BACKUP_DIR (a host bind mount, outside the bench
-            # volume), pruned to the newest CADRO_BACKUP_KEEP backups.
+            # volume), pruned to the newest CADRO_BACKUP_KEEP backups. Each backup is verified
+            # (checksums, gzip integrity, required files) before it counts: only a verified
+            # backup is pruned against, uploaded and recorded in <dir>/.last_verified_backup (a
+            # monitor can alert when that file is older than the interval). The optional
+            # CADRO_BACKUP_UPLOAD_COMMAND (operator-supplied, e.g. an rclone/aws/rsync call) runs
+            # through bash with CADRO_BACKUP_PATH set to the verified backup directory, for the
+            # off-host copy; a failing upload is reported but never deletes anything.
             local dir="${CADRO_BACKUP_DIR:-/backups}" keep="${CADRO_BACKUP_KEEP:-14}"
-            local hours="${CADRO_BACKUP_INTERVAL_HOURS:-24}"
+            local hours="${CADRO_BACKUP_INTERVAL_HOURS:-24}" newest
             mkdir -p "${dir}" || { echo "ERROR: cannot create ${dir}" >&2; exit 1; }
             while true; do
-                if bash /home/frappe/scripts/backup_site.sh "${SITE_NAME}" "${dir}"; then
+                if bash /home/frappe/scripts/backup_site.sh "${SITE_NAME}" "${dir}" \
+                    && newest="$(ls -1dt "${dir}/${SITE_NAME}-"* 2>/dev/null | head -n1)" \
+                    && bash /home/frappe/scripts/verify_backup.sh "${newest}"; then
+                    date -u +"%Y-%m-%dT%H:%M:%SZ ${newest}" > "${dir}/.last_verified_backup"
+                    if [ -n "${CADRO_BACKUP_UPLOAD_COMMAND:-}" ]; then
+                        CADRO_BACKUP_PATH="${newest}" bash -c "${CADRO_BACKUP_UPLOAD_COMMAND}" \
+                            || echo "ERROR: off-host upload of ${newest} failed" >&2
+                    fi
                     ls -1dt "${dir}/${SITE_NAME}-"* 2>/dev/null | tail -n +$((keep + 1)) | xargs -r rm -rf
                 else
-                    echo "ERROR: scheduled backup of ${SITE_NAME} failed" >&2
+                    echo "ERROR: scheduled backup of ${SITE_NAME} failed or did not verify" >&2
                 fi
                 sleep "$((hours * 3600))"
             done

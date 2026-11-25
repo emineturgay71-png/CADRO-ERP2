@@ -1,0 +1,18 @@
+# TLS override: terminate HTTPS in the bundled nginx.
+#
+#   bash scripts/make_self_signed_cert.sh <site-name>      # staging only; production: your CA's
+#                                                          # fullchain.pem + privkey.pem in cadro/certs/
+#   docker compose -p cadro --project-directory . --env-file cadro/.env \
+#       -f cadro/docker-compose.yml -f cadro/docker-compose.tls.yml up -d
+#
+# Publishes 443 (HTTPS) and 80 (redirect to HTTPS) and no longer publishes the plain-HTTP port
+# 8001, which stays reachable inside cadro-net for the health check. Needs Docker Compose >= 2.24
+# (`!override`). Certificate renewal and an OCSP/WAF layer are outside this repository.
+services:
+  nginx:
+    ports: !override
+      - "${CADRO_HTTPS_PORT:-443}:8443"
+      - "${CADRO_HTTP_PORT:-80}:8080"
+    volumes:
+      - ./cadro/nginx/cadro-tls.conf:/etc/nginx/conf.d/cadro-tls.conf:ro
+      - ./cadro/certs:/etc/nginx/certs:ro

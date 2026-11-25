@@ -36,3 +36,4 @@ cadro/.env
 # CADRO Docker secrets (passwords)
 cadro/secrets/
 cadro/backups/
+cadro/certs/
