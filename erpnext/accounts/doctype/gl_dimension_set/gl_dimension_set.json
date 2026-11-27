@@ -1,0 +1,25 @@
+{
+ "actions": [],
+ "doctype": "DocType",
+ "editable_grid": 1,
+ "engine": "InnoDB",
+ "field_order": [
+  "dimension_fingerprint", "values"
+ ],
+ "fields": [
+  {"fieldname":"dimension_fingerprint","fieldtype":"Data","in_list_view":1,"label":"Dimension Fingerprint","reqd":1},
+  {"fieldname":"values","fieldtype":"Table","label":"Values","options":"GL Dimension Set Value"}
+ ],
+ "index_web_pages_for_search":1,
+ "links":[],
+ "modified":"2026-11-27 00:00:00.000000",
+ "module":"Accounts",
+ "name":"GL Dimension Set",
+ "naming_rule":"By fieldname",
+ "permissions":[
+  {"create":1,"delete":1,"email":1,"export":1,"print":1,"read":1,"report":1,"role":"Accounts Manager","share":1,"write":1},
+  {"read":1,"report":1,"role":"Accounts User"}
+ ],
+ "sort_field":"modified","sort_order":"DESC","states":[],
+ "title_field":"dimension_fingerprint","track_changes":1
+}
