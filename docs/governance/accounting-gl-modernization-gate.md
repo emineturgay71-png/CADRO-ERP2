@@ -1,6 +1,6 @@
 # Muhasebe / General Ledger Modernizasyonu
 
-Durum: Faz 1–2 uygulanıyor.
+Durum: Faz 1–3 uygulanıyor.
 
 ## Model
 
@@ -52,6 +52,27 @@ Document Type
 - CADRO Teknoloji A.Ş. dry-run raporu şirket default hesaplarını, 0 party account, 0 item default ve 0 profile olarak verdi.
 - Profile DocType testleri 2/2 geçti.
 - Önceki denemede test ve canlı DocType klasörleri yanlış nested kopyalanınca ImportError bulundu ve düzeltildi.
+
+## Faz 3 — Composer entegrasyonu
+
+Sales Invoice, Purchase Invoice, Payment Entry ve Journal Entry için tek resolver noktası
+`BaseGLComposer.resolve_profile_account` eklendi. Şu anda legacy default yalnızca feature
+bayrağı kapalıyken veya profil dry-run modundayken korunur.
+
+Baglama noktaları:
+
+- Sales Invoice: kalem gelir/deferred revenue hesabı
+- Purchase Invoice: kalem gider hesabı
+- Payment Entry: paid-from / paid-to banka hesabı
+- Journal Entry: satır hesapları henüz elle tanımlı; yalnızca merkezi resolver API ile hazırlık yapıldı
+
+27 Kasım 2026 canlı doğrulama:
+
+- Profil testleri 5/5 geçti.
+- SaaS regression testleri 59/59 geçti.
+- Pilot feature flag kapalı olduğundan Sales/Purchase/Payment/Journal için legacy hesaplar
+  `feature-disabled` nedeniyle geri döndü.
+- Strict mode ve dry-run profile uygulanmadı.
 
 ## Henüz değişmeyenler
 

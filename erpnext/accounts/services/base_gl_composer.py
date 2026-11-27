@@ -283,3 +283,19 @@ class BaseGLComposer:
 			posting_date,
 			dimensions,
 		)
+
+	def resolve_profile_account(
+		self,
+		legacy_account: str | None,
+		context: dict,
+		side: str,
+	) -> tuple[str | None, str]:
+		"""Resolve one posting account through CADRO's optional GL Posting Profile.
+
+		The default is legacy_account with reason="feature-disabled". The legacy posting
+		path remains unchanged until the feature flag and then the strict/dry-run modes allow
+		profile application.
+		"""
+		from erpnext.accounts.services.gl_posting_profile import apply_profile_account
+
+		return apply_profile_account(self.doc.company, legacy_account, context, side)

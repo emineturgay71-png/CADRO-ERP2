@@ -180,10 +180,25 @@ class PaymentEntryGLComposer(BaseGLComposer):
 	def add_bank_gl_entries(self, gl_entries):
 		doc = self.doc
 		if doc.payment_type in ("Pay", "Internal Transfer"):
+			payment_account = doc.paid_from
+			if doc.payment_type == "Pay":
+				payment_account, _reason = self.resolve_profile_account(
+					doc.paid_from,
+					{
+						"document_type": "Payment Entry",
+						"party_type": doc.party_type,
+						"party": doc.party,
+						"transaction_type": "Payment Pay",
+						"currency": doc.transaction_currency,
+						"cost_center": doc.cost_center,
+					},
+					"credit",
+				)
+
 			gl_entries.append(
 				self.get_gl_dict(
 					{
-						"account": doc.paid_from,
+						"account": payment_account,
 						"account_currency": doc.paid_from_account_currency,
 						"against": doc.party if doc.payment_type == "Pay" else doc.paid_to,
 						"credit_in_account_currency": doc.paid_amount,
@@ -198,10 +213,26 @@ class PaymentEntryGLComposer(BaseGLComposer):
 				)
 			)
 		if doc.payment_type in ("Receive", "Internal Transfer"):
+			payment_account = doc.paid_to
+			if doc.payment_type == "Receive":
+				# Use resolved account for Payment Receive
+				payment_account, _reason = self.resolve_profile_account(
+					doc.paid_to,
+					{
+						"document_type": "Payment Entry",
+						"party_type": doc.party_type,
+						"party": doc.party,
+						"transaction_type": "Payment Receive",
+						"currency": doc.transaction_currency,
+						"cost_center": doc.cost_center,
+					},
+					"credit",
+				)
+
 			gl_entries.append(
 				self.get_gl_dict(
 					{
-						"account": doc.paid_to,
+						"account": payment_account,
 						"account_currency": doc.paid_to_account_currency,
 						"against": doc.party if doc.payment_type == "Receive" else doc.paid_from,
 						"debit_in_account_currency": doc.received_amount,
@@ -305,3 +336,6 @@ class PaymentEntryGLComposer(BaseGLComposer):
 					item=d,
 				)
 			)
+
+	def resolve_payment_bank_account(self, legacy_account: str | None) -> str | None:
+		return legacy_account

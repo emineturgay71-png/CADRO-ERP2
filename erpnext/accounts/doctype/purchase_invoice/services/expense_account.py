@@ -156,6 +156,10 @@ class ExpenseAccountService:
 				item.expense_account = account
 			elif not item.expense_account and for_validate:
 				throw(_("Expense account is mandatory for item {0}").format(item.item_code or item.item_name))
+			else:
+				resolved_account = self.resolve_purchase_expense_account(item)
+				if resolved_account:
+					item.expense_account = resolved_account
 
 	def validate_expense_account(self) -> None:
 		for item in self.doc.get("items"):
@@ -174,3 +178,25 @@ class ExpenseAccountService:
 		doc = self.doc
 		self.set_against_expense_account()
 		frappe.db.set_value(doc.doctype, doc.name, "against_expense_account", doc.against_expense_account)
+
+	def resolve_purchase_expense_account(self, item) -> str | None:
+		legacy_account = item.expense_account
+		from erpnext.accounts.services.base_gl_composer import BaseGLComposer
+
+		composer = BaseGLComposer(self.doc)
+		resolved_account, _reason = composer.resolve_profile_account(
+			legacy_account,
+			{
+				"document_type": "Purchase Invoice",
+				"party_type": "Supplier",
+				"party": self.doc.supplier,
+				"item": item.item_code,
+				"item_group": frappe.db.get_value("Item", item.item_code, "item_group") if item.item_code else None,
+				"transaction_type": "Purchase",
+				"tax_category": getattr(self.doc, "tax_category", None),
+				"currency": self.doc.currency,
+				"cost_center": item.cost_center or self.doc.cost_center,
+			},
+			"debit",
+		)
+		return resolved_account

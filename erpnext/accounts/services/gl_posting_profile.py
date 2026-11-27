@@ -147,3 +147,43 @@ def dry_run_posting_profiles(company: str) -> dict:
 		"status": "dry-run",
 		"changes_applied": False,
 	}
+
+
+def apply_profile_account(
+	company: str,
+	legacy_account: str | None,
+	context: Mapping[str, Any],
+	side: str,
+) -> tuple[str | None, str]:
+	"""Return (account, reason) for one posting side.
+
+	By default it is fully non-destructive: legacy_account is returned and no profile is
+	applied. Only when Accounts Settings enables the posting profile does the resolver run.
+	When dry-run is enabled or strict mode is disabled, mismatches are also report-only.
+	"""
+	settings = frappe.get_single("Accounts Settings")
+	if not getattr(settings, "enable_cadro_posting_profile", 0):
+		return legacy_account, "feature-disabled"
+
+	resolution = resolve_posting_profile(company, context)
+	profile_account = (
+		resolution.credit_account if side == "credit" else resolution.debit_account
+	)
+
+	if getattr(settings, "cadro_posting_profile_dry_run", 1):
+		return legacy_account, resolution.reason
+
+	if profile_account:
+		return profile_account, resolution.reason
+
+	strict_profile = False
+	if resolution.profile:
+		strict_profile = bool(
+			frappe.db.get_value("GL Posting Profile", resolution.profile, "strict_mode")
+		)
+	if strict_profile or getattr(settings, "cadro_posting_profile_strict_mode", 0):
+		frappe.throw(
+			f"GL Posting Profile could not resolve a {side} account for {context.get('document_type') or 'document'}"
+		)
+
+	return legacy_account, resolution.reason

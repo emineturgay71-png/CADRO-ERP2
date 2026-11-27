@@ -407,16 +407,34 @@ class SalesInvoiceGLComposer(BaseGLComposer):
 		)
 
 	def get_item_income_account(self, item):
+		legacy_account = None
 		if not item.enable_deferred_revenue:
-			return item.income_account
-		if not self.doc.is_return:
-			return item.deferred_revenue_account
-		if not self.doc.return_against or not item.sales_invoice_item:
-			return item.income_account
+			legacy_account = item.income_account
+		elif not self.doc.is_return:
+			legacy_account = item.deferred_revenue_account
+		elif not self.doc.return_against or not item.sales_invoice_item:
+			legacy_account = item.income_account
+		elif item.name in self.deferred_return_items:
+			legacy_account = item.deferred_revenue_account
+		else:
+			legacy_account = item.income_account
 
-		if item.name in self.deferred_return_items:
-			return item.deferred_revenue_account
-		return item.income_account
+		resolved_account, _reason = self.resolve_profile_account(
+			legacy_account,
+			{
+				"document_type": "Sales Invoice",
+				"party_type": "Customer",
+				"party": self.doc.customer,
+				"item": item.item_code,
+				"item_group": frappe.db.get_value("Item", item.item_code, "item_group"),
+				"transaction_type": "Sales",
+				"tax_category": self.doc.tax_category,
+				"currency": self.doc.currency,
+				"cost_center": item.cost_center or self.doc.cost_center,
+			},
+			"credit",
+		)
+		return resolved_account
 
 	@cached_property
 	def deferred_return_items(self):
