@@ -16,7 +16,7 @@ export interface BankStatementImportLog {
 	/**	File : Attach	*/
 	file: string
 	/**	Status : Select	*/
-	status?: "Not Started" | "Completed"
+	status?: "Not Started" | "In Progress" | "Completed"
 	/**	Currency : Link - Currency	*/
 	currency?: string
 	/**	Number of Transactions : Int	*/

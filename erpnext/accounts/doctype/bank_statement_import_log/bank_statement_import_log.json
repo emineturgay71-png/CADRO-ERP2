@@ -140,7 +140,7 @@
    "fieldname": "status",
    "fieldtype": "Select",
    "label": "Status",
-   "options": "Not Started\nCompleted",
+   "options": "Not Started\nIn Progress\nCompleted",
    "read_only": 1
   },
   {
@@ -191,7 +191,7 @@
  "icon": "file-clock",
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2026-07-09 17:55:25.615942",
+ "modified": "2026-11-26 10:30:00.000000",
  "modified_by": "Administrator",
  "module": "Accounts",
  "name": "Bank Statement Import Log",

@@ -19,6 +19,15 @@ from frappe.utils.xlsxutils import (
 
 from erpnext.accounts.doctype.bank_account.bank_account import _set_closing_balance_as_per_statement
 
+# A statement with more rows than this is imported by a background job: the import costs roughly
+# 20-25 ms per row, so a large file would run into the web request timeout (gunicorn and the
+# reverse proxy both stop a request after 120 s) and be lost. Rows are committed in batches there,
+# so an interrupted import keeps what it did and can simply be started again (rows already
+# imported are skipped as duplicates).
+BACKGROUND_IMPORT_THRESHOLD = 1000
+BACKGROUND_IMPORT_COMMIT_EVERY = 200
+BACKGROUND_IMPORT_TIMEOUT = 3600
+
 
 class BankStatementImportLog(Document):
 	# begin: auto-generated types
@@ -492,7 +501,39 @@ class BankStatementImportLog(Document):
 			frappe.throw(
 				_("This statement has already been imported."), title=_("Already Imported")
 			)
+		if self.status == "In Progress" and not self.import_is_stale():
+			frappe.throw(
+				_("This statement is already being imported."), title=_("Import In Progress")
+			)
 
+		final_transactions = self.get_importable_transactions()
+
+		if len(final_transactions) > BACKGROUND_IMPORT_THRESHOLD:
+			self.status = "In Progress"
+			self.save()
+			frappe.enqueue(
+				run_background_import,
+				queue="long",
+				timeout=BACKGROUND_IMPORT_TIMEOUT,
+				enqueue_after_commit=True,
+				name=self.name,
+			)
+			return
+
+		self.import_transactions(final_transactions)
+
+	def import_is_stale(self) -> bool:
+		"""True when a background import was queued longer ago than its timeout allows.
+
+		Such a job can no longer be running (it died, or never started, e.g. the worker could not
+		reach the database), so the log must not stay "In Progress" forever: the user may start it
+		again, and rows that were already imported are skipped as duplicates.
+		"""
+		age = frappe.utils.time_diff_in_seconds(frappe.utils.now_datetime(), self.modified)
+		return age > BACKGROUND_IMPORT_TIMEOUT + 300
+
+	def get_importable_transactions(self) -> list:
+		"""Check that the bank account can receive the import and return the rows to import."""
 		company, account, is_company_account, disabled = frappe.get_value(
 			"Bank Account", self.bank_account, ["company", "account", "is_company_account", "disabled"]
 		)
@@ -507,10 +548,6 @@ class BankStatementImportLog(Document):
 				_("The bank account is disabled. Please enable it"), title=_("Disabled Bank Account")
 			)
 
-		currency = frappe.get_value("Account", account, "account_currency")
-
-		progress = 0
-
 		if self.is_pdf():
 			final_transactions = self.get_pdf_final_transactions()
 		else:
@@ -518,6 +555,14 @@ class BankStatementImportLog(Document):
 			transaction_rows, _starting_index, _ending_index = self.get_transaction_rows(raw_data)
 			final_transactions = self.get_final_transactions(transaction_rows=transaction_rows)
 
+		return final_transactions
+
+	def import_transactions(self, final_transactions: list, commit_every: int = 0):
+		"""Create the Bank Transactions. With `commit_every` the work is committed in batches."""
+		company, account = frappe.get_value("Bank Account", self.bank_account, ["company", "account"])
+		currency = frappe.get_value("Account", account, "account_currency")
+
+		progress = 0
 		total_transactions = len(final_transactions)
 		skipped_count = 0
 
@@ -557,6 +602,9 @@ class BankStatementImportLog(Document):
 			bank_tx.insert()
 			bank_tx.submit()
 			progress += 1
+
+			if commit_every and progress % commit_every == 0:
+				frappe.db.commit()  # nosemgrep: frappe-manual-commit
 
 			frappe.publish_realtime(
 				"bank-rec-statement-import-progress",
@@ -600,6 +648,45 @@ class BankStatementImportLog(Document):
 		)
 		self.save()
 
+		frappe.publish_realtime(
+			"bank-rec-statement-import-complete",
+			{
+				"start_date": str(self.start_date) if self.start_date else None,
+				"end_date": str(self.end_date) if self.end_date else None,
+				"imported": progress,
+				"skipped": skipped_count,
+			},
+			doctype="Bank Statement Import Log",
+			docname=self.name,
+			after_commit=True,
+		)
+
+
+def run_background_import(name: str):
+	"""Import a large statement in a background job (see BACKGROUND_IMPORT_THRESHOLD).
+
+	On failure the work done since the last batch commit is rolled back, the log goes back to
+	"Not Started" with the reason in a comment, and the user can start the import again: the rows
+	already imported are skipped as duplicates.
+	"""
+	doc = frappe.get_doc("Bank Statement Import Log", name)
+	try:
+		doc.import_transactions(doc.get_importable_transactions(), commit_every=BACKGROUND_IMPORT_COMMIT_EVERY)
+	except Exception as error:
+		frappe.db.rollback()
+		doc.reload()
+		doc.status = "Not Started"
+		doc.add_comment("Info", _("The import stopped with an error and can be started again: {0}").format(str(error)[:300]))
+		doc.save()
+		frappe.publish_realtime(
+			"bank-rec-statement-import-failed",
+			{"error": str(error)[:300]},
+			doctype="Bank Statement Import Log",
+			docname=name,
+			after_commit=True,
+		)
+		frappe.db.commit()  # nosemgrep: frappe-manual-commit
+		raise
 
 def fold_text(text) -> str:
 	"""Lowercase text with accents removed, aware of the Turkish dotted/dotless i.

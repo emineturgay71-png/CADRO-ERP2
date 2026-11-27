@@ -62,6 +62,21 @@ const StatementDetails = ({ data }: Props) => {
 
     const direction = useDirection()
 
+    // Large statements are imported by a background job: the request returns at once with the
+    // log in "In Progress" and the result arrives as a realtime event.
+    const [inBackground, setInBackground] = useState(data.doc.status === 'In Progress')
+
+    const finishImport = (startDate?: string | null, endDate?: string | null) => {
+        if (startDate && endDate) {
+            setDates({
+                fromDate: startDate,
+                toDate: endDate,
+            })
+        }
+        toast.success(_("Bank statement imported."))
+        navigate(`/`)
+    }
+
     const onImport = () => {
 
         call({
@@ -69,19 +84,26 @@ const StatementDetails = ({ data }: Props) => {
             method: 'insert_transactions'
         }).then((response) => {
             const doc = response.docs ? response.docs[0] : undefined
-            if (doc && doc.start_date && doc.end_date) {
-                setDates({
-                    fromDate: doc.start_date,
-                    toDate: doc.end_date,
-                })
+            if (doc?.status === 'In Progress') {
+                setInBackground(true)
+                return
             }
-            toast.success(_("Bank statement imported."))
-            navigate(`/`)
+            finishImport(doc?.start_date, doc?.end_date)
         }).catch(() => {
             toast.error(_("There was an error while importing the bank statement."))
         })
 
     }
+
+    useFrappeEventListener("bank-rec-statement-import-complete", (event) => {
+        setInBackground(false)
+        finishImport(event.start_date, event.end_date)
+    })
+
+    useFrappeEventListener("bank-rec-statement-import-failed", () => {
+        setInBackground(false)
+        toast.error(_("There was an error while importing the bank statement."))
+    })
 
     // `progress` is a percentage (drives the bar); `current`/`total` are actual counts.
     const [progress, setProgress] = useState(0)
@@ -113,9 +135,9 @@ const StatementDetails = ({ data }: Props) => {
                         </Link>
                     </Button>
                     {data.doc.status === 'Completed' ? <Badge theme='green'>{_("Completed")}</Badge> :
-                        <Button onClick={onImport} disabled={loading || data.final_transactions?.length === 0} size='sm' type='button'>
-                            {loading ? <Loader2Icon className='size-4 animate-spin' /> : null}
-                            {loading ? _("Importing...") : data.final_transactions?.length === 1
+                        <Button onClick={onImport} disabled={loading || inBackground || data.final_transactions?.length === 0} size='sm' type='button'>
+                            {loading || inBackground ? <Loader2Icon className='size-4 animate-spin' /> : null}
+                            {loading || inBackground ? _("Importing...") : data.final_transactions?.length === 1
                                 ? _("Import 1 transaction")
                                 : _("Import {0} transactions", [data.final_transactions?.length?.toString() || "0"])}</Button>
                     }
@@ -203,7 +225,7 @@ const StatementDetails = ({ data }: Props) => {
                                     </Tooltip>
                                 </div>
                             </TableHead>
-                            <TableCell>{_(data.doc.detected_amount_format)}</TableCell>
+                            <TableCell>{_(data.doc.detected_amount_format || "")}</TableCell>
                         </TableRow>
                         <TableRow>
                             <TableHead>
@@ -225,7 +247,7 @@ const StatementDetails = ({ data }: Props) => {
                 </Table>
             </div>
 
-            {data.doc.status === "Not Started" ? <>
+            {data.doc.status !== "Completed" ? <>
 
                 <ConflictingTransactions transactions={data.conflicting_transactions} />
 

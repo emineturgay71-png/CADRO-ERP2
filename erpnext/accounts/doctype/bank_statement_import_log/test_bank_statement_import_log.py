@@ -1,6 +1,8 @@
 # Copyright (c) 2026, Frappe Technologies Pvt. Ltd. and Contributors
 # See license.txt
 
+from unittest.mock import patch
+
 import frappe
 from frappe import qb
 from frappe.utils import getdate
@@ -110,6 +112,66 @@ class TestBankStatementImportLog(ERPNextTestSuite, AccountsTestMixin):
 		for data, expected_output in test_data:
 			doc = self._create_bank_statement_import_log(data)
 			self._check_output(doc, expected_output)
+
+	def _create_statement_with_file(self, content: str):
+		file_doc = frappe.get_doc(
+			{"doctype": "File", "file_name": "statement.csv", "content": content.encode("utf-8"), "is_private": 1}
+		).insert()
+		return frappe.get_doc(
+			{"doctype": "Bank Statement Import Log", "bank_account": self.bank_account, "file": file_doc.file_url}
+		).insert()
+
+	def test_small_statement_is_imported_inline(self):
+		from erpnext.accounts.doctype.bank_statement_import_log import bank_statement_import_log as module
+
+		doc = self._create_statement_with_file(
+			"Tarih,Açıklama,Tutar,Referans\n24.11.2026,Müşteri tahsilatı,\"5.000,00\",INL-1\n25.11.2026,Ofis,\"-320,40\",INL-2\n"
+		)
+		with patch("frappe.enqueue") as enqueue:
+			doc.insert_transactions()
+		# (the bank transaction rules are queued separately; only the import job must not be)
+		self.assertFalse(
+			any(call.args and call.args[0] is module.run_background_import for call in enqueue.call_args_list)
+		)
+		self.assertEqual(doc.status, "Completed")
+		self.assertEqual(frappe.db.count("Bank Transaction", {"reference_number": ["like", "INL-%"]}), 2)
+
+	def test_large_statement_is_imported_by_a_background_job(self):
+		from erpnext.accounts.doctype.bank_statement_import_log import bank_statement_import_log as module
+
+		lines = ["Tarih,Açıklama,Tutar,Referans"]
+		for number in range(1, 7):
+			lines.append(f"{number:02d}.11.2026,Tahsilat {number},\"{number * 100},00\",BGJ-{number}")
+		doc = self._create_statement_with_file("\n".join(lines) + "\n")
+
+		with patch.object(module, "BACKGROUND_IMPORT_THRESHOLD", 3), patch("frappe.enqueue") as enqueue:
+			doc.insert_transactions()
+
+		# The request only queues the work; nothing is imported yet and the log says so.
+		enqueue.assert_called_once()
+		self.assertEqual(enqueue.call_args.kwargs["name"], doc.name)
+		self.assertTrue(enqueue.call_args.kwargs["enqueue_after_commit"])
+		self.assertEqual(frappe.db.get_value("Bank Statement Import Log", doc.name, "status"), "In Progress")
+		self.assertEqual(frappe.db.count("Bank Transaction", {"reference_number": ["like", "BGJ-%"]}), 0)
+
+		# A second start while the job is pending is refused.
+		with self.assertRaises(frappe.ValidationError):
+			doc.insert_transactions()
+
+		# ... unless the job is so old that it cannot be running any more (it died or never started).
+		with (
+			patch.object(module, "BACKGROUND_IMPORT_THRESHOLD", 3),
+			patch.object(module, "BACKGROUND_IMPORT_TIMEOUT", -400),
+			patch("frappe.enqueue") as restarted,
+		):
+			doc.insert_transactions()
+		restarted.assert_called_once()
+
+		# The job imports everything and completes the log.
+		with patch.object(module, "BACKGROUND_IMPORT_COMMIT_EVERY", 10_000):
+			module.run_background_import(doc.name)
+		self.assertEqual(frappe.db.get_value("Bank Statement Import Log", doc.name, "status"), "Completed")
+		self.assertEqual(frappe.db.count("Bank Transaction", {"reference_number": ["like", "BGJ-%"]}), 6)
 
 	def test_amount_parser(self):
 		# Parse numeric strings after removing all characters except digits, decimal point, and minus sign

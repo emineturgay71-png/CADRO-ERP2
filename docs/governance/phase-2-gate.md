@@ -154,6 +154,19 @@ Bulunan ve düzeltilen: nginx başlangıçta `bench` adresini bir kez çözüyor
 
 Pilot konteynerleri kaldırıldı (birimler ve veri korundu; pilotun ek yedeği `D:\dev\cadro-backups\20261125-pre-fresh`), ayrı bir Compose projesinde (`-p cadrofresh`, `SITE_NAME=cadro-fresh.localhost`) boş birimlerle `up -d --build` çalıştırıldı. Sonuç: 11 konteynerin tamamı sağlıklı (kontrol düzlemi profili dahil), `ready` işaretçisi yazıldı; `frappe`/`erpnext`/`payments` HEAD'leri `cadro.baseline.json` pin'leriyle birebir; site uygulamaları frappe + erpnext + payments; site veritabanı kullanıcısı `%` ana makinesine sahip; `innodb_snapshot_isolation=0` (cnf uygulanıyor); `tr.po` imajdan bindirilmiş, sistem dili `tr`, ülke `Türkiye`; yönetici girişi ve API okuması 200; `worker`, `scheduler`, `socketio` günlüklerinde hata yok; ilk zamanlanmış yedek alındı ve `verify_backup.sh` ile doğrulandı. Test projesi birimleriyle silindi, pilot yeniden başlatıldı (şirketler ve giriş doğrulandı). Not: bu doğrulama imaj önbelleğiyle yapıldı (Dockerfile katmanları yeniden derlenmedi); sıfırdan `--no-cache` derlemesi ve gerçek GitHub CI çalıştırması ayrıca yapılmadı.
 
+### Banka ekstresi import yükü (26 Kasım 2026)
+
+`scripts/bank_import_load.py` Türkçe biçimli (BORÇ/ALACAK, `1.234,56`, `gg.aa.yyyy`) bir CSV ekstre üretir, dosyayı ekleyip gerçek yolu çalıştırır (`Bank Statement Import Log` ekleme + `insert_transactions`), aynı dosyayı tekrar ve yarı örtüşen bir dosyayı içe aktarır, sonucu dosya toplamlarıyla karşılaştırır (site adı `load` içermelidir).
+
+**Bulunan ve düzeltilen hata:** import web isteği içinde eşzamansal çalışıyor, satır başına ~20–25 ms (40–55 satır/sn) tutuyordu. gunicorn ve nginx isteği 120 sn'de kestiğinden ~5.000 satırdan büyük bir ekstre hiç içe aktarılamazdı (kullanıcıya hata, işlem yarım). Düzeltme (`bank_statement_import_log.py`): 1000 satırı aşan ekstre `long` kuyruğunda arka plan işiyle içe aktarılır; kayıt `In Progress` olur (yeni `status` seçeneği), iş 200 satırda bir commit eder (kesilirse yapılan korunur, yeniden başlatınca içe aktarılmış satırlar yinelenen sayılıp atlanır), sonuç `bank-rec-statement-import-complete` / `-failed` gerçek zamanlı olaylarıyla bildirilir, bankacılık arayüzü (`StatementDetails.tsx`) bu olayları bekler. Bir iş ölmüş ya da hiç başlamamışsa (canlı denemede worker site veritabanına erişemedi) kayıt zaman aşımı + 5 dk sonra bayat sayılır ve yeniden başlatılabilir. Küçük ekstreler eskisi gibi isteğin içinde içe aktarılır.
+
+| Ekstre | İlk içe aktarma | Aynı dosya tekrar | Yarı örtüşen dosya |
+| --- | --- | --- | --- |
+| 3.000 satır (arka plan) | 54 sn (56 satır/sn) | 3000 satır yinelenen atlandı, 0 yeni | 1500 yeni / 1500 atlandı |
+| 12.000 satır (arka plan) | 260 sn (46 satır/sn) | 12000 atlandı, 0 yeni (70 sn) | 6000 yeni / 6000 atlandı |
+
+Her koşuda: tutarlar dosyayla eşleşti, tekrar içe aktarma hiçbir şey eklemedi, örtüşen dosya yalnızca yeni yarıyı ekledi, tüm kayıtlar `Completed`. 12.000 satırlık içe aktarma eski 120 sn istek sınırının 2 katından uzun sürdü. Birim testleri 31/31 (arka plana alma, iki kez başlatmanın reddi, bayat işin yeniden başlatılması, küçük ekstrenin satır içi içe aktarılması). Satır başına mükerrer kontrol (`Bank Transaction` varlık sorgusu) tekrar içe aktarmayı hızlı (~170–830 satır/sn) ama yeni satır ekleme (belge ekleme + onaylama) yavaş tutar; daha hızlı olması toplu ekleme gerektirir (yapılmadı). Arayüz yolu (olayların tarayıcıya ulaşması) tarayıcıda denenmedi, yalnızca tip denetimi yapıldı.
+
 ### Rapor ve yazma yükü (25 Kasım 2026)
 
 `load_smoke.py --scenario reports|write`, aynı hacimli sitede (1500 → ~2100 fatura), nginx üzerinden, her düzeyde 8–10 sn:
@@ -183,7 +196,7 @@ Sınırlar: yazma verimi ~9 fatura/sn'de doyar (numara serisi satırı işlemler
 | --- | --- |
 | Vault / secret manager | Docker secret dosyaları yerine merkezi sır yönetimi |
 | Sürüm numaralandırma ve kayıt defteri | Etiket değişkeni hazır; hangi sürüm şemasının ve deponun kullanılacağı kararı |
-| Gerçek veriyle yük ve kapasite testi | Hacimli okuma, rapor, eşzamanlı yazma ve stoklu yazma ölçüldü (yukarıda); import, çok kiracılı yük ve üretim donanımı kaldı |
+| Gerçek veriyle yük ve kapasite testi | Hacimli okuma, rapor, eşzamanlı yazma, stoklu yazma ve banka ekstresi import ölçüldü (yukarıda); çok kiracılı yük ve üretim donanımı kaldı |
 | TLS, WAF/CDN, izleme | Dış ters vekil, sertifikalar, alarm |
 | Yedeklerin makine dışına kopyalanması | Nesne depolama veya ikinci disk; geri yükleme tatbikatının periyodik tekrarı |
 | Kalan zafiyetlerin risk kabulü | Düzeltmesi olmayan OS paketleri |
