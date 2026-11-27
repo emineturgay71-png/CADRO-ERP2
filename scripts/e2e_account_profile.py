@@ -208,13 +208,10 @@ def test_mandatory_dimension_gate(company: str):
 
     try:
         entry = frappe._dict(account="Sales - _TC", company=company, cost_center=None)
-        with frappe.ValidationError:
-            validate_account_structure(entry)
-        print("  OK  Mandatory dimension gate blocks missing cost center")
+        validate_account_structure(entry)
+        print("  FAIL  Mandatory dimension gate should have blocked missing cost center")
     except frappe.ValidationError:
         print("  OK  Mandatory dimension gate blocks missing cost center")
-    except SystemExit:
-        print("  FAIL  Mandatory dimension gate should have blocked missing cost center")
 
 
 # ────────────────────────────────────────────────────────────
