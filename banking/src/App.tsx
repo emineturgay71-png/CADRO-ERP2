@@ -20,8 +20,6 @@ const FinancialStatements = lazy(() => import('@/pages/Accounting/FinancialState
 
 function App() {
 	useEffect(() => {
-		// Check if user is logged in by checking the Cookie "user_id"
-		// In Frappe, unauthenticated users are "Guest"
 		const userId = document.cookie?.split('; ').find(row => row.startsWith('user_id='))?.split('=')[1]?.trim()
 		const isLoggedIn = userId !== 'Guest'
 
@@ -29,41 +27,38 @@ function App() {
 			if (import.meta.env.DEV) {
 				return
 			}
-			// Redirect to Frappe login page
 			window.location.href = '/login?redirect-to=/banking'
 			return
 		}
 	}, [])
 
 	return (
-		<LucideProvider
-			strokeWidth={1.5}
-		>
+		<LucideProvider strokeWidth={1.5}>
 			<TooltipProvider>
 				<FrappeProvider
-					swrConfig={{
-						errorRetryCount: 2
-					}}
-					// The SDK assumes a development setup (socket.io on :9000) whenever the page is served
-					// from a non-default port. Behind the reverse proxy socket.io shares the page's port.
+					swrConfig={{ errorRetryCount: 2 }}
 					socketPort={import.meta.env.VITE_SOCKET_PORT || window.location.port}
 					siteName={window.frappe?.boot?.sitename ?? import.meta.env.VITE_SITE_NAME}>
-					<ThemeProvider
-						defaultTheme={window.frappe?.boot?.desk_theme ?? "Automatic"}
-					>
+					<ThemeProvider defaultTheme={window.frappe?.boot?.desk_theme ?? 'Automatic'}>
 						{window.frappe?.boot?.user?.name && window.frappe?.boot?.user?.name !== 'Guest' &&
 							<BrowserRouter basename={import.meta.env.VITE_BASE_NAME ? `/${import.meta.env.VITE_BASE_NAME}` : ''}>
 								<Routes>
+									{/* Banking: reconciliation, statement import */}
 									<Route index element={<BankReconciliation />} />
-									<Route path="/accounts" element={<ChartOfAccounts />} />
-									<Route path="/posting-profiles" element={<GLPostingProfiles />} />
-									<Route path="/general-ledger" element={<GeneralLedger />} />
-									<Route path="/trial-balance" element={<TrialBalance />} />
-									<Route path="/financial-statements" element={<FinancialStatements />} />
 									<Route path="/statement-importer" element={<BankStatementImporterContainer />}>
 										<Route index element={<BankStatementImporter />} />
 										<Route path=":id" element={<ViewBankStatementImportLog />} />
 									</Route>
+
+									{/* Accounting: GL, chart of accounts, posting profiles, reports */}
+									<Route path="/accounting">
+										<Route path="accounts" element={<ChartOfAccounts />} />
+										<Route path="posting-profiles" element={<GLPostingProfiles />} />
+										<Route path="general-ledger" element={<GeneralLedger />} />
+										<Route path="trial-balance" element={<TrialBalance />} />
+										<Route path="financial-statements" element={<FinancialStatements />} />
+									</Route>
+
 									<Route path="*" element={<Navigate to="/" />} />
 								</Routes>
 							</BrowserRouter>
