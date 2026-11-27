@@ -1,0 +1,35 @@
+{
+ "actions": [],
+ "allow_rename": 1,
+ "autoname": "field:profile_name",
+ "doctype": "DocType",
+ "engine": "InnoDB",
+ "field_order": [
+  "profile_name", "company", "disabled", "column_break_1",
+  "strict_mode", "default_debit_account", "default_credit_account",
+  "section_rules", "rules"
+ ],
+ "fields": [
+  {"fieldname":"profile_name","fieldtype":"Data","in_list_view":1,"label":"Profile Name","reqd":1},
+  {"fieldname":"company","fieldtype":"Link","in_list_view":1,"label":"Company","options":"Company","reqd":1},
+  {"fieldname":"disabled","fieldtype":"Check","default":"0","label":"Disabled"},
+  {"fieldname":"column_break_1","fieldtype":"Column Break"},
+  {"fieldname":"strict_mode","fieldtype":"Check","default":"0","label":"Strict Mode"},
+  {"fieldname":"default_debit_account","fieldtype":"Link","label":"Default Debit Account","options":"Account"},
+  {"fieldname":"default_credit_account","fieldtype":"Link","label":"Default Credit Account","options":"Account"},
+  {"fieldname":"section_rules","fieldtype":"Section Break","label":"Posting Rules"},
+  {"fieldname":"rules","fieldtype":"Table","label":"Rules","options":"GL Posting Profile Rule"}
+ ],
+ "index_web_pages_for_search":1,
+ "links":[],
+ "modified":"2026-11-27 00:00:00.000000",
+ "module":"Accounts",
+ "name":"GL Posting Profile",
+ "naming_rule":"By fieldname",
+ "permissions":[
+  {"create":1,"delete":1,"email":1,"export":1,"print":1,"read":1,"report":1,"role":"Accounts Manager","share":1,"write":1},
+  {"read":1,"report":1,"role":"Accounts User"}
+ ],
+ "sort_field":"modified","sort_order":"DESC","states":[],
+ "title_field":"profile_name","track_changes":1
+}

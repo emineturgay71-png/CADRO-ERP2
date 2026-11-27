@@ -28,6 +28,9 @@
   "analytics_section",
   "enable_discounts_and_margin",
   "enable_accounting_dimensions",
+  "enable_cadro_posting_profile",
+  "cadro_posting_profile_strict_mode",
+  "cadro_posting_profile_dry_run",
   "column_break_vtnr",
   "journals_section",
   "merge_similar_account_heads",
@@ -799,6 +802,29 @@
    "fieldname": "disable_include_dimensions",
    "fieldtype": "Check",
    "label": "Disable \"Consider Accounting Dimension\" Filter"
+  },
+  {
+   "fieldname": "enable_cadro_posting_profile",
+   "fieldtype": "Check",
+   "default": "0",
+   "description": "Enable the centralized CADRO GL Posting Profile resolver. Until strict mode is enabled, legacy posting behavior is retained.",
+   "label": "Enable CADRO GL Posting Profile"
+  },
+  {
+   "fieldname": "cadro_posting_profile_strict_mode",
+   "fieldtype": "Check",
+   "default": "0",
+   "depends_on": "eval:doc.enable_cadro_posting_profile",
+   "description": "Stop posting if no active posting rule or default account is resolved.",
+   "label": "CADRO Posting Profile Strict Mode"
+  },
+  {
+   "fieldname": "cadro_posting_profile_dry_run",
+   "fieldtype": "Check",
+   "default": "1",
+   "depends_on": "eval:doc.enable_cadro_posting_profile",
+   "description": "Resolve posting profiles for reporting and migration comparison without changing document account selection.",
+   "label": "CADRO Posting Profile Dry Run"
   }
  ],
  "grid_page_length": 50,

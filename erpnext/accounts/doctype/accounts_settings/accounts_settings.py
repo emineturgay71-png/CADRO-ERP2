@@ -75,6 +75,7 @@ class AccountsSettings(Document):
 		disable_include_dimensions: DF.Check
 		enable_accounting_dimensions: DF.Check
 		enable_common_party_accounting: DF.Check
+		enable_cadro_posting_profile: DF.Check
 		enable_discounts_and_margin: DF.Check
 		enable_fuzzy_matching: DF.Check
 		enable_immutable_ledger: DF.Check
@@ -115,6 +116,8 @@ class AccountsSettings(Document):
 		unlink_payment_on_cancellation_of_invoice: DF.Check
 		use_legacy_budget_controller: DF.Check
 		use_legacy_controller_for_pcv: DF.Check
+		cadro_posting_profile_strict_mode: DF.Check
+		cadro_posting_profile_dry_run: DF.Check
 	# end: auto-generated types
 
 	def validate(self):
