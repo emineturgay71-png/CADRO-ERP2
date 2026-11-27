@@ -11,6 +11,13 @@ import { ThemeProvider } from './components/ui/theme-provider'
 const BankStatementImporter = lazy(() => import('@/pages/BankStatementImporter'))
 const ViewBankStatementImportLog = lazy(() => import('@/pages/ViewBankStatementImportLog'))
 
+// Accounting workspace: core financial pages (Faz 6)
+const ChartOfAccounts = lazy(() => import('@/pages/Accounting/ChartOfAccounts'))
+const GLPostingProfiles = lazy(() => import('@/pages/Accounting/PostingProfiles'))
+const GeneralLedger = lazy(() => import('@/pages/Accounting/GeneralLedger'))
+const TrialBalance = lazy(() => import('@/pages/Accounting/TrialBalance'))
+const FinancialStatements = lazy(() => import('@/pages/Accounting/FinancialStatements'))
+
 function App() {
 	useEffect(() => {
 		// Check if user is logged in by checking the Cookie "user_id"
@@ -48,6 +55,11 @@ function App() {
 							<BrowserRouter basename={import.meta.env.VITE_BASE_NAME ? `/${import.meta.env.VITE_BASE_NAME}` : ''}>
 								<Routes>
 									<Route index element={<BankReconciliation />} />
+									<Route path="/accounts" element={<ChartOfAccounts />} />
+									<Route path="/posting-profiles" element={<GLPostingProfiles />} />
+									<Route path="/general-ledger" element={<GeneralLedger />} />
+									<Route path="/trial-balance" element={<TrialBalance />} />
+									<Route path="/financial-statements" element={<FinancialStatements />} />
 									<Route path="/statement-importer" element={<BankStatementImporterContainer />}>
 										<Route index element={<BankStatementImporter />} />
 										<Route path=":id" element={<ViewBankStatementImportLog />} />
