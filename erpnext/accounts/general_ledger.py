@@ -402,6 +402,9 @@ def save_entries(gl_map, adv_adj, update_outstanding, from_repost=False):
 
 	for entry in gl_map:
 		validate_allowed_dimensions(entry, dimension_filter_map)
+		from erpnext.accounts.services.gl_structure_validator import validate_account_structure
+
+		validate_account_structure(entry)
 		make_entry(entry, adv_adj, update_outstanding, from_repost)
 
 
